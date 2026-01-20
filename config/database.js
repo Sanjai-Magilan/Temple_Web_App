@@ -2,7 +2,7 @@
  * Database Configuration
  * MySQL connection setup for Hostinger
  */
-
+const logger = require('../utils/logger');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
@@ -27,9 +27,9 @@ pool.getConnection()
   })
   .catch(err => {
     logger.error('Database connection failed', {
-  message: err.message,
-  stack: err.stack,
-});
+    message: err.message,
+    stack: err.stack,
+  });
   });
 
 module.exports = pool;

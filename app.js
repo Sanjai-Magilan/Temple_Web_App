@@ -5,9 +5,10 @@ const morgan = require('morgan');
 const compression = require('compression');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const logger = require('./utils/logger');
 
 // Load environment variables
-dotenv.config();
+ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -81,7 +82,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 

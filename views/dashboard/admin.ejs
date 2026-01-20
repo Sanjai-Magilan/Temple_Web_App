@@ -1,0 +1,161 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="bi bi-shield-check"></i> Admin Dashboard
+            </h2>
+        </div>
+    </div>
+
+    <!-- Admin Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <i class="bi bi-people-fill text-primary fs-1"></i>
+                    <h5 class="card-title mt-2"><%= typeof totalUsers !== 'undefined' ? totalUsers : 0 %></h5>
+                    <p class="card-text text-muted small">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <i class="bi bi-heart-fill text-danger fs-1"></i>
+                    <h5 class="card-title mt-2"><%= typeof totalDonations !== 'undefined' ? totalDonations : 0 %></h5>
+                    <p class="card-text text-muted small">Total Donations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check-fill text-info fs-1"></i>
+                    <h5 class="card-title mt-2"><%= typeof totalBookings !== 'undefined' ? totalBookings : 0 %></h5>
+                    <p class="card-text text-muted small">Total Bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <i class="bi bi-wallet2-fill text-warning fs-1"></i>
+                    <h5 class="card-title mt-2">₹<%= typeof totalRevenue !== 'undefined' ? totalRevenue.toLocaleString() : '0' %></h5>
+                    <p class="card-text text-muted small">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/users" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-people"></i><br>
+                                <small>Manage Users</small>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/donations" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-heart"></i><br>
+                                <small>View Donations</small>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/bookings" class="btn btn-outline-success w-100">
+                                <i class="bi bi-calendar"></i><br>
+                                <small>Manage Bookings</small>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/payments" class="btn btn-outline-info w-100">
+                                <i class="bi bi-credit-card"></i><br>
+                                <small>Payment History</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12 col-lg-6 mb-3 mb-lg-0">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Payments</h5>
+                </div>
+                <div class="card-body">
+                    <% if (typeof recentPayments !== 'undefined' && recentPayments.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentPayments.forEach(payment => { %>
+                                        <tr>
+                                            <td><%= payment.payment_type %></td>
+                                            <td>₹<%= payment.amount.toLocaleString() %></td>
+                                            <td><span class="badge bg-<%= payment.status === 'completed' ? 'success' : 'warning' %>"><%= payment.status %></span></td>
+                                            <td><small><%= new Date(payment.created_at).toLocaleDateString() %></small></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted text-center mb-0">No recent payments</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Pending Approvals</h5>
+                </div>
+                <div class="card-body">
+                    <% if (typeof pendingBookings !== 'undefined' && pendingBookings.length > 0) { %>
+                        <div class="list-group list-group-flush">
+                            <% pendingBookings.forEach(booking => { %>
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><%= booking.booking_number || booking.pooja_name || booking.hall_name %></h6>
+                                            <small class="text-muted"><%= new Date(booking.booking_date).toLocaleDateString() %></small>
+                                        </div>
+                                        <span class="badge bg-warning">Pending</span>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted text-center mb-0">No pending approvals</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+
+

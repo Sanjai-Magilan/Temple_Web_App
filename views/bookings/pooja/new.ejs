@@ -1,0 +1,137 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="bi bi-star"></i> Book a Pooja</h4>
+                </div>
+                <div class="card-body p-4">
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form id="poojaBookingForm">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="pooja_name" class="form-label">Pooja Name *</label>
+                                <input type="text" class="form-control" id="pooja_name" name="pooja_name" 
+                                       placeholder="e.g., Ganapathi Pooja, Lakshmi Pooja" required>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="pooja_type" class="form-label">Pooja Type</label>
+                                <select class="form-select" id="pooja_type" name="pooja_type">
+                                    <option value="">Select type</option>
+                                    <option value="daily">Daily Pooja</option>
+                                    <option value="special">Special Pooja</option>
+                                    <option value="festival">Festival Pooja</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="booking_date" class="form-label">Booking Date *</label>
+                                <input type="date" class="form-control" id="booking_date" name="booking_date" 
+                                       min="<%= new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="booking_time" class="form-label">Booking Time *</label>
+                                <input type="time" class="form-control" id="booking_time" name="booking_time" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="devotee_name" class="form-label">Devotee Name *</label>
+                            <input type="text" class="form-control" id="devotee_name" name="devotee_name" 
+                                   placeholder="Name of person for whom pooja is performed" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="gotra" class="form-label">Gotra (Optional)</label>
+                                <input type="text" class="form-control" id="gotra" name="gotra" 
+                                       placeholder="e.g., Bharadwaja">
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="nakshatra" class="form-label">Nakshatra (Optional)</label>
+                                <input type="text" class="form-control" id="nakshatra" name="nakshatra" 
+                                       placeholder="e.g., Rohini">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="special_instructions" class="form-label">Special Instructions (Optional)</label>
+                            <textarea class="form-control" id="special_instructions" name="special_instructions" 
+                                      rows="3" placeholder="Any special requirements or instructions..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Pooja Amount (₹) *</label>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   min="1" step="0.01" required>
+                            <small class="form-text text-muted">Please confirm the amount with temple administration</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                                <i class="bi bi-credit-card"></i> Proceed to Payment
+                            </button>
+                            <a href="/bookings/pooja" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('poojaBookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+    
+    const formData = {
+        pooja_name: document.getElementById('pooja_name').value,
+        pooja_type: document.getElementById('pooja_type').value,
+        booking_date: document.getElementById('booking_date').value,
+        booking_time: document.getElementById('booking_time').value,
+        devotee_name: document.getElementById('devotee_name').value,
+        gotra: document.getElementById('gotra').value,
+        nakshatra: document.getElementById('nakshatra').value,
+        special_instructions: document.getElementById('special_instructions').value,
+        amount: document.getElementById('amount').value
+    };
+    
+    try {
+        await initiatePayment('pooja-booking', formData, {
+            onSuccess: (result) => {
+                window.location.href = '/payment/success?payment_id=' + result.payment_id;
+            },
+            onFailure: (error) => {
+                alert('Payment failed: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    } catch (error) {
+        alert('Error: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+
+<%- include('../../partials/footer') %>
+
+
+

@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: null }) %>
+
+<div class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-center mb-4">Login</h2>
+                        
+                        <% if (error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                        <% } %>
+
+                        <form action="/login" method="POST">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="<%= formData.email || '' %>" required autocomplete="email" autofocus>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       required autocomplete="current-password">
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account? <a href="/register">Register here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<%- include('../partials/footer') %>
+

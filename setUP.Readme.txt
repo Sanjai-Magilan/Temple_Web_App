@@ -1,3 +1,0 @@
-config/ - is mysql connection 
-public/ - for css files
-views/  - for html ejs files

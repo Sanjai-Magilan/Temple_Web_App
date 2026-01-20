@@ -1,0 +1,196 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-people"></i> Family Members</h2>
+                <% if (isHead && family) { %>
+                    <a href="/family/member/add" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Add Member
+                    </a>
+                <% } %>
+            </div>
+
+            <% if (typeof message !== 'undefined' && message) { %>
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> <%= message %>
+                </div>
+            <% } %>
+
+            <% 
+                const urlParams = new URLSearchParams(typeof req !== 'undefined' && req.query ? req.query : {});
+                const success = urlParams.get('success');
+                const error = urlParams.get('error');
+            %>
+
+            <% if (family) { %>
+                <!-- Family Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-house-heart"></i> <%= family.family_name %></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Address:</strong> <%= family.address || 'Not provided' %></p>
+                                <p class="mb-1"><strong>City:</strong> <%= family.city || 'Not provided' %></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>State:</strong> <%= family.state || 'Not provided' %></p>
+                                <p class="mb-1"><strong>Pincode:</strong> <%= family.pincode || 'Not provided' %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Family Members Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Members (<%= members.length %>)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <% if (members.length > 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Relationship</th>
+                                            <th>Mobile</th>
+                                            <th>Email</th>
+                                            <th>Age</th>
+                                            <th>Occupation</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% members.forEach(member => { %>
+                                            <tr>
+                                                <td>
+                                                    <strong><%= member.member_name %></strong>
+                                                    <% if (member.relationship === 'head') { %>
+                                                        <span class="badge bg-primary ms-1">Head</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<%= 
+                                                        member.relationship === 'head' ? 'primary' : 
+                                                        member.relationship === 'spouse' ? 'success' : 
+                                                        member.relationship === 'child' ? 'info' : 
+                                                        member.relationship === 'parent' ? 'warning' : 'secondary' 
+                                                    %>">
+                                                        <%= member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) %>
+                                                    </span>
+                                                </td>
+                                                <td><%= member.mobile || '-' %></td>
+                                                <td><%= member.email || '-' %></td>
+                                                <td><%= member.age || '-' %></td>
+                                                <td><%= member.occupation || '-' %></td>
+                                                <td class="text-center">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="/family/member/<%= member.id %>" class="btn btn-outline-info" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                        <% if (isHead) { %>
+                                                            <a href="/family/member/<%= member.id %>/edit" class="btn btn-outline-primary" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <% if (member.relationship !== 'head') { %>
+                                                                <button type="button" class="btn btn-outline-danger" title="Delete" 
+                                                                        onclick="deleteMember(<%= member.id %>, '<%= member.member_name %>')">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            <% } %>
+                                                        <% } %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">No family members added yet.</p>
+                                <% if (isHead) { %>
+                                    <a href="/family/member/add" class="btn btn-primary">
+                                        <i class="bi bi-person-plus"></i> Add First Member
+                                    </a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-house-x text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">No Family Found</h5>
+                        <p class="text-muted">You haven't created a family yet. Family details can be added during registration.</p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove <strong id="deleteMemberName"></strong> from the family?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let memberIdToDelete = null;
+
+function deleteMember(id, name) {
+    memberIdToDelete = id;
+    document.getElementById('deleteMemberName').textContent = name;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+    if (!memberIdToDelete) return;
+    
+    try {
+        const response = await fetch('/family/member/' + memberIdToDelete, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Failed to delete member. Please try again.');
+    }
+    
+    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+});
+</script>
+
+<%- include('../partials/footer') %>
+

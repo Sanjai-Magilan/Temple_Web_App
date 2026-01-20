@@ -1,0 +1,138 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Family Member</h4>
+                </div>
+                <div class="card-body p-4">
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form action="/family/member/<%= member.id %>/edit" method="POST" id="editMemberForm">
+                        <div class="row">
+                            <div class="col-12 col-md-8 mb-3">
+                                <label for="member_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="member_name" name="member_name" 
+                                       value="<%= member.member_name %>" required placeholder="Enter full name">
+                            </div>
+                            <div class="col-12 col-md-4 mb-3">
+                                <label for="relationship" class="form-label">Relationship *</label>
+                                <select class="form-select" id="relationship" name="relationship" required 
+                                        <%= member.relationship === 'head' ? 'disabled' : '' %>>
+                                    <option value="">Select relationship</option>
+                                    <option value="head" <%= member.relationship === 'head' ? 'selected' : '' %>>Head</option>
+                                    <option value="spouse" <%= member.relationship === 'spouse' ? 'selected' : '' %>>Spouse</option>
+                                    <option value="child" <%= member.relationship === 'child' ? 'selected' : '' %>>Child</option>
+                                    <option value="parent" <%= member.relationship === 'parent' ? 'selected' : '' %>>Parent</option>
+                                    <option value="sibling" <%= member.relationship === 'sibling' ? 'selected' : '' %>>Sibling</option>
+                                    <option value="grandparent" <%= member.relationship === 'grandparent' ? 'selected' : '' %>>Grandparent</option>
+                                    <option value="grandchild" <%= member.relationship === 'grandchild' ? 'selected' : '' %>>Grandchild</option>
+                                    <option value="other" <%= member.relationship === 'other' ? 'selected' : '' %>>Other</option>
+                                </select>
+                                <% if (member.relationship === 'head') { %>
+                                    <input type="hidden" name="relationship" value="head">
+                                    <small class="form-text text-muted">Family head relationship cannot be changed</small>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="<%= member.email || '' %>" placeholder="email@example.com">
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="mobile" class="form-label">Mobile Number</label>
+                                <input type="tel" class="form-control" id="mobile" name="mobile" 
+                                       value="<%= member.mobile || '' %>" 
+                                       pattern="[6-9]\d{9}" maxlength="10" placeholder="10-digit mobile number">
+                                <small class="form-text text-muted">10-digit Indian mobile number</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2" 
+                                      placeholder="Enter address"><%= member.address || '' %></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="occupation" class="form-label">Occupation</label>
+                                <input type="text" class="form-control" id="occupation" name="occupation" 
+                                       value="<%= member.occupation || '' %>" 
+                                       placeholder="e.g., Student, Engineer, Homemaker">
+                            </div>
+                            <div class="col-12 col-md-3 mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" 
+                                       value="<%= member.age || '' %>" 
+                                       min="0" max="150" placeholder="Age">
+                            </div>
+                            <div class="col-12 col-md-3 mb-3">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <% 
+                                    let dobValue = '';
+                                    if (member.date_of_birth) {
+                                        const dob = new Date(member.date_of_birth);
+                                        dobValue = dob.toISOString().split('T')[0];
+                                    }
+                                %>
+                                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                       value="<%= dobValue %>">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            <div>
+                                <small class="text-muted">
+                                    Added: <%= new Date(member.added_at).toLocaleDateString() %>
+                                    <% if (member.updated_at) { %>
+                                        | Updated: <%= new Date(member.updated_at).toLocaleDateString() %>
+                                    <% } %>
+                                </small>
+                            </div>
+                            <div>
+                                <a href="/family" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-x-lg"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-calculate age from date of birth
+document.getElementById('date_of_birth').addEventListener('change', function() {
+    const dob = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    if (age >= 0 && age <= 150) {
+        document.getElementById('age').value = age;
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>
+

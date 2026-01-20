@@ -1,0 +1,125 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-person"></i> Member Details</h4>
+                    <% if (isHead) { %>
+                        <a href="/family/member/<%= member.id %>/edit" class="btn btn-light btn-sm">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    <% } %>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Member Name and Relationship -->
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-person-fill text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h3 class="mt-3 mb-1"><%= member.member_name %></h3>
+                        <span class="badge bg-<%= 
+                            member.relationship === 'head' ? 'primary' : 
+                            member.relationship === 'spouse' ? 'success' : 
+                            member.relationship === 'child' ? 'info' : 
+                            member.relationship === 'parent' ? 'warning' : 'secondary' 
+                        %> fs-6">
+                            <%= member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) %>
+                        </span>
+                    </div>
+
+                    <hr>
+
+                    <!-- Contact Information -->
+                    <h5 class="mb-3"><i class="bi bi-telephone"></i> Contact Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Email</label>
+                            <p class="mb-0">
+                                <% if (member.email) { %>
+                                    <a href="mailto:<%= member.email %>"><%= member.email %></a>
+                                <% } else { %>
+                                    <span class="text-muted">Not provided</span>
+                                <% } %>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Mobile</label>
+                            <p class="mb-0">
+                                <% if (member.mobile) { %>
+                                    <a href="tel:<%= member.mobile %>"><%= member.mobile %></a>
+                                <% } else { %>
+                                    <span class="text-muted">Not provided</span>
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small">Address</label>
+                        <p class="mb-0"><%= member.address || 'Not provided' %></p>
+                    </div>
+
+                    <hr>
+
+                    <!-- Personal Information -->
+                    <h5 class="mb-3"><i class="bi bi-info-circle"></i> Personal Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Age</label>
+                            <p class="mb-0"><%= member.age ? member.age + ' years' : 'Not provided' %></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Date of Birth</label>
+                            <p class="mb-0">
+                                <% if (member.date_of_birth) { %>
+                                    <%= new Date(member.date_of_birth).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                                <% } else { %>
+                                    <span class="text-muted">Not provided</span>
+                                <% } %>
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted small">Occupation</label>
+                            <p class="mb-0"><%= member.occupation || 'Not provided' %></p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Family Information -->
+                    <h5 class="mb-3"><i class="bi bi-house-heart"></i> Family Information</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Family Name</label>
+                            <p class="mb-0"><%= family.family_name %></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Member Since</label>
+                            <p class="mb-0"><%= new Date(member.added_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/family" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Family
+                        </a>
+                        <% if (isHead) { %>
+                            <a href="/family/member/<%= member.id %>/edit" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Edit Member
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+

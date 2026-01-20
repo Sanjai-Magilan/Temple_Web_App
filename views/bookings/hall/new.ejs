@@ -1,0 +1,135 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> Book a Hall</h4>
+                </div>
+                <div class="card-body p-4">
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+
+                    <form id="hallBookingForm">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="hall_name" class="form-label">Hall Name *</label>
+                                <select class="form-select" id="hall_name" name="hall_name" required>
+                                    <option value="">Select hall</option>
+                                    <option value="Main Hall">Main Hall</option>
+                                    <option value="Community Hall">Community Hall</option>
+                                    <option value="Small Hall">Small Hall</option>
+                                    <option value="Outdoor Area">Outdoor Area</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="booking_date" class="form-label">Booking Date *</label>
+                                <input type="date" class="form-control" id="booking_date" name="booking_date" 
+                                       min="<%= new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="start_time" class="form-label">Start Time *</label>
+                                <input type="time" class="form-control" id="start_time" name="start_time" required>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="end_time" class="form-label">End Time *</label>
+                                <input type="time" class="form-control" id="end_time" name="end_time" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="event_type" class="form-label">Event Type</label>
+                                <select class="form-select" id="event_type" name="event_type">
+                                    <option value="">Select type</option>
+                                    <option value="wedding">Wedding</option>
+                                    <option value="function">Function</option>
+                                    <option value="ceremony">Ceremony</option>
+                                    <option value="meeting">Meeting</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="expected_guests" class="form-label">Expected Guests</label>
+                                <input type="number" class="form-control" id="expected_guests" name="expected_guests" 
+                                       min="1">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="event_description" class="form-label">Event Description</label>
+                            <textarea class="form-control" id="event_description" name="event_description" 
+                                      rows="3" placeholder="Describe your event..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Booking Amount (₹) *</label>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   min="1" step="0.01" required>
+                            <small class="form-text text-muted">Please confirm the amount with temple administration</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                <i class="bi bi-credit-card"></i> Proceed to Payment
+                            </button>
+                            <a href="/bookings/hall" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('hallBookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+    
+    const formData = {
+        hall_name: document.getElementById('hall_name').value,
+        booking_date: document.getElementById('booking_date').value,
+        start_time: document.getElementById('start_time').value,
+        end_time: document.getElementById('end_time').value,
+        event_type: document.getElementById('event_type').value,
+        event_description: document.getElementById('event_description').value,
+        expected_guests: document.getElementById('expected_guests').value,
+        amount: document.getElementById('amount').value
+    };
+    
+    try {
+        await initiatePayment('hall-booking', formData, {
+            onSuccess: (result) => {
+                window.location.href = '/payment/success?payment_id=' + result.payment_id;
+            },
+            onFailure: (error) => {
+                alert('Payment failed: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    } catch (error) {
+        alert('Error: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+
+<%- include('../../partials/footer') %>
+
+
+

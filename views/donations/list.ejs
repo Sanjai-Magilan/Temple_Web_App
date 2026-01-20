@@ -1,0 +1,75 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h2><i class="bi bi-heart"></i> My Donations</h2>
+                <a href="/donations/new" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Make Donation
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (typeof donations !== 'undefined' && donations.length > 0) { %>
+        <div class="row">
+            <% donations.forEach(donation => { %>
+                <div class="col-12 col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">₹<%= donation.amount.toLocaleString() %></h5>
+                                    <p class="text-muted small mb-0"><%= donation.donation_type %></p>
+                                </div>
+                                <span class="badge bg-<%= donation.payment_status === 'completed' ? 'success' : donation.payment_status === 'failed' ? 'danger' : 'warning' %>">
+                                    <%= donation.payment_status || 'pending' %>
+                                </span>
+                            </div>
+                            <% if (donation.purpose) { %>
+                                <p class="card-text small text-muted"><%= donation.purpose %></p>
+                            <% } %>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> <%= new Date(donation.created_at).toLocaleDateString() %>
+                                    <% if (donation.receipt_number) { %>
+                                        <br><i class="bi bi-receipt"></i> Receipt: <%= donation.receipt_number %>
+                                    <% } %>
+                                </small>
+                            </div>
+                        </div>
+                        <% if (donation.payment_status === 'completed' && donation.receipt_number) { %>
+                            <div class="card-footer bg-light">
+                                <a href="/donations/<%= donation.id %>/receipt" class="btn btn-sm btn-outline-primary w-100">
+                                    <i class="bi bi-download"></i> Download Receipt
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="row">
+            <div class="col-12">
+                <div class="card text-center py-5">
+                    <div class="card-body">
+                        <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3">No Donations Yet</h4>
+                        <p class="text-muted">Start supporting the temple with your first donation</p>
+                        <a href="/donations/new" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Make Your First Donation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+
+
+

@@ -157,6 +157,18 @@ exports.phoneExists = async (phone) => {
     throw error;
   }
 };
+//profile model functions
+exports.findById = async (id) => {
+  const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [id]);
+  return rows[0];
+};
 
+exports.updateProfile = async (id, data) => {
+  const { first_name, last_name, phone } = data;
+  await pool.execute(
+    'UPDATE users SET first_name=?, last_name=?, phone=? WHERE id=?',
+    [first_name, last_name, phone, id]
+  );
+};
 
 

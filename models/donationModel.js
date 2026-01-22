@@ -3,7 +3,7 @@
  * Handles donation-related database operations
  */
 
-const pool = require('../config/database');
+const pool = require("../config/database");
 
 /**
  * Create donation record
@@ -24,12 +24,12 @@ exports.create = async (donationData) => {
         donationData.user_id || null,
         donationData.family_id || null,
         donationData.amount,
-        donationData.donation_type || 'general',
+        donationData.donation_type || "general",
         donationData.purpose || null,
         donationData.payment_id || null,
         donationData.is_anonymous || 0,
-        receiptNumber
-      ]
+        receiptNumber,
+      ],
     );
 
     const donationId = result.insertId;
@@ -37,23 +37,22 @@ exports.create = async (donationData) => {
     // Update payment with related_id
     if (donationData.payment_id) {
       await connection.execute(
-        'UPDATE payments SET related_id = ? WHERE id = ?',
-        [donationId, donationData.payment_id]
+        "UPDATE payments SET related_id = ? WHERE id = ?",
+        [donationId, donationData.payment_id],
       );
     }
 
     await connection.commit();
 
     // Get created donation
-    const [rows] = await pool.execute(
-      'SELECT * FROM donations WHERE id = ?',
-      [donationId]
-    );
+    const [rows] = await pool.execute("SELECT * FROM donations WHERE id = ?", [
+      donationId,
+    ]);
 
     return rows[0];
   } catch (error) {
     await connection.rollback();
-    console.error('Error creating donation:', error);
+    console.error("Error creating donation:", error);
     throw error;
   } finally {
     connection.release();
@@ -74,8 +73,8 @@ const generateReceiptNumber = async (connection) => {
     receiptNumber = `DON-${year}-${random}`;
 
     const [rows] = await connection.execute(
-      'SELECT COUNT(*) as count FROM donations WHERE receipt_number = ?',
-      [receiptNumber]
+      "SELECT COUNT(*) as count FROM donations WHERE receipt_number = ?",
+      [receiptNumber],
     );
 
     exists = rows[0].count > 0;
@@ -83,7 +82,7 @@ const generateReceiptNumber = async (connection) => {
   }
 
   if (exists) {
-    throw new Error('Failed to generate unique receipt number');
+    throw new Error("Failed to generate unique receipt number");
   }
 
   return receiptNumber;
@@ -94,13 +93,12 @@ const generateReceiptNumber = async (connection) => {
  */
 exports.findById = async (id) => {
   try {
-    const [rows] = await pool.execute(
-      'SELECT * FROM donations WHERE id = ?',
-      [id]
-    );
+    const [rows] = await pool.execute("SELECT * FROM donations WHERE id = ?", [
+      id,
+    ]);
     return rows[0] || null;
   } catch (error) {
-    console.error('Error finding donation by ID:', error);
+    console.error("Error finding donation by ID:", error);
     throw error;
   }
 };
@@ -116,15 +114,12 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
        LEFT JOIN payments p ON d.payment_id = p.id
        WHERE d.user_id = ?
        ORDER BY d.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [userId, limit, offset]
+       LIMIT ${limit} OFFSET ${offset}`,
+      [userId],
     );
     return rows;
   } catch (error) {
-    console.error('Error getting user donations:', error);
+    console.error("Error getting user donations:", error);
     throw error;
   }
 };
-
-
-

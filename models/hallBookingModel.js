@@ -3,7 +3,7 @@
  * Handles hall booking-related database operations
  */
 
-const pool = require('../config/database');
+const pool = require("../config/database");
 
 /**
  * Generate unique booking number
@@ -15,13 +15,13 @@ const generateBookingNumber = async (connection) => {
 
   while (exists && attempts < 10) {
     const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const month = String(new Date().getMonth() + 1).padStart(2, "0");
     const random = Math.floor(1000 + Math.random() * 9000);
     bookingNumber = `HALL-${year}${month}-${random}`;
 
     const [rows] = await connection.execute(
-      'SELECT COUNT(*) as count FROM hall_bookings WHERE booking_number = ?',
-      [bookingNumber]
+      "SELECT COUNT(*) as count FROM hall_bookings WHERE booking_number = ?",
+      [bookingNumber],
     );
 
     exists = rows[0].count > 0;
@@ -29,7 +29,7 @@ const generateBookingNumber = async (connection) => {
   }
 
   if (exists) {
-    throw new Error('Failed to generate unique booking number');
+    throw new Error("Failed to generate unique booking number");
   }
 
   return bookingNumber;
@@ -63,8 +63,8 @@ exports.create = async (bookingData) => {
         bookingData.expected_guests || null,
         bookingData.amount,
         bookingData.payment_id || null,
-        bookingData.status || 'pending'
-      ]
+        bookingData.status || "pending",
+      ],
     );
 
     const bookingId = result.insertId;
@@ -72,8 +72,8 @@ exports.create = async (bookingData) => {
     // Update payment with related_id
     if (bookingData.payment_id) {
       await connection.execute(
-        'UPDATE payments SET related_id = ? WHERE id = ?',
-        [bookingId, bookingData.payment_id]
+        "UPDATE payments SET related_id = ? WHERE id = ?",
+        [bookingId, bookingData.payment_id],
       );
     }
 
@@ -81,14 +81,14 @@ exports.create = async (bookingData) => {
 
     // Get created booking
     const [rows] = await pool.execute(
-      'SELECT * FROM hall_bookings WHERE id = ?',
-      [bookingId]
+      "SELECT * FROM hall_bookings WHERE id = ?",
+      [bookingId],
     );
 
     return rows[0];
   } catch (error) {
     await connection.rollback();
-    console.error('Error creating hall booking:', error);
+    console.error("Error creating hall booking:", error);
     throw error;
   } finally {
     connection.release();
@@ -101,12 +101,12 @@ exports.create = async (bookingData) => {
 exports.findById = async (id) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT * FROM hall_bookings WHERE id = ?',
-      [id]
+      "SELECT * FROM hall_bookings WHERE id = ?",
+      [id],
     );
     return rows[0] || null;
   } catch (error) {
-    console.error('Error finding hall booking by ID:', error);
+    console.error("Error finding hall booking by ID:", error);
     throw error;
   }
 };
@@ -117,12 +117,12 @@ exports.findById = async (id) => {
 exports.findByBookingNumber = async (bookingNumber) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT * FROM hall_bookings WHERE booking_number = ?',
-      [bookingNumber]
+      "SELECT * FROM hall_bookings WHERE booking_number = ?",
+      [bookingNumber],
     );
     return rows[0] || null;
   } catch (error) {
-    console.error('Error finding hall booking by booking number:', error);
+    console.error("Error finding hall booking by booking number:", error);
     throw error;
   }
 };
@@ -139,13 +139,13 @@ exports.updateStatus = async (bookingId, status, cancellationReason = null) => {
       [
         status,
         cancellationReason,
-        status === 'cancelled' ? new Date() : null,
-        bookingId
-      ]
+        status === "cancelled" ? new Date() : null,
+        bookingId,
+      ],
     );
     return true;
   } catch (error) {
-    console.error('Error updating hall booking status:', error);
+    console.error("Error updating hall booking status:", error);
     throw error;
   }
 };
@@ -159,13 +159,12 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
       `SELECT * FROM hall_bookings 
        WHERE user_id = ?
        ORDER BY created_at DESC
-       LIMIT ? OFFSET ?`,
-      [userId, limit, offset]
+       LIMIT ${limit} OFFSET ${offset}`,
+      [userId, limit, offset],
     );
     return rows;
   } catch (error) {
-    console.error('Error getting user hall bookings:', error);
+    console.error("Error getting user hall bookings:", error);
     throw error;
   }
 };
-

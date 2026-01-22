@@ -23,8 +23,20 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            const pull_number = context.payload.pull_request.number;
+            let pull_number;
 
+            if (context.payload.pull_request && context.payload.pull_request.number) {
+              pull_number = context.payload.pull_request.number;
+            } else if (
+              context.payload.review &&
+              context.payload.review.pull_request &&
+              context.payload.review.pull_request.number
+            ) {
+              pull_number = context.payload.review.pull_request.number;
+            } else {
+              core.setFailed("Unable to determine pull request number from event payload.");
+              return;
+            }
             const reviews = await github.rest.pulls.listReviews({
               owner,
               repo,

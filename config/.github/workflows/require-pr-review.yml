@@ -44,7 +44,7 @@ jobs:
               pull_number,
             });
 
-            const prAuthorId = pullRequest.user && pullRequest.user.id;
+            const prAuthorId = pullRequest.user?.id;
 
             const reviews = await github.rest.pulls.listReviews({
               owner,
@@ -74,7 +74,7 @@ jobs:
 
             // Filter out self-approvals (where reviewer is the PR author)
             const approvals = latestReviews.filter(
-              review => review.state === "APPROVED" && review.user && review.user.id !== prAuthorId
+              review => review.state === "APPROVED" && review.user?.id && review.user.id !== prAuthorId
             );
 
             const REQUIRED_APPROVALS = 1;

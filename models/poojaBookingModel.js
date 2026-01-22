@@ -161,7 +161,7 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
        WHERE user_id = ?
        ORDER BY created_at DESC
        LIMIT ${limit} OFFSET ${offset}`,
-      [Number(userId), Number(limit), Number(offset)],
+      [(userId, limit, offset)],
     );
     return rows;
   } catch (error) {
@@ -169,28 +169,3 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
-
-// exports.getUserBookings = async (userId, limit, offset) => {
-//   const sql = `
-//     SELECT * FROM pooja_bookings
-//     WHERE user_id = ?
-//     ORDER BY created_at DESC
-//     LIMIT ? OFFSET ?
-//   `;
-
-//   return pool.execute(sql, [Number(userId), Number(limit), Number(offset)]);
-// };
-// exports.getUserBookings = async (userId, limit, offset) => {
-//   limit = parseInt(limit, 10);
-//   offset = parseInt(offset, 10);
-
-//   const sql = `
-//     SELECT *
-//     FROM pooja_bookings
-//     WHERE user_id = ?
-//     ORDER BY created_at DESC
-//     LIMIT ${limit} OFFSET ${offset}
-//   `;
-
-//   return pool.execute(sql, [Number(userId)]);
-// };

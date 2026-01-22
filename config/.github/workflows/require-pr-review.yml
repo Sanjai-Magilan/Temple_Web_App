@@ -69,7 +69,7 @@ jobs:
               review => review.state === "APPROVED"
             );
 
-            const REQUIRED_APPROVALS = parseInt(process.env.REQUIRED_APPROVALS || '1', 10);
+            const REQUIRED_APPROVALS = parseInt(process.env.REQUIRED_APPROVALS || '1', 10) || 1;
 
             if (approvals.length < REQUIRED_APPROVALS) {
               core.setFailed(

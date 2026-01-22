@@ -159,8 +159,8 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
       `SELECT * FROM hall_bookings 
        WHERE user_id = ?
        ORDER BY created_at DESC
-       LIMIT ${limit} OFFSET ${offset}`,
-      [userId, limit, offset],
+      LIMIT ${limit} OFFSET ${offset}`,
+      [(userId, limit, offset)],
     );
     return rows;
   } catch (error) {

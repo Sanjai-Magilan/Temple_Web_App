@@ -43,7 +43,27 @@ jobs:
               pull_number,
             });
 
-            const approvals = reviews.data.filter(
+            // Consider only the latest review per reviewer
+            const latestReviewsByUser = new Map();
+            for (const review of reviews.data) {
+              const userId = review.user && review.user.id;
+              if (!userId) continue;
+
+              const existing = latestReviewsByUser.get(userId);
+              if (
+                !existing ||
+                (review.submitted_at && !existing.submitted_at) ||
+                (review.submitted_at &&
+                  existing.submitted_at &&
+                  new Date(review.submitted_at) > new Date(existing.submitted_at))
+              ) {
+                latestReviewsByUser.set(userId, review);
+              }
+            }
+
+            const latestReviews = Array.from(latestReviewsByUser.values());
+
+            const approvals = latestReviews.filter(
               review => review.state === "APPROVED"
             );
 

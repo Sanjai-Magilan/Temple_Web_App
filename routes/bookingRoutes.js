@@ -8,9 +8,9 @@ const hallBookingController = require("../controllers/hallBookingController");
 const poojaBookingController = require("../controllers/poojaBookingController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-console.log("hallBookingController:", hallBookingController);
-console.log("poojaBookingController:", poojaBookingController);
-console.log("authMiddleware:", authMiddleware);
+// console.log("hallBookingController:", hallBookingController);
+// console.log("poojaBookingController:", poojaBookingController);
+// console.log("authMiddleware:", authMiddleware);
 
 // Hall booking routes
 router.get(

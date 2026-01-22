@@ -157,7 +157,7 @@ exports.updateStatus = async (bookingId, status, cancellationReason = null) => {
 exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM pooja_bookings 
+      `SELECT * FROM pooja_bookings
        WHERE user_id = ?
        ORDER BY created_at DESC
        LIMIT ${limit} OFFSET ${offset}`,

@@ -114,8 +114,8 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
        LEFT JOIN payments p ON d.payment_id = p.id
        WHERE d.user_id = ?
        ORDER BY d.created_at DESC
-LIMIT ${limit} OFFSET ${offset}`,
-      [userId, limit, offset],
+       LIMIT ${limit} OFFSET ${offset}`,
+      [userId],
     );
     return rows;
   } catch (error) {

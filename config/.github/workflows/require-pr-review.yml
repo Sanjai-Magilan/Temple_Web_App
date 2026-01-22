@@ -37,6 +37,16 @@ jobs:
               core.setFailed("Unable to determine pull request number from event payload.");
               return;
             }
+            
+            // Get PR details to determine the author
+            const pullRequest = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number,
+            });
+            
+            const prAuthorId = pullRequest.data.user && pullRequest.data.user.id;
+            
             const reviews = await github.rest.pulls.listReviews({
               owner,
               repo,
@@ -63,8 +73,11 @@ jobs:
 
             const latestReviews = Array.from(latestReviewsByUser.values());
 
+            // Filter out self-approvals (where reviewer is the PR author)
             const approvals = latestReviews.filter(
-              review => review.state === "APPROVED"
+              review => review.state === "APPROVED" && 
+                        review.user && 
+                        review.user.id !== prAuthorId
             );
 
             const REQUIRED_APPROVALS = 1;

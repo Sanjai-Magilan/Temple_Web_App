@@ -21,7 +21,7 @@ jobs:
       - name: Check approved reviews
         uses: actions/github-script@v7
         env:
-          REQUIRED_APPROVALS: ${{ vars.REQUIRED_APPROVALS || 1 }}
+          REQUIRED_APPROVALS: ${{ vars.REQUIRED_APPROVALS }}
         with:
           script: |
             const { owner, repo } = context.repo;

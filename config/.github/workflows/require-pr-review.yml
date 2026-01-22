@@ -12,6 +12,12 @@ on:
   pull_request_review:
     types:
       - submitted
+  workflow_dispatch:
+    inputs:
+      required_approvals:
+        description: 'Number of required approvals'
+        required: false
+        default: '1'
 
 jobs:
   check-approvals:
@@ -20,6 +26,8 @@ jobs:
     steps:
       - name: Check approved reviews
         uses: actions/github-script@v7
+        env:
+          REQUIRED_APPROVALS: ${{ inputs.required_approvals || '1' }}
         with:
           script: |
             const { owner, repo } = context.repo;
@@ -67,7 +75,7 @@ jobs:
               review => review.state === "APPROVED"
             );
 
-            const REQUIRED_APPROVALS = 1;
+            const REQUIRED_APPROVALS = parseInt(process.env.REQUIRED_APPROVALS || '1', 10);
 
             if (approvals.length < REQUIRED_APPROVALS) {
               core.setFailed(

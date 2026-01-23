@@ -7,10 +7,10 @@ const router = express.Router();
 const hallBookingController = require("../controllers/hallBookingController");
 const poojaBookingController = require("../controllers/poojaBookingController");
 const authMiddleware = require("../middleware/authMiddleware");
-
-// console.log("hallBookingController:", hallBookingController);
-// console.log("poojaBookingController:", poojaBookingController);
-// console.log("authMiddleware:", authMiddleware);
+const logger = require('../utils/logger')
+ logger.info("hallBookingController:", hallBookingController);
+ logger.info("poojaBookingController:", poojaBookingController);
+ logger.info("authMiddleware:", authMiddleware);
 
 // Hall booking routes
 router.get(

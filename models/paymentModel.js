@@ -3,7 +3,7 @@
  * Handles payment-related database operations
  */
 
-const pool = require('../config/database');
+const pool = require("../config/database");
 
 /**
  * Create payment record
@@ -11,26 +11,27 @@ const pool = require('../config/database');
 exports.create = async (paymentData) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO payments 
-       (payment_id, order_id, user_id, family_id, amount, currency, payment_method, status, payment_type, related_id, razorpay_response)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO payments (order_id, user_id, family_id, amount, currency, payment_method, status, payment_type, related_id, razorpay_response)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        paymentData.payment_id,
+        //paymentData.payment_id,
         paymentData.order_id,
         paymentData.user_id || null,
         paymentData.family_id || null,
         paymentData.amount,
-        paymentData.currency || 'INR',
+        paymentData.currency || "INR",
         paymentData.payment_method || null,
-        paymentData.status || 'pending',
+        paymentData.status || "pending",
         paymentData.payment_type,
         paymentData.related_id || null,
-        paymentData.razorpay_response ? JSON.stringify(paymentData.razorpay_response) : null
-      ]
+        paymentData.razorpay_response
+          ? JSON.stringify(paymentData.razorpay_response)
+          : null,
+      ],
     );
     return result.insertId;
   } catch (error) {
-    console.error('Error creating payment:', error);
+    console.error("Error creating payment:", error);
     throw error;
   }
 };
@@ -41,12 +42,12 @@ exports.create = async (paymentData) => {
 exports.findByPaymentId = async (paymentId) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT * FROM payments WHERE payment_id = ?',
-      [paymentId]
+      "SELECT * FROM payments WHERE payment_id = ?",
+      [paymentId],
     );
     return rows[0] || null;
   } catch (error) {
-    console.error('Error finding payment by payment ID:', error);
+    console.error("Error finding payment by payment ID:", error);
     throw error;
   }
 };
@@ -57,12 +58,12 @@ exports.findByPaymentId = async (paymentId) => {
 exports.findByOrderId = async (orderId) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT * FROM payments WHERE order_id = ?',
-      [orderId]
+      "SELECT * FROM payments WHERE order_id = ?",
+      [orderId],
     );
     return rows[0] || null;
   } catch (error) {
-    console.error('Error finding payment by order ID:', error);
+    console.error("Error finding payment by order ID:", error);
     throw error;
   }
 };
@@ -72,21 +73,21 @@ exports.findByOrderId = async (orderId) => {
  */
 exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
   try {
-    const updateFields = ['status = ?'];
+    const updateFields = ["status = ?"];
     const updateValues = [status, paymentId];
-    
+
     if (razorpayResponse) {
-      updateFields.push('razorpay_response = ?');
+      updateFields.push("razorpay_response = ?");
       updateValues.splice(1, 0, JSON.stringify(razorpayResponse));
     }
-    
+
     await pool.execute(
-      `UPDATE payments SET ${updateFields.join(', ')}, updated_at = NOW() WHERE payment_id = ?`,
-      updateValues
+      `UPDATE payments SET ${updateFields.join(", ")}, updated_at = NOW() WHERE payment_id = ?`,
+      updateValues,
     );
     return true;
   } catch (error) {
-    console.error('Error updating payment status:', error);
+    console.error("Error updating payment status:", error);
     throw error;
   }
 };
@@ -103,13 +104,15 @@ exports.update = async (paymentId, paymentData) => {
       [
         paymentData.payment_method || null,
         paymentData.status,
-        paymentData.razorpay_response ? JSON.stringify(paymentData.razorpay_response) : null,
-        paymentId
-      ]
+        paymentData.razorpay_response
+          ? JSON.stringify(paymentData.razorpay_response)
+          : null,
+        paymentId,
+      ],
     );
     return true;
   } catch (error) {
-    console.error('Error updating payment:', error);
+    console.error("Error updating payment:", error);
     throw error;
   }
 };
@@ -127,13 +130,15 @@ exports.updateByOrderId = async (orderId, paymentId, paymentData) => {
         paymentId,
         paymentData.payment_method || null,
         paymentData.status,
-        paymentData.razorpay_response ? JSON.stringify(paymentData.razorpay_response) : null,
-        orderId
-      ]
+        paymentData.razorpay_response
+          ? JSON.stringify(paymentData.razorpay_response)
+          : null,
+        orderId,
+      ],
     );
     return true;
   } catch (error) {
-    console.error('Error updating payment by order ID:', error);
+    console.error("Error updating payment by order ID:", error);
     throw error;
   }
 };
@@ -160,7 +165,7 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
     const [rows] = await pool.execute(query, params);
     return rows;
   } catch (error) {
-    console.error('Error getting user payments:', error);
+    console.error("Error getting user payments:", error);
     throw error;
   }
 };
@@ -171,13 +176,12 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
 exports.paymentExists = async (paymentId) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT COUNT(*) as count FROM payments WHERE payment_id = ?',
-      [paymentId]
+      "SELECT COUNT(*) as count FROM payments WHERE payment_id = ?",
+      [paymentId],
     );
     return rows[0].count > 0;
   } catch (error) {
-    console.error('Error checking payment existence:', error);
+    console.error("Error checking payment existence:", error);
     throw error;
   }
 };
-

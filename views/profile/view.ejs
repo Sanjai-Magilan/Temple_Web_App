@@ -1,0 +1,14 @@
+<h2>My Profile</h2>
+
+<form action="/profile/update" method="POST">
+  <label>First Name</label>
+  <input type="text" name="first_name" value="<%= user.first_name %>" required>
+
+  <label>Last Name</label>
+  <input type="text" name="last_name" value="<%= user.last_name %>" required>
+
+  <label>Phone</label>
+  <input type="text" name="phone" value="<%= user.phone %>" required>
+
+  <button type="submit">Update Profile</button>
+</form>

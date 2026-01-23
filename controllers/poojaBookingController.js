@@ -3,7 +3,7 @@
  * Handles pooja booking-related operations
  */
 
-const poojaBookingModel = require('../models/poojaBookingModel');
+const poojaBookingModel = require("../models/poojaBookingModel");
 
 /**
  * List user pooja bookings
@@ -11,21 +11,25 @@ const poojaBookingModel = require('../models/poojaBookingModel');
 exports.list = async (req, res) => {
   try {
     if (!req.user) {
-      return res.redirect('/login');
+      return res.redirect("/login");
     }
 
-    const bookings = await poojaBookingModel.getUserBookings(req.user.id, 50, 0);
+    const [bookings] = await poojaBookingModel.getUserBookings(
+      req.user.id,
+      50,
+      0,
+    );
 
-    res.render('bookings/pooja/list', {
-      title: 'Pooja Bookings',
+    res.render("bookings/pooja/list", {
+      title: "Pooja Bookings",
       user: req.user,
-      bookings: bookings
+      bookings: bookings,
     });
   } catch (error) {
-    console.error('Error loading pooja bookings:', error);
-    res.status(500).render('errors/500', {
-      title: 'Server Error',
-      message: 'Failed to load pooja bookings'
+    console.error("Error loading pooja bookings:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "Failed to load pooja bookings",
     });
   }
 };
@@ -36,22 +40,19 @@ exports.list = async (req, res) => {
 exports.showNew = (req, res) => {
   try {
     if (!req.user) {
-      return res.redirect('/login');
+      return res.redirect("/login");
     }
 
-    res.render('bookings/pooja/new', {
-      title: 'Book a Pooja',
+    res.render("bookings/pooja/new", {
+      title: "Book a Pooja",
       user: req.user,
-      error: null
+      error: null,
     });
   } catch (error) {
-    console.error('Error loading pooja booking form:', error);
-    res.status(500).render('errors/500', {
-      title: 'Server Error',
-      message: 'Failed to load pooja booking form'
+    console.error("Error loading pooja booking form:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "Failed to load pooja booking form",
     });
   }
 };
-
-
-

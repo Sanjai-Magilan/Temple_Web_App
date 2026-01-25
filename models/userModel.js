@@ -171,4 +171,97 @@ exports.updateProfile = async (id, data) => {
   );
 };
 
+/**
+ * Create password reset token
+ */
+exports.createPasswordResetToken = async (email) => {
+  try {
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 hour from now
+
+    await pool.execute(
+      'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE email = ?',
+      [token, expires, email]
+    );
+
+    return token;
+  } catch (error) {
+    console.error('Error creating password reset token:', error);
+    throw error;
+  }
+};
+
+/**
+ * Find user by reset token
+ */
+exports.findByResetToken = async (token) => {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, email, first_name, last_name, reset_token_expires FROM users WHERE reset_token = ? AND reset_token_expires > NOW()',
+      [token]
+    );
+    return rows[0] || null;
+  } catch (error) {
+    console.error('Error finding user by reset token:', error);
+    throw error;
+  }
+};
+
+/**
+ * Reset password with token
+ */
+exports.resetPassword = async (token, newPassword) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Verify token is valid
+    const [rows] = await connection.execute(
+      'SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > NOW()',
+      [token]
+    );
+
+    if (rows.length === 0) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const userId = rows[0].id;
+
+    // Hash new password
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update password and clear reset token
+    await connection.execute(
+      'UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+      [passwordHash, userId]
+    );
+
+    await connection.commit();
+    return true;
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error resetting password:', error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+/**
+ * Clear reset token
+ */
+exports.clearResetToken = async (userId) => {
+  try {
+    await pool.execute(
+      'UPDATE users SET reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+      [userId]
+    );
+  } catch (error) {
+    console.error('Error clearing reset token:', error);
+    throw error;
+  }
+};
+
 

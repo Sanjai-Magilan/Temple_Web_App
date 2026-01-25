@@ -20,6 +20,14 @@ router.post('/login', authMiddleware.optionalAuth, validationMiddleware.validate
 router.post('/logout', authController.logout);
 router.get('/logout', authController.logout);
 
+// Forgot password routes
+router.get('/forgot-password', authController.showForgotPassword);
+router.post('/forgot-password', authController.forgotPassword);
+
+// Reset password routes
+router.get('/reset-password', authController.showResetPassword);
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;
 
 

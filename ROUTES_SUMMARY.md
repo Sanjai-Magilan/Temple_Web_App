@@ -8,6 +8,10 @@
 - `POST /login` - Login handler
 - `GET /register` - Registration page
 - `POST /register` - Registration handler
+- `GET /forgot-password` - Forgot password page
+- `POST /forgot-password` - Handle forgot password request
+- `GET /reset-password` - Reset password page (with token)
+- `POST /reset-password` - Handle password reset
 
 ### Protected Routes (Authentication Required)
 

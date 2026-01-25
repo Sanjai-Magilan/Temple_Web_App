@@ -61,7 +61,7 @@ exports.validateRegistration = [
     .withMessage('First name can only contain letters and spaces'),
   body('last_name')
     .trim()
-    .isLength({ min: 2, max: 100 })
+    .isLength({ min: 1, max: 100 })
     .withMessage('Last name must be between 2 and 100 characters')
     .matches(/^[a-zA-Z\s]+$/)
     .withMessage('Last name can only contain letters and spaces'),

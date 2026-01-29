@@ -75,3 +75,22 @@ test('should show error if user not found', async () => {
   }));
 });
 
+//case 4 error if password is invalid during login
+test('should show error if password is invalid', async () => {
+  userModel.findByEmail.mockResolvedValue({
+    id: 1,
+    password_hash: 'hash',
+    is_active: true
+  });
+
+  userModel.verifyPassword.mockResolvedValue(false);
+
+  const req = mockRequest({ email: 'a@mail.com', password: 'wrong' });
+  const res = mockResponse();
+
+  await authController.login(req, res);
+
+  expect(res.render).toHaveBeenCalledWith('auth/login', expect.objectContaining({
+    error: 'Invalid email or password.'
+  }));
+});

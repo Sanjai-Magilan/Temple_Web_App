@@ -1,10 +1,10 @@
 const authController = require('../controllers/authController');
 const userModel = require('../models/userModel');
-const familyModel = require('../models/familyModel');
+// const familyModel = require('../models/familyModel');
 const jwtUtils = require('../utils/jwt');
 
 jest.mock('../models/userModel');
-jest.mock('../models/familyModel');
+// jest.mock('../models/familyModel');
 jest.mock('../utils/jwt');
 
 const mockRequest = (body = {}, user = null) => ({
@@ -22,7 +22,7 @@ const mockResponse = () => {
   return res;
 };
 
-//case 1 erro if email already exists
+//case 1 error if email already exists
 test('should show error if email already exists', async () => {
   userModel.emailExists.mockResolvedValue(true);
 
@@ -36,3 +36,28 @@ test('should show error if email already exists', async () => {
     error: expect.stringContaining('Email already registered')
   }));
 });
+
+//case 2 successful registration
+test('should register user and set cookie', async () => {
+  userModel.emailExists.mockResolvedValue(false);
+  userModel.phoneExists.mockResolvedValue(false);
+  userModel.create.mockResolvedValue({ id: 1, email: 'a@mail.com', role: 'user' });
+  jwtUtils.generateToken.mockReturnValue('fake-token');
+
+  const req = mockRequest({
+    email: 'a@mail.com',
+    phone: '9999999999',
+    password: '123456',
+    first_name: 'A',
+    last_name: 'B'
+  });
+
+  const res = mockResponse();
+
+  await authController.register(req, res);
+
+  expect(userModel.create).toHaveBeenCalled();
+  expect(res.cookie).toHaveBeenCalledWith('token', 'fake-token', expect.any(Object));
+  expect(res.redirect).toHaveBeenCalledWith('/');
+});
+

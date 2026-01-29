@@ -61,3 +61,17 @@ test('should register user and set cookie', async () => {
   expect(res.redirect).toHaveBeenCalledWith('/');
 });
 
+//case 3 error if user not found during login
+test('should show error if user not found', async () => {
+  userModel.findByEmail.mockResolvedValue(null);
+
+  const req = mockRequest({ email: 'x@mail.com', password: '123' });
+  const res = mockResponse();
+
+  await authController.login(req, res);
+
+  expect(res.render).toHaveBeenCalledWith('auth/login', expect.objectContaining({
+    error: 'Invalid email or password.'
+  }));
+});
+

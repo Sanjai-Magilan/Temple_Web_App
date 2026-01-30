@@ -1,4 +1,4 @@
 implemented
-    profile controller test
+    profile controller test &
     auth controller test
     - miruthul & magilan

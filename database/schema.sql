@@ -96,7 +96,6 @@ CREATE TABLE payments (
     order_id VARCHAR(255) NOT NULL COMMENT 'Razorpay order ID',
     user_id INT UNSIGNED NULL COMMENT 'Can be null for guest payments',
     family_id INT UNSIGNED NULL COMMENT 'If payment is for a family',
-    amount DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'INR',
     payment_method VARCHAR(50) COMMENT 'card, upi, netbanking, etc.',
     status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',

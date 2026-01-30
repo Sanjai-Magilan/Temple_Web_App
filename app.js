@@ -11,7 +11,7 @@ const logger = require('./utils/logger');
  dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3007;
 
 // View engine setup
 app.set("view engine", "ejs");
@@ -89,7 +89,7 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'} - app.js:92`);
 });
 
 module.exports = app;

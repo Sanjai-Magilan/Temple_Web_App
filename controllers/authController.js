@@ -194,3 +194,180 @@ exports.logout = (req, res) => {
 
 
 
+
+/**
+ * Send OTP
+ */
+exports.sendOtp = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    if (!email || !name) {
+      return res.render('auth/login', {
+        title: 'Login',
+        error: 'Please provide both name and email address.',
+        formData: { name, email },
+        step: 'details'
+      });
+    }
+
+    // Generate 4-digit OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Store in session
+    req.session.otpAuth = {
+      otp,
+      email,
+      name,
+      expires: Date.now() + 5 * 60 * 1000 // 5 minutes
+    };
+
+    // For demo purposes, log OTP to console
+    console.log(`=========================================`);
+    console.log(`OTP for ${name} (${email}): ${otp}`);
+    console.log(`=========================================`);
+
+    res.render('auth/login', {
+      title: 'Verify OTP',
+      error: null,
+      step: 'otp',
+      name,
+      email,
+      devOtp: otp // Pass OTP to view for testing
+    });
+
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.render('auth/login', {
+      title: 'Login',
+      error: 'Failed to send OTP. Please try again.',
+      formData: req.body,
+      step: 'details'
+    });
+  }
+};
+
+/**
+ * Verify OTP and Login/Register
+ */
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const authData = req.session.otpAuth;
+
+    if (!authData || !authData.otp) {
+      return res.render('auth/login', {
+        title: 'Login',
+        error: 'Session expired. Please start again.',
+        step: 'details',
+        formData: {}
+      });
+    }
+
+    if (authData.otp !== otp) {
+      return res.render('auth/login', {
+        title: 'Verify OTP',
+        error: 'Invalid OTP. Please try again.',
+        step: 'otp',
+        name: authData.name,
+        email: authData.email,
+        devOtp: authData.otp // keep OTP on screen
+      });
+    }
+
+    if (Date.now() > authData.expires) {
+      delete req.session.otpAuth;
+      return res.render('auth/login', {
+        title: 'Login',
+        error: 'OTP expired. Please request a new one.',
+        step: 'details',
+        formData: { name: authData.name, email: authData.email }
+      });
+    }
+
+    // OTP Verified. Check if user exists.
+    let user = await userModel.findByEmail(authData.email);
+
+    if (!user) {
+      // Create user
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+
+      // Split name
+      const names = authData.name.trim().split(' ');
+      const firstName = names[0];
+      const lastName = names.slice(1).join(' ') || '';
+
+      user = await userModel.create({
+        email: authData.email,
+        // Using a dummy phone number since it's required by the DB but not by the flow
+        phone: '000' + Date.now().toString().slice(-7),
+        password: randomPassword,
+        first_name: firstName,
+        last_name: lastName,
+        role: 'user',
+        is_active: 1
+      });
+    }
+
+    // Login User
+    await userModel.updateLastLogin(user.id);
+
+    const token = jwtUtils.generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'strict'
+    });
+
+    // Clear session OTP
+    delete req.session.otpAuth;
+
+    const redirectUrl = user.role === 'admin' ? '/admin' : '/dashboard';
+    req.flash ? req.flash('success', 'Login successful!') : null;
+    res.redirect(redirectUrl);
+
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.render('auth/login', {
+      title: 'Verify OTP',
+      error: 'Verification failed. Please try again.',
+      step: 'otp',
+      name: req.session.otpAuth?.name,
+      email: req.session.otpAuth?.email,
+      devOtp: req.session.otpAuth?.otp // keep OTP on screen
+    });
+  }
+};
+
+/**
+ * Resend OTP
+ */
+exports.resendOtp = (req, res) => {
+  if (!req.session.otpAuth) {
+    return res.redirect('/login');
+  }
+
+  // Regenerate OTP
+  const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  req.session.otpAuth.otp = otp;
+  req.session.otpAuth.expires = Date.now() + 5 * 60 * 1000;
+
+  console.log(`=========================================`);
+  console.log(`Resent OTP for ${req.session.otpAuth.name} (${req.session.otpAuth.email}): ${otp}`);
+  console.log(`=========================================`);
+
+  res.render('auth/login', {
+    title: 'Verify OTP',
+    error: 'A new OTP has been sent.',
+    step: 'otp',
+    name: req.session.otpAuth.name,
+    email: req.session.otpAuth.email,
+    devOtp: otp
+  });
+};

@@ -1,50 +1,92 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: null }) %>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-4 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="card shadow">
-                    <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Login</h2>
-                        
-                        <% if (error) { %>
-                        <div class="alert alert-danger" role="alert">
-                            <%= error %>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temple Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="auth-body">
+    <nav class="auth-nav">
+        <a href="/" class="auth-nav-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Temple Management
+        </a>
+    </nav>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div style="margin-bottom: 2rem;">
+                <h1 class="auth-title">Welcome</h1>
+                <p class="auth-subtitle">Enter your details to proceed</p>
+            </div>
+
+            <% if (typeof error !=='undefined' && error) { %>
+                <div class="alert-error">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <% if (typeof devOtp !=='undefined' && devOtp) { %>
+                        <div
+                            style="background-color: #dbeafe; color: #1e40af; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #bfdbfe;">
+                            <strong>Demo OTP:</strong>
+                            <%= devOtp %>
                         </div>
                         <% } %>
 
-                        <form action="/login" method="POST">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       value="<%= formData.email || '' %>" required autocomplete="email" autofocus>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" 
-                                       required autocomplete="current-password">
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                <label class="form-check-label" for="remember">
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-                        </form>
-
-                        <div class="text-center">
-                            <p class="mb-0">Don't have an account? <a href="/register">Register here</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <% if (typeof step !=='undefined' && step==='otp' ) { %>
+                                <form action="/verify-otp" method="POST" class="auth-form">
+                                    <div>
+                                        <label for="otp" class="auth-label">One Time Password (OTP)</label>
+                                        <input type="text" id="otp" name="otp" required placeholder="XXXX" maxlength="4"
+                                            class="auth-input otp-input" autofocus>
+                                    </div>
+                                    <button type="submit" class="btn-auth">Verify & Join</button>
+                                </form>
+                                <div style="margin-top: 1.5rem; font-size: 0.875rem;">
+                                    <p><a href="/resend-otp" class="auth-link">Resend Code</a></p>
+                                </div>
+                                <% } else { %>
+                                    <form action="/send-otp" method="POST" class="auth-form">
+                                        <div>
+                                            <label for="name" class="auth-label">Full Name</label>
+                                            <input type="text" id="name" name="name" required
+                                                placeholder="Enter your full name"
+                                                value="<%= typeof name !== 'undefined' ? name : '' %>"
+                                                class="auth-input">
+                                        </div>
+                                        <div>
+                                            <label for="email" class="auth-label">Email Address</label>
+                                            <input type="email" id="email" name="email" required
+                                                placeholder="Enter your email address"
+                                                value="<%= typeof email !== 'undefined' ? email : '' %>"
+                                                class="auth-input">
+                                        </div>
+                                        <button type="submit" class="btn-auth">Get OTP</button>
+                                    </form>
+                                    <% } %>
         </div>
     </div>
 
-<%- include('../partials/footer') %>
+    <footer class="auth-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Temple Management. All rights reserved.</p>
+        <p>
+            <a href="/">Home</a> |
+            <a href="/contact">Contact</a>
+        </p>
+    </footer>
+</body>
 
+</html>

@@ -16,6 +16,11 @@ router.post('/register', authMiddleware.optionalAuth, validationMiddleware.valid
 router.get('/login', authMiddleware.optionalAuth, authController.showLogin);
 router.post('/login', authMiddleware.optionalAuth, validationMiddleware.validateLogin, authController.login);
 
+// OTP Routes
+router.post('/send-otp', authMiddleware.optionalAuth, authController.sendOtp);
+router.post('/verify-otp', authMiddleware.optionalAuth, authController.verifyOtp);
+router.get('/resend-otp', authMiddleware.optionalAuth, authController.resendOtp);
+
 // Logout route
 router.post('/logout', authController.logout);
 router.get('/logout', authController.logout);

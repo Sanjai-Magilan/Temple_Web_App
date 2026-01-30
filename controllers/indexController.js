@@ -4,10 +4,7 @@
  */
 
 exports.home = (req, res) => {
-  res.render('index', {
-    title: 'Temple Management System',
-    message: 'Welcome to Temple Management System',
-    user: req.user || null
-  });
+  // Redirect to login page immediately
+  res.redirect('/login');
 };
 

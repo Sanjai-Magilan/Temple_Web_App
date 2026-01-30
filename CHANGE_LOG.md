@@ -6,3 +6,6 @@ implemented
     profile page(profile.ejs & 
     profile.css)
     - Deepikaa 
+implemented 
+    update hall booking UI
+    - kamalesh 

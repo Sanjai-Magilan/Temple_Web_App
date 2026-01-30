@@ -1,1 +1,4 @@
-everyone should update ur changes in the change log
+implemented
+    profile controller test
+    auth controller test
+    - miruthul & magilan

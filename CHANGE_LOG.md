@@ -3,7 +3,7 @@ implemented
     - miruthul & magilan  
       
 implemented  
-    profile page(profile.ejs & profile.css)
+    profile page(profile.ejs & profile.css)  
     - Deepikaa  
       
 implemented   

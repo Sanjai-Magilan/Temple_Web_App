@@ -2,25 +2,78 @@
  * Authentication Routes
  */
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authController = require('../controllers/authController');
-const validationMiddleware = require('../middleware/validationMiddleware');
-const authMiddleware = require('../middleware/authMiddleware');
+const authController = require("../controllers/authController");
+const validationMiddleware = require("../middleware/validationMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const jwtUtils = require("../utils/jwt");
+const passport = require("passport");
 
 // Registration routes
-router.get('/register', authMiddleware.optionalAuth, authController.showRegister);
-router.post('/register', authMiddleware.optionalAuth, validationMiddleware.validateRegistration, authController.register);
+router.get(
+  "/register",
+  authMiddleware.optionalAuth,
+  authController.showRegister,
+);
+router.post(
+  "/register",
+  authMiddleware.optionalAuth,
+  validationMiddleware.validateRegistration,
+  authController.register,
+);
 
 // Login routes
-router.get('/login', authMiddleware.optionalAuth, authController.showLogin);
-router.post('/login', authMiddleware.optionalAuth, validationMiddleware.validateLogin, authController.login);
+router.get("/login", authMiddleware.optionalAuth, authController.showLogin);
+router.post(
+  "/login",
+  authMiddleware.optionalAuth,
+  validationMiddleware.validateLogin,
+  authController.login,
+);
+
+//Google Login starts here
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  }),
+);
+
+// Google callback
+// Google callback
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+  }),
+  authController.googleCallback,
+);
 
 // Logout route
-router.post('/logout', authController.logout);
-router.get('/logout', authController.logout);
+router.post("/logout", authController.logout);
+router.get("/logout", authController.logout);
+
+// OTP Verification routes
+router.get("/verify-otp", authController.showOTPPage);
+router.post("/verify-otp", authController.verifyOTP);
+
+// Resend OTP route
+router.post("/resend-otp", authController.resendOTP);
+
+// Complete profile (phone) routes for Google users
+router.get(
+  "/complete-profile",
+  authMiddleware.verifyToken,
+  authController.showCompleteProfile,
+);
+router.post(
+  "/complete-profile",
+  authMiddleware.verifyToken,
+  authController.savePhone,
+);
+
+// router.get("/complete-profile", authMiddleware.verifyToken, authController.showCompleteProfile);
+// router.post("/complete-profile", authMiddleware.verifyToken, authController.savePhone);
 
 module.exports = router;
-
-
-

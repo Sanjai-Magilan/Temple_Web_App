@@ -5,3 +5,6 @@ implemented
 implemented
     removed role form profile and homepage
     - dharshini
+implemented 
+    update hall booking UI
+    - kamalesh 

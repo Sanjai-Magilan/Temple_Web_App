@@ -94,3 +94,26 @@ test('should show error if password is invalid', async () => {
     error: 'Invalid email or password.'
   }));
 });
+
+//login and redirect user based on role
+test('should login user and redirect based on role', async () => {
+  userModel.findByEmail.mockResolvedValue({
+    id: 1,
+    email: 'admin@mail.com',
+    role: 'admin',
+    password_hash: 'hash',
+    is_active: true
+  });
+
+  userModel.verifyPassword.mockResolvedValue(true);
+  userModel.updateLastLogin.mockResolvedValue();
+  jwtUtils.generateToken.mockReturnValue('admin-token');
+
+  const req = mockRequest({ email: 'admin@mail.com', password: '123' });
+  const res = mockResponse();
+
+  await authController.login(req, res);
+
+  expect(res.cookie).toHaveBeenCalled();
+  expect(res.redirect).toHaveBeenCalledWith('/admin');
+});

@@ -117,3 +117,14 @@ test('should login user and redirect based on role', async () => {
   expect(res.cookie).toHaveBeenCalled();
   expect(res.redirect).toHaveBeenCalledWith('/admin');
 });
+
+//case 5 logout user
+test('should clear cookie and redirect to login', () => {
+  const req = mockRequest();
+  const res = mockResponse();
+
+  authController.logout(req, res);
+
+  expect(res.clearCookie).toHaveBeenCalledWith('token');
+  expect(res.redirect).toHaveBeenCalledWith('/login');
+});

@@ -13,12 +13,12 @@ const handleValidationErrors = (req, res, next) => {
   if (!errors.isEmpty()) {
     // Get first error message
     const firstError = errors.array()[0].msg;
-    
+
     // Determine which view to render based on route
     const isLogin = req.path === '/login' || req.originalUrl.includes('/login');
     const viewName = isLogin ? 'auth/login' : 'auth/register';
     const title = isLogin ? 'Login' : 'Register';
-    
+
     return res.status(400).render(viewName, {
       title: title,
       error: firstError,
@@ -61,15 +61,15 @@ exports.validateRegistration = [
     .withMessage('First name can only contain letters and spaces'),
   body('last_name')
     .trim()
-    .isLength({ min: 2, max: 100 })
-    .withMessage('Last name must be between 2 and 100 characters')
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Last name must be between 1 and 100 characters')
     .matches(/^[a-zA-Z\s]+$/)
     .withMessage('Last name can only contain letters and spaces'),
   body('family_name')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
-    .isLength({ min: 2, max: 200 })
-    .withMessage('Family name must be between 2 and 200 characters'),
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Family name must be between 1 and 200 characters'),
   handleValidationErrors
 ];
 

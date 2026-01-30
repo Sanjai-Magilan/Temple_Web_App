@@ -49,20 +49,88 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
-    const user = await userModel.create({
-      email,
-      phone,
-      password,
-      first_name,
-      last_name,
-      role: 'user'
+    // Generate 4-digit OTP
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Store in session (temp registration data)
+    req.session.registerAuth = {
+      otp,
+      userData: {
+        email, phone, password, first_name, last_name, family_name, address, city, state, pincode
+      },
+      expires: Date.now() + 10 * 60 * 1000 // 10 minutes
+    };
+
+    console.log(`=========================================`);
+    console.log(`Registration OTP for ${email}: ${otp}`);
+    console.log(`=========================================`);
+
+    res.render('auth/register', {
+      title: 'Verify Email',
+      error: null,
+      step: 'otp',
+      email: email,
+      devOtp: otp,
+      formData: {}
     });
 
-    // Create family if family_name is provided
-    let family = null;
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.render('auth/register', {
+      title: 'Register',
+      error: 'Registration failed. Please try again.',
+      formData: req.body
+    });
+  }
+};
+
+/**
+ * Verify Registration OTP
+ */
+exports.verifyRegisterOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const authData = req.session.registerAuth;
+
+    if (!authData || !authData.userData) {
+      return res.redirect('/register');
+    }
+
+    if (authData.otp !== otp) {
+      return res.render('auth/register', {
+        title: 'Verify Email',
+        error: 'Invalid OTP. Please try again.',
+        step: 'otp',
+        email: authData.userData.email,
+        devOtp: authData.otp, // Keep showing for demo
+        formData: {}
+      });
+    }
+
+    if (Date.now() > authData.expires) {
+      delete req.session.registerAuth;
+      return res.render('auth/register', {
+        title: 'Register',
+        error: 'OTP expired. Please register again.',
+        formData: authData.userData
+      });
+    }
+
+    // OTP Verified. Create User.
+    const { email, phone, password, first_name, last_name, family_name, address, city, state, pincode } = authData.userData;
+
+    // Double check existence just in case
+    if (await userModel.emailExists(email)) {
+      delete req.session.registerAuth;
+      return res.render('auth/register', { title: 'Register', error: 'User already exists.', formData: {} });
+    }
+
+    const user = await userModel.create({
+      email, phone, password, first_name, last_name, role: 'user'
+    });
+
     if (family_name && family_name.trim()) {
-      family = await familyModel.create({
+      await familyModel.create({
         family_name: family_name.trim(),
         head_user_id: user.id,
         address: address || null,
@@ -72,30 +140,31 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Generate JWT token
+    // Generate Token and Login
     const token = jwtUtils.generateToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role
+      userId: user.id, email: user.email, role: user.role
     });
 
-    // Set token in httpOnly cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: 'strict'
     });
 
-    // Redirect to home or dashboard
-    req.flash ? req.flash('success', 'Registration successful! Welcome to Temple Management System.') : null;
+    delete req.session.registerAuth;
+    req.flash ? req.flash('success', 'Registration successful!') : null;
     res.redirect('/');
+
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Verify Register OTP error:', error);
     res.render('auth/register', {
-      title: 'Register',
-      error: 'Registration failed. Please try again.',
-      formData: req.body
+      title: 'Verify Email',
+      error: 'Verification failed. Please try again.',
+      step: 'otp',
+      email: req.session.registerAuth?.userData?.email,
+      devOtp: req.session.registerAuth?.otp,
+      formData: {}
     });
   }
 };

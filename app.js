@@ -46,6 +46,12 @@ app.use(express.static(path.join(__dirname, "public")));
 const authMiddleware = require("./middleware/authMiddleware");
 app.use(authMiddleware.optionalAuth);
 
+// Make user available to all views
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+
 // Routes
 const indexRoutes = require("./routes/index");
 const authRoutes = require("./routes/authRoutes");

@@ -1,36 +1,67 @@
 <%- include('partials/header') %>
-<%- include('partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+    <%- include('partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h1 class="card-title mb-4"><%= title %></h1>
-                    <p class="lead"><%= message %></p>
-                    <% if (typeof user !== 'undefined' && user) { %>
-                        <div class="alert alert-success mt-4">
-                            <h5>Welcome, <%= user.first_name %>!</h5>
-                            <p class="mb-0">You are logged in as <strong><%= user.role %></strong></p>
-                            <div class="mt-3">
-                                <a href="/dashboard" class="btn btn-primary me-2">Go to Dashboard</a>
-                                <% if (user.role === 'admin') { %>
-                                    <a href="/admin" class="btn btn-outline-primary">Admin Panel</a>
-                                <% } %>
+        <div class="container mt-5 mb-5">
+            <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
+                        <div class="card-body text-center p-5"
+                            style="background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);">
+                            <div class="mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
+                                    fill="none" stroke="#1e3a8a" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" class="mb-3">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                </svg>
+                                <h1 class="display-5 fw-bold text-primary mb-3"
+                                    style="color: #1e3a8a !important; font-family: 'Playfair Display', serif;">Welcome
+                                </h1>
+                                <p class="lead text-muted">
+                                    <%= message %>
+                                </p>
                             </div>
+
+                            <% if (typeof user !=='undefined' && user) { %>
+                                <div class="alert alert-success mt-4 p-4"
+                                    style="background-color: #ecfdf5; border-color: #10b981; color: #064e3b;">
+                                    <h4 class="alert-heading mb-3">Welcome Back, <%= user.first_name %>!</h4>
+                                    <p class="mb-3">You are currently logged in as <strong>
+                                            <%= user.role %>
+                                        </strong>.</p>
+                                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                        <a href="/dashboard" class="btn btn-primary btn-lg px-4 gap-3">Go to
+                                            Dashboard</a>
+                                        <% if (user.role==='admin' ) { %>
+                                            <a href="/admin" class="btn btn-outline-primary btn-lg px-4">Admin Panel</a>
+                                            <% } %>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">Not you? <a href="/logout"
+                                                class="text-decoration-none">Logout</a></small>
+                                    </div>
+                                </div>
+                                <% } else { %>
+                                    <div class="d-grid gap-3 col-md-10 mx-auto mt-5">
+                                        <a href="/login" class="btn btn-primary btn-lg py-3 shadow-sm"
+                                            style="background-color: #1e3a8a; border: none;">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                                        </a>
+                                        <a href="/register" class="btn btn-outline-primary btn-lg py-3 shadow-sm"
+                                            style="color: #1e3a8a; border-color: #1e3a8a;">
+                                            <i class="bi bi-person-plus me-2"></i> Create Account
+                                        </a>
+                                    </div>
+                                    <p class="text-muted mt-4 mb-0 small">
+                                        By continuing, you agree to our <a href="#" class="text-decoration-none">Terms
+                                            of Service</a> and <a href="#" class="text-decoration-none">Privacy
+                                            Policy</a>.
+                                    </p>
+                                    <% } %>
                         </div>
-                    <% } else { %>
-                        <p class="text-muted mt-4">Please <a href="/login">login</a> or <a href="/register">register</a> to continue.</p>
-                        <div class="mt-4">
-                            <a href="/login" class="btn btn-primary me-2">Login</a>
-                            <a href="/register" class="btn btn-outline-primary">Register</a>
-                        </div>
-                    <% } %>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<%- include('partials/footer') %>
-
+        <%- include('partials/footer') %>

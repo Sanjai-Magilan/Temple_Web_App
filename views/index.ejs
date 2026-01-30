@@ -8,14 +8,10 @@
                         <div class="card-body text-center p-5"
                             style="background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);">
                             <div class="mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
-                                    fill="none" stroke="#1e3a8a" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round" class="mb-3">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                </svg>
-                                <h1 class="display-5 fw-bold text-primary mb-3"
-                                    style="color: #1e3a8a !important; font-family: 'Playfair Display', serif;">Welcome
+                                <img src="/assets/temple-gopuram.png" alt="Temple Logo" width="120" class="mb-3">
+                                <h1 class="display-5 fw-bold mb-3"
+                                    style="color: #800000 !important; font-family: 'Playfair Display', serif;">Temple
+                                    Welcomes You!
                                 </h1>
                                 <p class="lead text-muted">
                                     <%= message %>
@@ -25,7 +21,8 @@
                             <% if (typeof user !=='undefined' && user) { %>
                                 <div class="alert alert-success mt-4 p-4"
                                     style="background-color: #ecfdf5; border-color: #10b981; color: #064e3b;">
-                                    <h4 class="alert-heading mb-3">Welcome Back, <%= user.first_name %>!</h4>
+                                    <h4 class="alert-heading mb-3" style="color: #4a4036 !important;">Welcome Back, <%=
+                                            user.first_name %>!</h4>
                                     <p class="mb-3">You are currently logged in as <strong>
                                             <%= user.role %>
                                         </strong>.</p>
@@ -43,12 +40,10 @@
                                 </div>
                                 <% } else { %>
                                     <div class="d-grid gap-3 col-md-10 mx-auto mt-5">
-                                        <a href="/login" class="btn btn-primary btn-lg py-3 shadow-sm"
-                                            style="background-color: #1e3a8a; border: none;">
+                                        <a href="/login" class="btn btn-primary btn-lg py-3 shadow-sm">
                                             <i class="bi bi-box-arrow-in-right me-2"></i> Login
                                         </a>
-                                        <a href="/register" class="btn btn-outline-primary btn-lg py-3 shadow-sm"
-                                            style="color: #1e3a8a; border-color: #1e3a8a;">
+                                        <a href="/register" class="btn btn-outline-primary btn-lg py-3 shadow-sm">
                                             <i class="bi bi-person-plus me-2"></i> Create Account
                                         </a>
                                     </div>

@@ -32,7 +32,7 @@ body {
 /* =========================
    NAVBAR (LANDING)
 ========================= */
-.navbar {
+.landing-navbar {
     height: 72px;
     padding: 0 36px;
     display: flex;
@@ -44,7 +44,7 @@ body {
 }
 
 /* Logo */
-.logo {
+.landing-logo {
     font-weight: 600;
     font-size: 18px;
     color: var(--heading-dark);
@@ -54,7 +54,7 @@ body {
    NAV ITEM STATES (SIMPLE)
 ========================= */
 
-.nav-links a {
+.landing-nav-links a {
     padding: 6px 12px;
     cursor: pointer;
     position: relative;
@@ -65,12 +65,12 @@ body {
 }
 
 /* Hover state */
-.nav-links a:hover {
+.landing-nav-links a:hover {
     color: var(--heading-dark);
 }
 
 /* Underline indicator */
-.nav-links a::after {
+.landing-nav-links a::after {
     content: "";
     position: absolute;
     left: 50%;
@@ -84,22 +84,20 @@ body {
 }
 
 /* Hover underline */
-.nav-links a:hover::after {
+.landing-nav-links a:hover::after {
     width: 60%;
 }
 
 /* Active (Home) */
-.nav-links a.active {
+.landing-nav-links a.active {
     color: var(--heading-dark);
     font-weight: 600;
 }
 
 /* Active underline */
-.nav-links a.active::after {
+.landing-nav-links a.active::after {
     width: 60%;
 }
-
-
 
 /* =========================
    BUTTONS (GLOBAL)
@@ -119,36 +117,36 @@ body {
 }
 
 /* Navbar auth buttons */
-.auth-buttons {
+.landing-auth-buttons {
     display: flex;
     gap: 10px;
 }
 
-.auth-buttons .btn {
+.landing-auth-buttons .btn {
     padding: 7px 16px;
     font-size: 13.5px;
     border-radius: 18px;
 }
 
 /* Register */
-.nav-secondary {
+.landing-nav-secondary {
     background: transparent;
     border: 1px solid var(--accent);
     color: var(--heading-dark);
 }
 
-.nav-secondary:hover {
+.landing-nav-secondary:hover {
     background: rgba(201, 181, 156, 0.15);
 }
 
 /* Login */
-.nav-primary {
+.landing-nav-primary {
     background: var(--accent);
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
-.nav-primary:hover {
+.landing-nav-primary:hover {
     background: #bfa889;
     box-shadow: 0 6px 16px rgba(0,0,0,0.16);
 }

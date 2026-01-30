@@ -1,36 +1,100 @@
 <%- include('partials/header') %>
-<%- include('partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+<%- include('partials/landing_nav') %>
 
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h1 class="card-title mb-4"><%= title %></h1>
-                    <p class="lead"><%= message %></p>
-                    <% if (typeof user !== 'undefined' && user) { %>
-                        <div class="alert alert-success mt-4">
-                            <h5>Welcome, <%= user.first_name %>!</h5>
-                            <p class="mb-0">You are logged in as <strong><%= user.role %></strong></p>
-                            <div class="mt-3">
-                                <a href="/dashboard" class="btn btn-primary me-2">Go to Dashboard</a>
-                                <% if (user.role === 'admin') { %>
-                                    <a href="/admin" class="btn btn-outline-primary">Admin Panel</a>
-                                <% } %>
-                            </div>
-                        </div>
-                    <% } else { %>
-                        <p class="text-muted mt-4">Please <a href="/login">login</a> or <a href="/register">register</a> to continue.</p>
-                        <div class="mt-4">
-                            <a href="/login" class="btn btn-primary me-2">Login</a>
-                            <a href="/register" class="btn btn-outline-primary">Register</a>
-                        </div>
-                    <% } %>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Shri Temple</h1>
+
+        <p class="hero-tagline">
+            A place of devotion, tradition, and community.
+        </p>
+
+        <p class="hero-description">
+            Shri Temple stands as a center of spiritual heritage and cultural
+            continuity. The temple hosts daily poojas, special rituals, and
+            community gatherings, offering devotees a peaceful space to
+            connect, reflect, and participate in sacred practices.
+        </p>
+
+        <div class="hero-actions">
+            <a href="/register" class="btn hero-secondary">Register</a>
+            <a href="/login" class="btn hero-primary">Login</a>
+        </div>
+    </div>
+</section>
+
+<!-- NEWS -->
+<section class="news-section" id="news">
+    <div class="news-header">
+        <h2>News & Updates</h2>
+        <p>Latest announcements and important updates from the temple.</p>
+    </div>
+
+    <div class="news-grid">
+        <div class="news-card">
+            <h3>Special Pooja on Friday</h3>
+            <p>A special pooja will be conducted this Friday morning.</p>
+            <span class="news-date">12 Jan 2026</span>
+        </div>
+
+        <div class="news-card">
+            <h3>Temple Renovation Update</h3>
+            <p>The inner mandapam renovation work is nearing completion.</p>
+            <span class="news-date">08 Jan 2026</span>
+        </div>
+
+        <div class="news-card">
+            <h3>Festival Arrangements</h3>
+            <p>Preparations have begun for the upcoming festival.</p>
+            <span class="news-date">02 Jan 2026</span>
+        </div>
+
+        <div class="news-card">
+            <h3>Donation Receipts Online</h3>
+            <p>Receipts are now available through the dashboard.</p>
+            <span class="news-date">28 Dec 2025</span>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contactModal">
+    <div class="modal">
+        <button class="modal-close" id="closeModal">&times;</button>
+
+        <h2>Contact Us</h2>
+        <p class="modal-subtitle">
+            Have a question or need assistance? Send us a message.
+        </p>
+
+        <div class="contact-form-wrapper">
+            <form class="contact-form" action="/contact" method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" required>
+                    </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea rows="5" name="message" required></textarea>
+                </div>
+
+                <button type="submit" class="btn hero-primary">
+                    Send Message
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
-<%- include('partials/footer') %>
+<script src="/js/landing.js"></script>
 
+<%- include('partials/footer') %>

@@ -106,7 +106,7 @@ exports.register = async (req, res) => {
 exports.showLogin = (req, res) => {
   // Redirect if already logged in
   if (req.user) {
-    return res.redirect('/');
+    return res.redirect('/dashboard');
   }
   res.render('auth/login', {
     title: 'Login',
@@ -170,7 +170,7 @@ exports.login = async (req, res) => {
     });
 
     // Redirect based on role
-    const redirectUrl = user.role === 'admin' ? '/admin' : '/';
+    const redirectUrl = user.role === 'admin' ? '/admin' : '/dashboard';
     req.flash ? req.flash('success', 'Login successful!') : null;
     res.redirect(redirectUrl);
   } catch (error) {

@@ -9,3 +9,6 @@ implemented
 implemented 
     update hall booking UI
     - kamalesh 
+implemented
+    update donation UI
+    -kamalesh

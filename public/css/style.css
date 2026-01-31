@@ -61,6 +61,17 @@ main, .container {
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
+/* Hide spin buttons globally for any input with .amount-input class */
+.amount-input {
+    -moz-appearance: textfield;
+}
+
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 /* Button improvements */
 .btn {
     border-radius: 6px;
@@ -166,4 +177,3 @@ footer {
         display: none !important;
     }
 }
-

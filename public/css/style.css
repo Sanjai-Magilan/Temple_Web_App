@@ -454,46 +454,54 @@ body {
 }
 
 
-/* =========================
-   FOOTER ALIGNMENT FIX
-========================= */
-
-/* Footer base */
-footer.bg-light {
-    background-color: var(--surface-primary) !important;
-    padding: 22px 24px !important;
-    margin-top: 0 !important;
+/* ===========================
+   FOOTER
+   =========================== */
+.page-footer {
+    background-color: #f5f1e8;
+    padding: 24px 32px;
+    border-top: 1px solid #e0d8c8;
 }
 
-/* Text color */
-footer.bg-light p,
-footer.bg-light a {
-    color: var(--text-main) !important;
-    font-size: 14px;
+.footer-container {
+    width: 100%;
 }
 
-/* LEFT COLUMN → CENTER */
-footer.bg-light .col-md-6:first-child {
+.footer-bottom {
     display: flex;
-    justify-content: center;
-    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-/* RIGHT COLUMN → RIGHT */
-footer.bg-light .col-md-6:last-child {
+.footer-copyright {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.footer-bottom-links {
     display: flex;
-    justify-content: flex-end;
-    text-align: right;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-/* Remove link underline */
-footer.bg-light a {
-    text-decoration: none !important;
+.footer-bottom-links li {
+    margin: 0;
 }
 
-/* Hover */
-footer.bg-light a:hover {
-    opacity: 0.7;
+.footer-bottom-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s ease;
 }
 
+.footer-bottom-links a:hover {
+    color: #2c2c2c;
+}
 

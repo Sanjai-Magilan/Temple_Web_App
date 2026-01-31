@@ -24,12 +24,12 @@
     <div class="nav-right">
         <div class="nav-user" id="navUser">
             <div class="nav-user-avatar">
-                <%= user && user.name ? user.name.charAt(0).toUpperCase() : ' ' %>
+                <%= user && user.first_name ? user.first_name.charAt(0).toUpperCase() : ' ' %>
             </div>
 
             <div class="nav-user-info">
                 <div class="nav-user-name">
-                    <%= user && user.name ? user.name : 'User' %>
+                    <%= user && user.first_name ? user.first_name : 'User' %>
                 </div>
                 <div class="nav-user-role">Devotee</div>
             </div>

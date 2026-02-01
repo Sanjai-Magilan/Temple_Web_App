@@ -1,1 +1,3 @@
-everyone should update ur changes in the change log
+implemented
+    updated the UI of pooja booking  
+    - joyal

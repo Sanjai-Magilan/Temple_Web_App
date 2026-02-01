@@ -166,4 +166,238 @@ footer {
         display: none !important;
     }
 }
+/* POoja Booking UI */
 
+.pooja-booking-section {
+  background: linear-gradient(to right,#fff3db,#ffe0b2);
+  padding: 60px 20px;
+}
+
+.pooja-container {
+  max-width: 600px;
+  margin: auto;
+}
+
+.pooja-title {
+  text-align: center;
+  font-size: 30px;
+  color: #b45309;
+}
+
+.pooja-subtitle {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.pooja-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-group textarea {
+  height: 70px;
+  resize: none;
+}
+
+.pooja-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.pooja-btn:hover {
+  background: #d97706;
+}
+
+/* HERO */
+
+.pooja-hero {
+  background: url("/images/temple-bg.jpg") center/cover no-repeat;
+  height: 250px;
+  position: relative;
+}
+
+.hero-overlay {
+  background: rgba(0,0,0,0.55);
+  height: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-overlay h1 {
+  font-size: 34px;
+}
+
+/* Layout */
+
+.pooja-main {
+  padding: 40px 20px;
+  background: #fff8ec;
+}
+
+.pooja-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* Form Card */
+
+.pooja-form-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* Pooja Cards */
+
+.pooja-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(130px,1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.pooja-box {
+  background: #fff3d6;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pooja-box img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.pooja-box:hover {
+  transform: scale(1.05);
+  background: #ffd699;
+}
+
+/* Inputs */
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+input, textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  width: 100%;
+  height: 70px;
+  margin-bottom: 15px;
+}
+
+/* Button */
+
+.confirm-btn {
+  width: 100%;
+  padding: 12px;
+  background: #f59e0b;
+  border: none;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+.confirm-btn:hover {
+  background: #d97706;
+}
+
+/* Summary Card */
+
+.pooja-summary {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  height: fit-content;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.note {
+  color: green;
+  font-size: 14px;
+}
+
+/* Mobile */
+
+@media(max-width:768px) {
+  .pooja-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.pooja-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.pooja-box {
+  background: #fff3d6;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.pooja-box img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.pooja-box:hover {
+  background: #ffd28a;
+  transform: scale(1.05);
+}
+
+.pooja-box span {
+  color: green;
+  font-weight: bold;
+}

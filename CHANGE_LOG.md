@@ -1,3 +1,3 @@
-implemented
-    updated the UI of pooja booking  
-    - joyal
+Implemented
+Update pooja booking UI
+ - Joyal Augustin 

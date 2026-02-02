@@ -61,9 +61,15 @@ app.use((req, res, next) => {
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Authentication middleware (optional - makes user available if logged in)
+// Authentication middleware (optional - makes user available if logged in) 
 const authMiddleware = require("./middleware/authMiddleware");
 app.use(authMiddleware.optionalAuth);
+
+// Make user available to all views
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
 
 // Routes
 const indexRoutes = require("./routes/index");

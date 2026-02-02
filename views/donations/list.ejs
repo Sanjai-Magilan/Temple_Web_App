@@ -337,18 +337,7 @@
                                     placeholder="Any specific intentions or prayers..."></textarea>
                             </div>
 
-                            <!-- Anonymous -->
-                            <div class="form-group-custom">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="is_anonymous"
-                                        name="is_anonymous"
-                                        style="width: 1.2em; height: 1.2em; margin-top: 0.1em; background-color: #fff; border-color: #e0d8cc;">
-                                    <label class="form-check-label ms-2" for="is_anonymous"
-                                        style="color: #5d5145; font-weight: 500;">
-                                        Make this donation anonymous
-                                    </label>
-                                </div>
-                            </div>
+
 
                             <!-- Buttons -->
                             <button type="submit" class="btn-submit-custom" id="submitBtn">
@@ -376,7 +365,7 @@
                     amount: document.getElementById('amount').value,
                     donation_type: document.getElementById('donation_type').value,
                     purpose: document.getElementById('purpose').value,
-                    is_anonymous: document.getElementById('is_anonymous').checked
+                    is_anonymous: false
                 };
 
                 try {

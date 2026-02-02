@@ -49,44 +49,14 @@
                             <input type="password" id="password" name="password" required
                                 placeholder="Enter your password" class="auth-input">
                         </div>
-                        <% } %>
 
-                        <form action="/login" method="POST">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       value="<%= formData.email || '' %>" required autocomplete="email" autofocus>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" 
-                                       required autocomplete="current-password">
-                            </div>
-
-                            <div class="mb-3 text-end">
-                                <a href="/forgot-password" class="text-decoration-none small">Forgot Password?</a>
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                <label class="form-check-label" for="remember">
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-                            <div class="text-center mt-3">
-                                <a href="/google" class="btn btn-outline-danger w-100">
-                                    <i class="bi bi-google"></i> Login with Google
-                                </a>
-                            </div>
-
-                        </form>
-                        
-
-                        <div class="text-center">
-                            <p class="mb-0">Don't have an account? <a href="/register">Register here</a></p>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem;">
+                            <label
+                                style="display: flex; align-items: center; gap: 0.5rem; color: #4b5563; cursor: pointer;">
+                                <input type="checkbox" name="remember" style="accent-color: #bf9b5f;"> Remember me
+                            </label>
+                            <a href="/forgot-password" class="auth-link">Forgot Password?</a>
                         </div>
 
                         <button type="submit" class="btn-auth">Sign In</button>

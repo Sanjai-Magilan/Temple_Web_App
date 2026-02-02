@@ -8,11 +8,7 @@ implemented
     - Deepikaa 
 implemented 
     update hall booking UI
-    - kamalesh 
-implemented  
-    forgot password feature with OTP email verification  
-    added password reset OTP fields in users table  
-    - S.T. Devi  
+    - kamalesh   
 implemented   
     added the feature Gmail verification using google-oauth  
     modified the users table added two new columns "email_otp, email_otp_expires"  

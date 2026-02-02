@@ -498,3 +498,275 @@ exports.googleCallback = async (req, res) => {
     res.redirect("/login");
   }
 };
+
+/**
+ * Show forgot password page
+ */
+exports.showForgotPassword = (req, res) => {
+  if (req.user) {
+    return res.redirect("/");
+  }
+  res.render("auth/forgot-password", {
+    title: "Forgot Password",
+    error: null,
+    success: null,
+    formData: {},
+  });
+};
+
+/**
+ * Handle forgot password request - send OTP to email
+ */
+exports.requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.render("auth/forgot-password", {
+        title: "Forgot Password",
+        error: "Email is required.",
+        success: null,
+        formData: { email },
+      });
+    }
+
+    const user = await userModel.findByEmail(email);
+
+    if (!user) {
+      return res.render("auth/forgot-password", {
+        title: "Forgot Password",
+        success:
+          "If your email exists in our system, you will receive an OTP shortly.",
+        error: null,
+        formData: { email },
+      });
+    }
+
+    if (!user.is_active) {
+      return res.render("auth/forgot-password", {
+        title: "Forgot Password",
+        error:
+          "Your account has been deactivated. Please contact administrator.",
+        success: null,
+        formData: { email },
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await userModel.savePasswordResetOtp(user.id, otp, expires);
+
+    try {
+      await mailer.sendPasswordResetOTP(user.email, otp);
+      console.log(`Password reset OTP sent to ${user.email}: ${otp}`);
+    } catch (mailError) {
+      console.error("Error sending password reset email:", mailError);
+    }
+
+    res.redirect(`/verify-reset-otp?email=${encodeURIComponent(user.email)}`);
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.render("auth/forgot-password", {
+      title: "Forgot Password",
+      error: "Failed to process request. Please try again.",
+      success: null,
+      formData: req.body,
+    });
+  }
+};
+
+/**
+ * Show verify reset OTP page
+ */
+exports.showVerifyResetOTP = (req, res) => {
+  const email = req.query.email;
+  if (!email) {
+    return res.redirect("/forgot-password");
+  }
+  res.render("auth/verify-reset-otp", {
+    title: "Verify OTP",
+    email,
+    error: null,
+    success: null,
+  });
+};
+
+/**
+ * Verify password reset OTP
+ */
+exports.verifyResetOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.render("auth/verify-reset-otp", {
+        title: "Verify OTP",
+        email,
+        error: "Email and OTP are required.",
+        success: null,
+      });
+    }
+
+    const user = await userModel.verifyPasswordResetOtp(email, otp);
+
+    if (!user) {
+      return res.render("auth/verify-reset-otp", {
+        title: "Verify OTP",
+        email,
+        error:
+          "Invalid OTP or OTP has expired. Please try again or request a new one.",
+        success: null,
+      });
+    }
+
+    res.redirect(
+      `/reset-password?email=${encodeURIComponent(email)}&verified=true`,
+    );
+  } catch (error) {
+    console.error("Verify reset OTP error:", error);
+    res.render("auth/verify-reset-otp", {
+      title: "Verify OTP",
+      email: req.body.email,
+      error: "Verification failed. Please try again.",
+      success: null,
+    });
+  }
+};
+
+/**
+ * Resend password reset OTP
+ */
+exports.resendResetOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.render("auth/verify-reset-otp", {
+        title: "Verify OTP",
+        email,
+        error: "Email is required.",
+        success: null,
+      });
+    }
+
+    const user = await userModel.findByEmail(email);
+
+    if (!user) {
+      return res.render("auth/verify-reset-otp", {
+        title: "Verify OTP",
+        email,
+        error: "User not found.",
+        success: null,
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await userModel.savePasswordResetOtp(user.id, otp, expires);
+
+    try {
+      await mailer.sendPasswordResetOTP(user.email, otp);
+      console.log(`Password reset OTP resent to ${user.email}: ${otp}`);
+    } catch (mailError) {
+      console.error("Error sending email:", mailError);
+    }
+
+    res.render("auth/verify-reset-otp", {
+      title: "Verify OTP",
+      email,
+      success: "New OTP sent to your email. It will expire in 10 minutes.",
+      error: null,
+    });
+  } catch (error) {
+    console.error("Resend reset OTP error:", error);
+    res.render("auth/verify-reset-otp", {
+      title: "Verify OTP",
+      email: req.body.email,
+      error: "Failed to resend OTP. Please try again.",
+      success: null,
+    });
+  }
+};
+
+/**
+ * Show reset password page
+ */
+exports.showResetPassword = (req, res) => {
+  const { email, verified } = req.query;
+
+  if (!email || verified !== "true") {
+    return res.redirect("/forgot-password");
+  }
+
+  res.render("auth/reset-password", {
+    title: "Reset Password",
+    email,
+    error: null,
+    formData: {},
+  });
+};
+
+/**
+ * Handle password reset
+ */
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, password, confirm_password } = req.body;
+
+    if (!email || !password || !confirm_password) {
+      return res.render("auth/reset-password", {
+        title: "Reset Password",
+        email,
+        error: "All fields are required.",
+        formData: { email },
+      });
+    }
+
+    if (password !== confirm_password) {
+      return res.render("auth/reset-password", {
+        title: "Reset Password",
+        email,
+        error: "Passwords do not match.",
+        formData: { email },
+      });
+    }
+
+    if (password.length < 6) {
+      return res.render("auth/reset-password", {
+        title: "Reset Password",
+        email,
+        error: "Password must be at least 6 characters long.",
+        formData: { email },
+      });
+    }
+
+    const user = await userModel.findByEmail(email);
+
+    if (!user) {
+      return res.render("auth/reset-password", {
+        title: "Reset Password",
+        email,
+        error: "User not found.",
+        formData: { email },
+      });
+    }
+
+    await userModel.updatePassword(user.id, password);
+
+    req.flash(
+      "success",
+      "Password reset successfully! You can now login with your new password.",
+    );
+    res.redirect("/login");
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.render("auth/reset-password", {
+      title: "Reset Password",
+      email: req.body.email,
+      error: "Failed to reset password. Please try again.",
+      formData: req.body,
+    });
+  }
+};

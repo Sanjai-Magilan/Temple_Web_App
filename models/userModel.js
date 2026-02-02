@@ -191,16 +191,16 @@ exports.verifyEmailOtp = async (email, otp) => {
     // First get the user with their hashed OTP
     const [rows] = await pool.execute(
       "SELECT id, email, email_otp, email_otp_expires FROM users WHERE email = ? AND email_otp IS NOT NULL AND email_otp_expires > NOW()",
-      [email]
+      [email],
     );
-    
+
     if (!rows[0]) {
       return null; // No valid OTP found or expired
     }
-    
+
     // Compare the provided OTP with the hashed OTP
     const isValid = await bcrypt.compare(otp.toString(), rows[0].email_otp);
-    
+
     return isValid ? rows[0] : null;
   } catch (error) {
     console.error("Error verifying OTP:", error);
@@ -223,8 +223,68 @@ exports.createGoogleUser = async ({ email, first_name, last_name }) => {
     `INSERT INTO users 
      (email, first_name, last_name, role, is_active, email_verified) 
      VALUES (?, ?, ?, 'user', 1, 1)`,
-    [email, first_name, last_name]
+    [email, first_name, last_name],
   );
 
   return this.findById(result.insertId);
+};
+
+/**
+ * Save password reset OTP for a user
+ */
+exports.savePasswordResetOtp = async (userId, otp, expires) => {
+  const saltRounds = 10;
+  const hashedOtp = await bcrypt.hash(otp.toString(), saltRounds);
+  await pool.execute(
+    "UPDATE users SET password_reset_otp = ?, password_reset_expires = ? WHERE id = ?",
+    [hashedOtp, expires, userId],
+  );
+};
+
+/**
+ * Verify password reset OTP (with hash comparison)
+ */
+exports.verifyPasswordResetOtp = async (email, otp) => {
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id, email, password_reset_otp, password_reset_expires FROM users WHERE email = ? AND password_reset_otp IS NOT NULL AND password_reset_expires > NOW()",
+      [email],
+    );
+
+    if (!rows[0]) {
+      return null;
+    }
+
+    const isValid = await bcrypt.compare(
+      otp.toString(),
+      rows[0].password_reset_otp,
+    );
+
+    return isValid ? rows[0] : null;
+  } catch (error) {
+    console.error("Error verifying password reset OTP:", error);
+    throw error;
+  }
+};
+
+/**
+ * Clear password reset OTP fields
+ */
+exports.clearPasswordResetOtp = async (userId) => {
+  await pool.execute(
+    "UPDATE users SET password_reset_otp = NULL, password_reset_expires = NULL WHERE id = ?",
+    [userId],
+  );
+};
+
+/**
+ * Update user password
+ */
+exports.updatePassword = async (userId, newPassword) => {
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+  await pool.execute(
+    "UPDATE users SET password_hash = ?, password_reset_otp = NULL, password_reset_expires = NULL WHERE id = ?",
+    [passwordHash, userId],
+  );
 };

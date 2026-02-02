@@ -5,27 +5,21 @@
             <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
                 <div class="col-md-8 col-lg-6">
                     <div class="card shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
-                        <div class="card-body text-center p-5"
-                            style="background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);">
+                        <div class="card-body text-center p-5" style="background-color: #fff;">
                             <div class="mb-4">
-                                <img src="/assets/temple-gopuram.png" alt="Temple Logo" width="120" class="mb-3">
-                                <h1 class="display-5 fw-bold mb-3"
-                                    style="color: #800000 !important; font-family: 'Playfair Display', serif;">Temple
-                                    Welcomes You!
-                                </h1>
+                                <h1 class="display-5 fw-bold mb-3">Temple Management System</h1>
                                 <p class="lead text-muted">
-                                    <%= message %>
+                                    Welcome to Temple Management System
                                 </p>
                             </div>
 
                             <% if (typeof user !=='undefined' && user) { %>
                                 <div class="alert alert-success mt-4 p-4"
-                                    style="background-color: #ecfdf5; border-color: #10b981; color: #064e3b;">
-                                    <h4 class="alert-heading mb-3" style="color: #4a4036 !important;">Welcome Back, <%=
-                                            user.first_name %>!</h4>
-                                    <p class="mb-3">You are currently logged in as <strong>
+                                    style="background-color: #d1e7dd; border-color: #badbcc; color: #0f5132;">
+                                    <h4 class="alert-heading mb-3">Welcome, <%= user.first_name %>!</h4>
+                                    <p class="mb-3">You are logged in as <strong>
                                             <%= user.role %>
-                                        </strong>.</p>
+                                        </strong></p>
                                     <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                                         <a href="/dashboard" class="btn btn-primary btn-lg px-4 gap-3">Go to
                                             Dashboard</a>

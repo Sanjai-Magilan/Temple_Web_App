@@ -1,27 +1,26 @@
 /* Global Styles */
 :root {
-    --primary-color: #800000;
-    /* Maroon/Deep Saffron */
-    --secondary-color: #D4AF37;
-    /* Metallic Gold */
-    --background-dark: #2c0e0e;
-    /* Deep Red/Brown Background - impressive */
-    --text-light: #FFF8E7;
-    /* Warm Cream Text */
+    --primary-color: #0d6efd;
+    /* Blue */
+    --secondary-color: #6c757d;
+    /* Gray */
+    --background-body: #f4f7f6;
+    /* Light Blue/Gray Background */
+    --text-main: #333333;
+    /* Dark Text */
     --success-color: #27ae60;
-    --danger-color: #e74c3c;
-    --warning-color: #f39c12;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
 
     /* Bootstrap Overrides */
-    --bs-primary: var(--secondary-color);
-    --bs-body-bg: var(--background-dark);
+    --bs-primary: var(--primary-color);
+    --bs-body-bg: var(--background-body);
 }
 
 body {
-    font-family: 'Playfair Display', 'Segoe UI', serif;
-    /* More premium font */
-    background-color: var(--background-dark);
-    color: var(--text-light);
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    background-color: var(--background-body);
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -29,49 +28,40 @@ body {
 
 /* Navbar Override */
 .bg-primary {
-    background: linear-gradient(135deg, #800000 0%, #4a0404 100%) !important;
-    /* Maroon Gradient */
-    border-bottom: 2px solid #D4AF37;
-    /* Bright Gold border */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: #0d6efd !important;
+    border-bottom: 1px solid #0a58ca;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Primary Button Override (Gold) */
+/* Primary Button Override */
 .btn-primary {
-    background: linear-gradient(to bottom, #D4AF37, #C5A028) !important;
-    border-color: #B8860B !important;
-    color: #2c0e0e !important;
-    /* Dark text on Gold button for contrast */
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(to bottom, #F4C430, #D4AF37) !important;
-    border-color: #DAA520 !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
 }
 
-/* Text Overrides for Dark Mode */
+/* Text Overrides */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-    color: #D4AF37 !important;
-    /* Gold headings */
-    font-family: 'Playfair Display', serif;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    color: #212529 !important;
+    font-weight: 600;
 }
 
 .text-muted {
-    color: #d1d1d1 !important;
+    color: #6c757d !important;
 }
 
 .text-primary {
-    color: #D4AF37 !important;
+    color: #0d6efd !important;
 }
 
 /* Main content wrapper */
@@ -240,23 +230,24 @@ footer {
 
 
 /* Auth Page Styles (Impressive Temple Theme) */
+/* Auth Page Styles (Clean Blue Theme) */
 :root {
-    --primary-blue: #D4AF37;
-    /* Gold */
-    --secondary-saffron: #800000;
-    /* Maroon */
+    --primary-blue: #0d6efd;
+    /* Blue */
+    --secondary-saffron: #6c757d;
+    /* Gray */
 
-    --bg-color: #2c0e0e;
-    /* Deep Red/Brown */
+    --bg-color: #f4f7f6;
+    /* Light Gray */
 
-    --text-main: #2c0e0e;
+    --text-main: #333333;
     /* Dark text for cards */
-    --text-muted: #5a4a4a;
+    --text-muted: #6c757d;
 
-    --glass-bg: rgba(255, 253, 240, 0.95);
-    /* Cream/Off-white Glass */
-    --glass-border: rgba(212, 175, 55, 0.6);
-    /* Gold border */
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    /* White Glass */
+    --glass-border: rgba(13, 110, 253, 0.2);
+    /* Light Blue border */
 }
 
 .auth-body,
@@ -266,7 +257,7 @@ footer {
 
 .auth-body {
     background-color: var(--bg-color);
-    background-image: radial-gradient(circle at center, #4a0404 0%, #2c0e0e 100%);
+    background-image: none;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -280,10 +271,10 @@ footer {
     left: 0;
     width: 100%;
     padding: 1rem 2rem;
-    background: linear-gradient(180deg, #6b6054 0%, #4a4036 100%);
-    /* Dark Brown Gradient */
-    border-bottom: 1px solid #bf9b5f;
-    /* Gold Border */
+    background: #0d6efd;
+    /* Blue */
+    border-bottom: 1px solid #0a58ca;
+    /* Darker Blue Border */
     color: white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     z-index: 50;
@@ -304,9 +295,9 @@ footer {
 }
 
 .auth-nav-brand:hover {
-    color: #FFD700;
-    /* Bright Gold */
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    color: #e2e6ea;
+    /* Light Gray */
+    text-shadow: none;
 }
 
 .auth-wrapper {
@@ -337,11 +328,10 @@ footer {
 
 
 .auth-title {
-    font-family: 'Playfair Display', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #800000 !important;
-    /* Deep Maroon for Title on Light Card */
+    color: #333 !important;
+    /* Dark Text */
     margin-bottom: 0.5rem;
     text-shadow: none;
 }
@@ -410,9 +400,9 @@ footer {
 }
 
 .btn-auth:hover {
-    background-color: #b8860b;
+    background-color: #0b5ed7;
     transform: translateY(-2px);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
 }
 
 .auth-link {

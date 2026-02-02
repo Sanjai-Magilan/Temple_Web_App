@@ -380,8 +380,8 @@ document.getElementById('poojaBookingForm').addEventListener('submit', async fun
 
   const formData = {
     pooja_name: document.getElementById('pooja_name').value,
-    booking_date: document.getElementById('booking_date').value,
-    booking_time: document.getElementById('booking_time').value,
+    booking_date: document.querySelector('[name="booking_date"]').value,
+    booking_time: document.querySelector('[name="booking_time"]').value, // input data without any id can not be fetched using getElementById 
     devotee_name: document.querySelector('input[name="devotee_name"]').value,
     gotra: document.querySelector('input[name="gotra"]').value,
     nakshatra: document.querySelector('select[name="nakshatra"]').value,

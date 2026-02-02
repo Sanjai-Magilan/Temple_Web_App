@@ -19,3 +19,6 @@ implemented
 implemented  
     updated landing page UI  
     - loki  
+implemented
+    update donation UI
+    -kamalesh

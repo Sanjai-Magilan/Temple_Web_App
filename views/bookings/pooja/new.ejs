@@ -3,13 +3,13 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap');
 
-/* Allow FULL WINDOW SCROLL  */
+/* ===== Allow FULL WINDOW SCROLL ===== */
 
 body {
   overflow-y: auto;
 }
 
-/* Overlay  */
+/* ===== Overlay ===== */
 
 .modal-overlay {
   position: fixed;
@@ -42,8 +42,6 @@ body {
   position: relative;
   animation: popup .3s ease;
 }
-
-/* Animation */
 
 @keyframes popup {
   from {
@@ -109,6 +107,10 @@ body {
   font-size: 14px;
 }
 
+.form-input::placeholder {
+  color: #aaa;
+}
+
 .form-input:focus {
   outline: none;
   border-color: #bfa15f;
@@ -169,14 +171,14 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(168,139,77,.35);
 }
-/* disable button */
+
 .btn-book:disabled {
   background: #dcdcdc;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Cancel Link */
+/* ===== Cancel Link ===== */
 
 .cancel-link {
   display: block;
@@ -218,19 +220,22 @@ body {
     <!-- Close Button -->
     <div class="close-btn" onclick="closeModal()">✖</div>
 
+    <!-- Header -->
     <h2 class="booking-title">Book a Pooja</h2>
     <p class="booking-subtitle">
       A Guide to Daily Rituals and Divine Connection
     </p>
 
+    <!-- Form -->
+
     <form id="poojaBookingForm">
 
       <!-- Select Pooja -->
+
       <div class="form-group">
         <label class="form-label">Select Pooja</label>
 
         <select id="pooja_name"
-                name="pooja_name"
                 class="form-input"
                 onchange="setAmount()"
                 required>
@@ -245,22 +250,30 @@ body {
         </select>
       </div>
 
-      <!-- Date & Time -->
+      <!-- Booking Date & Time -->
+
       <div class="row-2">
 
         <div class="col-2 form-group">
           <label class="form-label">Booking Date</label>
-          <input type="date" name="booking_date" class="form-input" required>
+          <input type="date"
+                 name="booking_date"
+                 class="form-input"
+                 required>
         </div>
 
         <div class="col-2 form-group">
           <label class="form-label">Booking Time</label>
-          <input type="time" name="booking_time" class="form-input" required>
+          <input type="time"
+                 name="booking_time"
+                 class="form-input"
+                 required>
         </div>
 
       </div>
 
       <!-- Devotee Name -->
+
       <div class="form-group">
         <label class="form-label">Devotee Name</label>
         <input type="text"
@@ -270,7 +283,8 @@ body {
                required>
       </div>
 
-      <!-- Gotra + Nakshatra -->
+      <!-- Gotra & Nakshatra -->
+
       <div class="row-2">
 
         <div class="col-2 form-group">
@@ -319,16 +333,19 @@ body {
 
       </div>
 
-      <!-- Instructions -->
+      <!-- Special Instructions -->
+
       <div class="form-group">
         <label class="form-label">Special Instructions</label>
+
         <textarea name="special_instructions"
                   rows="3"
                   class="form-input"
-                  placeholder="Flowers, timings, sankalpam etc"></textarea>
+                  placeholder="Flowers, preferred timings, sankalpam details..."></textarea>
       </div>
 
       <!-- Amount -->
+
       <div class="form-group">
         <label class="form-label">Pooja Amount</label>
 
@@ -336,19 +353,18 @@ body {
           <span class="amount-symbol">₹</span>
           <input type="number"
                  id="amount"
-                 name="amount"
                  class="form-input amount-input"
-                 placeholder="0.00"
+                 placeholder="Auto filled from pooja selection"
                  required>
         </div>
 
       </div>
 
       <!-- Buttons -->
+
       <button type="submit" class="btn-book" id="submitBtn">
         Proceed To Payment →
       </button>
-      
 
       <a class="cancel-link" onclick="closeModal()">Cancel Booking</a>
 
@@ -370,41 +386,61 @@ function setAmount() {
   document.getElementById("amount").value = price || "";
 }
 
-document.getElementById('poojaBookingForm').addEventListener('submit', async function (e) {
+document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
+
   e.preventDefault();
 
-  const submitBtn = document.getElementById('submitBtn');
+  const submitBtn = document.getElementById("submitBtn");
   const originalText = submitBtn.innerHTML;
+  let redirected = false;
+
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+  submitBtn.innerHTML = "⏳ Processing...";
 
   const formData = {
-    pooja_name: document.getElementById('pooja_name').value,
+    pooja_name: document.getElementById("pooja_name").value,
     booking_date: document.querySelector('[name="booking_date"]').value,
-    booking_time: document.querySelector('[name="booking_time"]').value, // input data without any id can not be fetched using getElementById 
-    devotee_name: document.querySelector('input[name="devotee_name"]').value,
-    gotra: document.querySelector('input[name="gotra"]').value,
-    nakshatra: document.querySelector('select[name="nakshatra"]').value,
-    special_instructions: document.querySelector('textarea[name="special_instructions"]').value,
-    amount: document.getElementById('amount').value
+    booking_time: document.querySelector('[name="booking_time"]').value,
+    devotee_name: document.querySelector('[name="devotee_name"]').value,
+    gotra: document.querySelector('[name="gotra"]').value,
+    nakshatra: document.querySelector('[name="nakshatra"]').value,
+    special_instructions: document.querySelector('[name="special_instructions"]').value,
+    amount: document.getElementById("amount").value
   };
 
   try {
-    await initiatePayment('pooja-booking', formData, {
+
+    await initiatePayment("pooja-booking", formData, {
+
       onSuccess: (result) => {
-        window.location.href = '/payment/success?payment_id=' + result.payment_id;
+        redirected = true;
+        window.location.href = "/payment/success?payment_id=" + result.payment_id;
       },
-      onFailure: (error) => {
-        alert('Payment failed: ' + error.message);
+
+      onFailure: () => {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
       }
+
     });
+
   } catch (error) {
-    alert('Error: ' + error.message);
+
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalText;
+    alert("Payment cancelled");
+
+  } finally {
+
+    setTimeout(() => {
+      if (!redirected) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }, 2000);
+
   }
+
 });
 
 </script>

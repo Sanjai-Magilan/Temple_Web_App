@@ -122,9 +122,17 @@ exports.adminDashboard = async (req, res) => {
 
     // Get counts
     const [totalUsers] = await pool.execute('SELECT COUNT(*) as count FROM users WHERE role = "user"');
-    const [totalDonations] = await pool.execute('SELECT COUNT(*) as count FROM donations');
+    const [totalDonations] = await pool.execute(
+      `SELECT COUNT(*) as count FROM donations d
+       WHERE d.payment_id IS NOT NULL AND 
+       d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`
+    );
+    
     const [totalBookings] = await pool.execute(
-      'SELECT (SELECT COUNT(*) FROM hall_bookings) + (SELECT COUNT(*) FROM pooja_bookings) as count'
+      `SELECT 
+        (SELECT COUNT(*) FROM hall_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) + 
+        (SELECT COUNT(*) FROM pooja_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) 
+       as count`
     );
     const [totalRevenue] = await pool.execute(
       `SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'completed'`
@@ -134,11 +142,19 @@ exports.adminDashboard = async (req, res) => {
     const recentPayments = await paymentModel.getUserPayments(null, 10, 0);
 
     // Get pending bookings
-    const [pendingHallBookings] = await pool.execute(
-      'SELECT * FROM hall_bookings WHERE status = "pending" ORDER BY created_at DESC LIMIT 5'
+        const [pendingHallBookings] = await pool.execute(
+      `SELECT hb.*, p.status as payment_status 
+       FROM hall_bookings hb
+       LEFT JOIN payments p ON hb.payment_id = p.id
+       WHERE hb.status = "pending" 
+       ORDER BY hb.created_at DESC LIMIT 5`
     );
     const [pendingPoojaBookings] = await pool.execute(
-      'SELECT * FROM pooja_bookings WHERE status = "pending" ORDER BY created_at DESC LIMIT 5'
+      `SELECT pb.*, p.status as payment_status 
+       FROM pooja_bookings pb
+       LEFT JOIN payments p ON pb.payment_id = p.id
+       WHERE pb.status = "pending" 
+       ORDER BY pb.created_at DESC LIMIT 5`
     );
     const pendingBookings = [...pendingHallBookings, ...pendingPoojaBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));

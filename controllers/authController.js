@@ -170,7 +170,7 @@ exports.login = async (req, res) => {
     });
 
     // Redirect based on role
-    const redirectUrl = user.role === 'admin' ? '/admin' : '/';
+    const redirectUrl = user.role === 'admin' ? '/admin' : '/dashboard';
     req.flash ? req.flash('success', 'Login successful!') : null;
     res.redirect(redirectUrl);
   } catch (error) {

@@ -81,4 +81,17 @@ router.post(
 // router.get("/complete-profile", authMiddleware.verifyToken, authController.showCompleteProfile);
 // router.post("/complete-profile", authMiddleware.verifyToken, authController.savePhone);
 
+router.get("/forgot-password", authController.showForgotPassword);
+router.post("/forgot-password", authController.requestPasswordReset);
+
+// Verify Reset OTP routes
+router.get("/verify-reset-otp", authController.showVerifyResetOTP);
+router.post("/verify-reset-otp", authController.verifyResetOTP);
+router.post("/resend-reset-otp", authController.resendResetOTP);
+
+// Reset Password routes
+router.get("/reset-password", authController.showResetPassword);
+router.post("/reset-password", authController.resetPassword);
+
+
 module.exports = router;

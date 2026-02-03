@@ -139,9 +139,6 @@
                                             <h6 class="mb-1"><%= booking.booking_number || booking.pooja_name || booking.hall_name %></h6>
                                             <small class="text-muted"><%= new Date(booking.booking_date).toLocaleDateString() %></small>
                                         </div>
-                                        <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : 'secondary' %>">
-                                            <%= booking.status %>
-                                        </span>
                                     </div>
                                 </div>
                             <% }); %>

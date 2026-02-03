@@ -21,4 +21,7 @@ implemented
     - loki  
 implemented
     update donation UI
-    -kamalesh
+    -kamalesh  
+Implemented  
+    Update pooja booking UI  
+    - Joyal Augustin 

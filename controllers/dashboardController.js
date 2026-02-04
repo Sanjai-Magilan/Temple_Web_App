@@ -45,7 +45,6 @@ exports.userDashboard = async (req, res) => {
     );
 
     // --- 3. GET FAMILY MEMBERS COUNT (Specific for "Family" Card) ---
-    // Note: Ensure your table is named 'family_members'
     const [familyResult] = await pool.execute(
         'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?', 
         [userId]
@@ -53,25 +52,27 @@ exports.userDashboard = async (req, res) => {
     const familyCount = familyResult[0].count;
 
     // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
-    // This query fetches the nearest booking that is today or in the future
     const [upcomingPoojaResult] = await pool.execute(
         `SELECT * FROM pooja_bookings 
          WHERE user_id = ? AND booking_date >= CURDATE() 
          ORDER BY booking_date ASC LIMIT 1`,
         [userId]
     );
-    // If we find a future booking, use it. Otherwise null.
     const upcomingPooja = upcomingPoojaResult.length > 0 ? upcomingPoojaResult[0] : null;
 
-    // --- 5. GET LATEST HALL BOOKING STATUS (Specific for "Hall Booking" Card) ---
-    const [latestHallResult] = await pool.execute(
-        `SELECT status FROM hall_bookings 
-         WHERE user_id = ? 
-         ORDER BY created_at DESC LIMIT 1`,
-        [userId]
-    );
-    // Default to "No Bookings" if the user hasn't booked a hall yet
-    const hallStatus = latestHallResult.length > 0 ? latestHallResult[0].status : "No Bookings";
+// --- 5. GET UPCOMING HALL BOOKING (FUTURE EVENT) ---
+const [upcomingHallResult] = await pool.execute(
+  `SELECT * FROM hall_bookings 
+   WHERE user_id = ? AND booking_date >= CURDATE()
+   ORDER BY booking_date ASC 
+   LIMIT 1`,
+  [userId]
+);
+
+const upcomingHall = upcomingHallResult.length > 0
+  ? upcomingHallResult[0]
+  : null;
+
 
     // --- 6. GET RECENT ACTIVITY (For tables/history if needed) ---
     const recentDonations = await donationModel.getUserDonations(userId, 1, 0);
@@ -80,7 +81,8 @@ exports.userDashboard = async (req, res) => {
 
     const recentBookings = [...recentHallBookings, ...recentPoojaBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 5);
+      .slice(0, 3);
+
 
     // --- RENDER ---
     res.render('dashboard/user', {
@@ -89,7 +91,7 @@ exports.userDashboard = async (req, res) => {
       
       // Dynamic Data for Dashboard Cards
       upcomingPooja: upcomingPooja, 
-      hallStatus: hallStatus,       
+      upcomingHall: upcomingHall,
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,
       familyCount: familyCount,
       
@@ -111,7 +113,7 @@ exports.userDashboard = async (req, res) => {
 };
 
 /**
- * Admin Dashboard (No changes needed here unless you want to add more stats)
+ * Admin Dashboard (No changes made here)
  */
 exports.adminDashboard = async (req, res) => {
   try {

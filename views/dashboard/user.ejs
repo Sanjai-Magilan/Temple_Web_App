@@ -1,101 +1,128 @@
-<link rel="stylesheet" href="/css/dashboard.css">
-<%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Temple Management</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
 
-<main class="container">
-    <h1 class="welcome-text">Welcome, <%= user && user.first_name ? user.first_name : 'User' %></h1>
+    <%- include('../partials/header') %>
+    <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
-    <div class="stats-grid">
-        
-        <div class="stat-card">
-            <div class="stat-label">Upcoming Pooja</div>
-            <div class="stat-value">
-                <%= upcomingPooja ? upcomingPooja.pooja_name : "None" %>
-            </div>
-        </div>
+    <main class="container">
+        <h1 class="welcome-text">Welcome, <%= user && user.first_name ? user.first_name : 'Devotee' %></h1>
 
-        <div class="stat-card">
-            <div class="stat-label">Hall Booking</div>
-            <div class="stat-value">
-                <%= hallStatus.charAt(0).toUpperCase() + hallStatus.slice(1) %> 
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Total Donation</div>
-            <div class="stat-value">
-                ₹<%= totalDonation.toLocaleString('en-IN') %>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Family Members</div>
-            <div class="stat-value">
-                <%= familyCount %> Members
-            </div>
-        </div>
-    </div> 
-
-
-    <div class="details-grid">
-        
-        <div class="detail-card">
-            <h3>Upcoming Pooja Details</h3>
+        <div class="stats-grid">
             
-            <% if (upcomingPooja) { %>
-                <div class="detail-content">
-                    <div class="detail-row">
-                        <span class="detail-label">Pooja:</span>
-                        <span class="detail-value"><%= upcomingPooja.pooja_name %></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Date:</span>
-                        <span class="detail-value">
-                            <%= new Date(upcomingPooja.booking_date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) %>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Time:</span>
-                        <span class="detail-value"><%= upcomingPooja.booking_time || '6:00 AM' %></span>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-label">Upcoming Pooja</div>
+                <div class="stat-value">
+                    <%= upcomingPooja ? upcomingPooja.pooja_name : "None" %>
                 </div>
-                <div class="detail-note">Please arrive 15 minutes early.</div>
-            <% } else { %>
-                <div class="detail-content">
-                    <p style="padding: 15px; color: #777;">You have no upcoming poojas scheduled.</p>
-                </div>
-                <div class="detail-note">Book a service to see details here.</div>
-            <% } %>
+            </div>
 
-            <div class="detail-footer">
-                <span class="footer-text">Next scheduled pooja</span>
-                <a href="/bookings/pooja" class="view-link">View details</a>
-            </div>
-        </div>
-
-        <div class="detail-card">
-            <h3>Donation Summary</h3>
-            <div class="detail-content">
-                <div class="detail-row">
-                    <span class="detail-label">Total Contributions:</span>
-                    <span class="detail-value">
-                        ₹<%= totalDonation.toLocaleString('en-IN') %>
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Last Donation:</span>
-                    <span class="detail-value">
-                        <%= (recentDonations && recentDonations.length > 0) ? "₹" + recentDonations[0].amount : "-" %>
-                    </span>
-                </div>
-            </div>
-            <div class="detail-note">Thank you for supporting the temple.</div>
-            <div class="detail-footer">
-                <span class="footer-text">Last updated today</span>
-                <a href="/donations" class="view-link">View history</a>
-            </div>
-        </div>
+           <div class="stat-card">
+    <div class="stat-label">Upcoming Event</div>
+    <div class="stat-value">
+        <%= upcomingHall ? upcomingHall.hall_name : '-' %>
     </div>
-</main>
+</div>
 
-<%- include('../partials/footer') %>
+
+            <div class="stat-card">
+                <div class="stat-label">Total Donation</div>
+                <div class="stat-value">
+                    ₹<%= totalDonation.toLocaleString('en-IN') %>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Family Members</div>
+                <div class="stat-value">
+                    <%= familyCount %> Members
+                </div>
+            </div>
+        </div> 
+
+        <div class="details-grid">
+            
+            <div class="detail-card">
+                <h3>Upcoming Pooja Details</h3>
+                
+                <% if (upcomingPooja) { %>
+                    <div class="detail-content">
+                        <div class="detail-row">
+                            <span class="detail-label">Pooja Name</span>
+                            <span class="detail-value"><%= upcomingPooja.pooja_name %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date</span>
+                            <span class="detail-value">
+                                <%= new Date(upcomingPooja.booking_date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }) %>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value"><%= upcomingPooja.booking_time || '6:00 AM' %></span>
+                        </div>
+                    </div>
+                    <div class="detail-note">Please arrive 15 minutes before the scheduled time. Dress code applies.</div>
+                <% } else { %>
+                    <div class="detail-content" style="display: flex; align-items: center; justify-content: center;">
+                        <p style="color: #777;">You have no upcoming poojas scheduled.</p>
+                    </div>
+                    <div class="detail-note">Visit the booking page to schedule a service.</div>
+                <% } %>
+
+                <div class="detail-footer">
+                    <span class="footer-text">Next scheduled service</span>
+                    <a href="/bookings/pooja" class="view-link">View Details</a>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h3>Recent Bookings</h3>
+                
+                <div class="detail-content">
+                    <% if (recentBookings && recentBookings.length > 0) { %>
+                        <div class="booking-list">
+                            <% recentBookings.forEach(booking => { %>
+                                <div class="booking-item">
+                                    <div class="booking-info">
+                                        <span class="booking-id">
+                                            #<%= booking.booking_number ? booking.booking_number : 'ID-PENDING' %>
+                                        </span>
+                                        <span class="booking-date">
+                                            <%= booking.hall_name ? booking.hall_name : booking.pooja_name %> | 
+                                            <%= new Date(booking.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %>
+                                        </span>
+                                    </div>
+                                    <div class="booking-status">
+                                        <span class="status-badge <%= booking.status === 'confirmed' ? 'status-success' : 'status-pending' %>">
+                                            <%= booking.status %>
+                                        </span>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p style="color: #777;">No recent bookings found.</p>
+                    <% } %>
+                </div>
+
+                <div class="detail-footer">
+                    <span class="footer-text">Manage your bookings</span>
+                    <a href="/bookings/hall" class="view-link">View Full History</a>
+
+                </div>
+            </div>
+
+        </div> </main>
+
+    <%- include('../partials/footer') %>
+
+</body>
+</html>

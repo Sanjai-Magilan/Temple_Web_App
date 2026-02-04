@@ -61,3 +61,38 @@ describe('initiatePayment', () => {
     expect(onFailure).toHaveBeenCalledWith({ message: 'Order failed' });
   });
 });
+
+describe('verifyPayment', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('calls onSuccess when verification succeeds', async () => {
+    const onSuccess = jest.fn();
+
+    fetch.mockResolvedValueOnce({
+      json: async () => ({ success: true })
+    });
+
+    const payment = new RazorpayPayment({
+      key: 'test_key',
+      onSuccess
+    });
+
+    await payment.verifyPayment(
+      {
+        razorpay_order_id: 'order_123',
+        razorpay_payment_id: 'pay_123',
+        razorpay_signature: 'sig_123'
+      },
+      { payment_type: 'donation' }
+    );
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/payment/verify',
+      expect.objectContaining({ method: 'POST' })
+    );
+
+    expect(onSuccess).toHaveBeenCalled();
+  });
+});

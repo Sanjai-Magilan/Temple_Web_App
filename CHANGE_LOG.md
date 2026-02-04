@@ -29,6 +29,5 @@ Implemented
     Update pooja booking UI  
     - Joyal Augustin 
 Implemented 
-    added contact modal in footer
-    clickable email and phone support
+    added clickable email and phone support in contact modal
     - Deepikaa

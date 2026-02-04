@@ -22,3 +22,7 @@ implemented
 implemented
     update donation UI
     -kamalesh
+implemented 
+    added contact modal in footer
+    clickable email and phone support
+    - Deepikaa

@@ -21,19 +21,25 @@ exports.userDashboard = async (req, res) => {
 
     const userId = req.user.id;
 
-    // Get counts
+    // Get counts - only count completed payments
     const [donationsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM donations WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM donations d
+       WHERE d.user_id = ? AND d.payment_id IS NOT NULL AND 
+       d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 
     const [hallBookingsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM hall_bookings WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM hall_bookings hb
+       WHERE hb.user_id = ? AND hb.payment_id IS NOT NULL AND
+       hb.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 
     const [poojaBookingsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM pooja_bookings WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM pooja_bookings pb
+       WHERE pb.user_id = ? AND pb.payment_id IS NOT NULL AND
+       pb.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 
@@ -47,8 +53,38 @@ exports.userDashboard = async (req, res) => {
     const recentDonations = await donationModel.getUserDonations(userId, 5, 0);
 
     // Get recent bookings (combine hall and pooja)
-    const recentHallBookings = await hallBookingModel.getUserBookings(userId, 3, 0);
-    const recentPoojaBookings = await poojaBookingModel.getUserBookings(userId, 3, 0);
+        // Get recent bookings with payment status (combine hall and pooja)
+    const [recentHallBookingsData] = await pool.execute(
+      `SELECT hb.*, p.status as payment_status 
+       FROM hall_bookings hb
+       LEFT JOIN payments p ON hb.payment_id = p.id
+       WHERE hb.user_id = ?
+       ORDER BY hb.created_at DESC
+       LIMIT 3`,
+      [userId]
+    );
+
+    const [recentPoojaBookingsData] = await pool.execute(
+      `SELECT pb.*, p.status as payment_status 
+       FROM pooja_bookings pb
+       LEFT JOIN payments p ON pb.payment_id = p.id
+       WHERE pb.user_id = ?
+       ORDER BY pb.created_at DESC
+       LIMIT 3`,
+      [userId]
+    );
+
+    // Format bookings with type indicator
+    const recentHallBookings = recentHallBookingsData.map(booking => ({
+      ...booking,
+      type: 'hall'
+    }));
+
+    const recentPoojaBookings = recentPoojaBookingsData.map(booking => ({
+      ...booking,
+      type: 'pooja'
+    }));
+
     const recentBookings = [...recentHallBookings, ...recentPoojaBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 5);

@@ -1,82 +1,305 @@
+<%
+if (!Array.isArray(bookings)) {
+  bookings = bookings ? [bookings] : [];
+}
+%>
 <%- include('../../partials/header') %>
+
+<style>
+/* ===== NAVBAR COLOR SAME AS HALL BOOKING ===== */
+.navbar {
+  background: linear-gradient(90deg, #2c241b, #8c7b65) !important;
+  border-bottom: 1px solid rgba(191, 161, 95, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.navbar-brand,
+.navbar .nav-link {
+  color: #f5f5f5 !important;
+  font-weight: 500;
+}
+.navbar .nav-link:hover {
+  color: #bfa15f !important;
+}
+.navbar .dropdown-toggle {
+  color: #ffffff !important;
+}
+.navbar-toggler {
+  border-color: rgba(191, 161, 95, 0.6);
+}
+.navbar-toggler-icon {
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(10deg);
+}
+
+/* ===== PAGE BACKGROUND ===== */
+
+body {
+  background: linear-gradient(180deg, #7a7a7a, #5f5f5f);
+}
+
+/* ===== PAGE TITLE ===== */
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,.4);
+}
+
+/* ===== CARD ===== */
+
+.pooja-card {
+  background: #fffaf2;
+  border-radius: 15px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 12px 22px rgba(0,0,0,.30);
+  transition: .3s ease;
+}
+
+.pooja-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 35px rgba(0,0,0,.45);
+}
+
+/* ===== CARD HEADER ===== */
+
+.pooja-header {
+  background: linear-gradient(90deg, #c6a75d, #b1934e);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c241b;
+}
+
+/* ===== CARD BODY ===== */
+
+.card-body {
+  padding: 16px 18px;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #2c241b;
+}
+
+/* ===== INFO LINES ===== */
+
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  margin-bottom: 7px;
+  color: #444;
+}
+
+/* ===== STATUS BADGES ===== */
+
+.badge-pending {
+  background: #ffc107;
+  color: #000;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-confirmed {
+  background: #28a745;
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-cancelled {
+  background: #dc3545;
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ===== AMOUNT ===== */
+
+.amount-badge {
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ===== FOOTER ===== */
+
+.card-footer {
+  padding: 10px 16px 14px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* ===== BUTTON ===== */
+
+.btn-gold {
+  background: linear-gradient(90deg, #c6a75d, #b1934e);
+  color: white;
+  border-radius: 20px;
+  padding: 8px 18px;
+  border: none;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(90deg, #b1934e, #9f823e);
+}
+</style>
+
 <%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
 <div class="container mt-4 mb-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h2><i class="bi bi-stars"></i> Pooja Bookings</h2>
-                <a href="/bookings/pooja/new" class="btn btn-warning">
-                    <i class="bi bi-plus-circle"></i> New Booking
-                </a>
-            </div>
+
+  <!-- ===== HEADER ===== -->
+
+  <div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+
+      <h2 class="page-title">
+        <i class="bi bi-stars me-2"></i> Pooja Bookings
+      </h2>
+
+      <a href="/bookings/pooja/new" class="btn btn-gold">
+        <i class="bi bi-plus-circle"></i> New Booking
+      </a>
+
+    </div>
+  </div>
+
+  <% if (bookings.length > 0) { %>
+
+  <!-- ===== CARD GRID ===== -->
+
+  <div class="row">
+
+    <% bookings.forEach(booking => { %>
+
+    <div class="col-12 col-md-6 col-lg-4 mb-4">
+
+      <div class="pooja-card h-100">
+
+        <!-- HEADER -->
+
+        <div class="pooja-header">
+          <%= booking.booking_number %>
         </div>
+
+        <!-- BODY -->
+
+        <div class="card-body">
+
+          <h5 class="card-title">
+            <%= booking.pooja_name %>
+          </h5>
+
+          <div class="info-line">
+            <i class="bi bi-calendar"></i>
+            <%= new Date(booking.booking_date).toLocaleDateString() %>
+          </div>
+
+          <div class="info-line">
+            <i class="bi bi-clock"></i>
+            <%= booking.booking_time %>
+          </div>
+
+          <div class="info-line">
+            <i class="bi bi-person"></i>
+            <%= booking.devotee_name %>
+          </div>
+
+          <% if (booking.gotra) { %>
+          <div class="info-line">
+            <strong>Gotra:</strong> <%= booking.gotra %>
+          </div>
+          <% } %>
+
+          <% if (booking.nakshatra) { %>
+          <div class="info-line">
+            <strong>Nakshatra:</strong> <%= booking.nakshatra %>
+          </div>
+          <% } %>
+
+          <% if (booking.special_instructions) { %>
+          <div class="info-line text-muted">
+            <i class="bi bi-info-circle"></i>
+            <%= booking.special_instructions %>
+          </div>
+          <% } %>
+
+          <!-- STATUS + AMOUNT -->
+
+          <div class="d-flex gap-2 mt-3">
+
+            <span class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>">
+              <%= booking.status %>
+            </span>
+
+            <span class="amount-badge">
+              ₹ <%= booking.amount.toLocaleString() %>
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="card-footer">
+          Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
+        </div>
+
+      </div>
+
     </div>
 
-    <% if (typeof bookings !== 'undefined' && bookings.length > 0) { %>
-        <div class="row">
-            <% bookings.forEach(booking => { %>
-                <div class="col-12 col-md-6 col-lg-4 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header bg-warning text-dark">
-                            <h6 class="mb-0"><%= booking.booking_number %></h6>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title"><%= booking.pooja_name %></h5>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="bi bi-calendar"></i> <%= new Date(booking.booking_date).toLocaleDateString() %><br>
-                                    <i class="bi bi-clock"></i> <%= booking.booking_time %><br>
-                                    <i class="bi bi-person"></i> <%= booking.devotee_name %><br>
-                                    <% if (booking.pooja_type) { %>
-                                        <i class="bi bi-tag"></i> <%= booking.pooja_type %>
-                                    <% } %>
-                                </small>
-                            </p>
-                            <% if (booking.gotra || booking.nakshatra) { %>
-                                <p class="card-text small">
-                                    <% if (booking.gotra) { %>Gotra: <%= booking.gotra %><br><% } %>
-                                    <% if (booking.nakshatra) { %>Nakshatra: <%= booking.nakshatra %><% } %>
-                                </p>
-                            <% } %>
-                            <% if (booking.special_instructions) { %>
-                                <p class="card-text small text-muted"><%= booking.special_instructions %></p>
-                            <% } %>
-                            <div class="mt-3">
-                                <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %>">
-                                    <%= booking.status %>
-                                </span>
-                                <span class="badge bg-info ms-2">₹<%= booking.amount.toLocaleString() %></span>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-light">
-                            <small class="text-muted">
-                                Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            <% }); %>
-        </div>
-    <% } else { %>
-        <div class="row">
-            <div class="col-12">
-                <div class="card text-center py-5">
-                    <div class="card-body">
-                        <i class="bi bi-stars text-muted" style="font-size: 4rem;"></i>
-                        <h4 class="mt-3">No Pooja Bookings Yet</h4>
-                        <p class="text-muted">Book a pooja for yourself or your family</p>
-                        <a href="/bookings/pooja/new" class="btn btn-warning">
-                            <i class="bi bi-plus-circle"></i> Book a Pooja
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <% } %>
+    <% }) %>
+
+  </div>
+
+  <% } else { %>
+
+  <!-- EMPTY STATE -->
+
+  <div class="row justify-content-center">
+
+    <div class="col-md-7">
+
+      <div class="card text-center p-4 shadow-lg border-0"
+           style="border-radius:15px;background:#fff;">
+
+        <i class="bi bi-stars text-warning" style="font-size:50px"></i>
+
+        <h4 class="mt-3">No Pooja Bookings Yet</h4>
+
+        <p class="text-muted">
+          Book a pooja and receive divine blessings 🙏
+        </p>
+
+        <a href="/bookings/pooja/new" class="btn btn-gold mt-2">
+          Book Pooja
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <% } %>
+
 </div>
 
 <%- include('../../partials/footer') %>
-
-
-

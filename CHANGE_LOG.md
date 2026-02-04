@@ -21,8 +21,14 @@ implemented
     - loki  
 implemented
     update donation UI
-    -kamalesh
-implemented 
+    -kamalesh  
+implemented
+    removd role from the profile and home page
+    - Dharshini   
+Implemented  
+    Update pooja booking UI  
+    - Joyal Augustin 
+Implemented 
     added contact modal in footer
     clickable email and phone support
     - Deepikaa

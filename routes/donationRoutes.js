@@ -13,6 +13,9 @@ router.get('/donations', authMiddleware.verifyToken, donationController.list);
 // New donation form
 router.get('/donations/new', authMiddleware.verifyToken, donationController.showNew);
 
+// Admin: List all donations
+router.get('/admin/donations', authMiddleware.verifyToken, authMiddleware.requireRole('admin'), donationController.adminList);
+
 module.exports = router;
 
 

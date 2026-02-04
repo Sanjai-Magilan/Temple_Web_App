@@ -96,26 +96,7 @@ describe('verifyPayment', () => {
     expect(onSuccess).toHaveBeenCalled();
   });
 });
-
-// test('redirects to failure page when verification fails', async () => {
-//   fetch.mockResolvedValueOnce({
-//     json: async () => ({ success: false, message: 'Invalid signature' })
-//   });
-
-//   const payment = new RazorpayPayment({ key: 'test_key' });
-
-//   await payment.verifyPayment(
-//     {
-//       razorpay_order_id: 'order_123',
-//       razorpay_payment_id: 'pay_123',
-//       razorpay_signature: 'sig_123'
-//     },
-//     { payment_type: 'donation' }
-//   );
-
-//   expect(window.location.assign).toHaveBeenCalledWith('/payment/failure');
-// });
-
+describe('cancelPayment', () => {
 test('handles network error during verification', async () => {
   fetch.mockRejectedValueOnce(new Error('Network error'));
 
@@ -150,4 +131,5 @@ test('calls onCancel when checkout dismissed', () => {
   optionsPassed.modal.ondismiss();
 
   expect(onCancel).toHaveBeenCalled();
+});
 });

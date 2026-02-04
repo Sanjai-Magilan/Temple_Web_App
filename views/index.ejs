@@ -1,5 +1,5 @@
 <%- include('partials/header') %>
-<%- include('partials/landing_nav') %>
+<%- include('partials/landing_nav', { user: typeof user !=='undefined' ? user : null }) %>
 
 <!-- HERO -->
 <section class="landing-hero">
@@ -21,8 +21,12 @@
             </p>
 
             <div class="landing-hero-actions">
-                <a href="/register" class="btn landing-hero-secondary">Register</a>
-                <a href="/login" class="btn landing-hero-primary">Login</a>
+                <% if(!user){ %>
+                    <a href="/register" class="btn landing-hero-secondary">Register</a>
+                    <a href="/login" class="btn landing-hero-primary">Login</a>
+                <% }else { %>
+                    <a href="/Dashboard" class="btn landing-hero-primary">Dashboard</a>
+                <% } %>
             </div>
         </div>
 

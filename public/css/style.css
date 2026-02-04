@@ -99,13 +99,47 @@ body {
     padding: 24px 18px;
     font-size: 15px;
     font-weight: 500;
+
+    position: relative;
+    transition:
+        color 0.25s ease,
+        background-color 0.25s ease;
 }
 
-.nav-links a.active,
+/* Hover → text & bg only (NO underline) */
 .nav-links a:hover {
     color: #333;
     background-color: #f9f7f4;
 }
+
+/* Active → text & bg */
+.nav-links a.active {
+    color: #333;
+    background-color: #f9f7f4;
+}
+
+/* Underline (hidden by default) */
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 10px;
+
+    height: 3px;
+    background-color: #333;
+    border-radius: 6px;
+
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.35s ease;
+}
+
+/* Active → underline appears smoothly */
+.nav-links a.active::after {
+    transform: scaleX(1);
+}
+
 
 /* RIGHT */
 .nav-right {

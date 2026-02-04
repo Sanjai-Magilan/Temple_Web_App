@@ -14,11 +14,12 @@ exports.list = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const [bookings] = await poojaBookingModel.getUserBookings(
+    const bookings = await poojaBookingModel.getUserBookings(
       req.user.id,
       50,
       0,
     );
+console.log(bookings)
 
     res.render("bookings/pooja/list", {
       title: "Pooja Bookings",
@@ -33,7 +34,6 @@ exports.list = async (req, res) => {
     });
   }
 };
-
 /**
  * Show pooja booking form
  */

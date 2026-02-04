@@ -19,8 +19,6 @@ exports.list = async (req, res) => {
       50,
       0,
     );
-console.log(bookings)
-
     res.render("bookings/pooja/list", {
       title: "Pooja Bookings",
       user: req.user,

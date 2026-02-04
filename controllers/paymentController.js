@@ -121,6 +121,21 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Invalid booking amount" });
     }
 
+    //Block booking if there is a confirmed booking with overlapping time slot
+    const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+      hall_name,
+      booking_date,
+      start_time,
+      end_time,
+    });
+
+    if (hasConflict) {
+      return res.status(409).json({
+        success: false,
+        message: "Selected time slot is already booked.",
+      });
+    }
+
     // Create Razorpay order
     const options = {
       amount: bookingAmount * 100, // Convert to paise
@@ -342,6 +357,31 @@ exports.verifyPayment = async (req, res) => {
         // Donation receipt is already generated during creation
         // No additional update needed
       } else if (payment.payment_type === "hall_booking") {
+        const booking = await hallBookingModel.findById(payment.related_id);
+
+        if (booking) {
+          const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+            hall_name: booking.hall_name,
+            booking_date: booking.booking_date,
+            start_time: booking.start_time,
+            end_time: booking.end_time,
+            excludeBookingId: booking.id,
+          });
+
+          if (hasConflict) {
+            await hallBookingModel.updateStatus(
+              booking.id,
+              "cancelled",
+              "Time slot already booked",
+            );
+            return res.status(409).json({
+              success: false,
+              message:
+                "Time slot already booked. Payment received; admin will contact you.",
+            });
+          }
+        }
+
         await hallBookingModel.updateStatus(payment.related_id, "confirmed");
       } else if (payment.payment_type === "pooja_booking") {
         await poojaBookingModel.updateStatus(payment.related_id, "confirmed");
@@ -416,6 +456,29 @@ exports.handleWebhook = async (req, res) => {
       // Update related records
       if (existingPayment.related_id) {
         if (existingPayment.payment_type === "hall_booking") {
+          const booking = await hallBookingModel.findById(
+            existingPayment.related_id,
+          );
+
+          if (booking) {
+            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+              hall_name: booking.hall_name,
+              booking_date: booking.booking_date,
+              start_time: booking.start_time,
+              end_time: booking.end_time,
+              excludeBookingId: booking.id,
+            });
+
+            if (hasConflict) {
+              await hallBookingModel.updateStatus(
+                booking.id,
+                "cancelled",
+                "Time slot already booked",
+              );
+              return res.json({ success: true });
+            }
+          }
+
           await hallBookingModel.updateStatus(
             existingPayment.related_id,
             "confirmed",

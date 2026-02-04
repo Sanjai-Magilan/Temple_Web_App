@@ -168,3 +168,42 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
+/**
+ * Check if a paid/confirmed booking overlaps a given slot
+ */
+exports.hasConfirmedOverlap = async ({
+  hall_name,
+  booking_date,
+  start_time,
+  end_time,
+  excludeBookingId = null,
+}) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT hb.id
+       FROM hall_bookings hb
+       INNER JOIN payments p ON hb.payment_id = p.id
+       WHERE hb.hall_name = ?
+         AND hb.booking_date = ?
+         AND hb.status IN ('confirmed', 'completed')
+         AND p.status = 'completed'
+         AND hb.start_time < ?
+         AND hb.end_time > ?
+         AND (? IS NULL OR hb.id <> ?)
+       LIMIT 1`,
+      [
+        hall_name,
+        booking_date,
+        end_time,
+        start_time,
+        excludeBookingId,
+        excludeBookingId,
+      ],
+    );
+
+    return rows.length > 0;
+  } catch (error) {
+    console.error("Error checking hall booking overlap:", error);
+    throw error;
+  }
+};

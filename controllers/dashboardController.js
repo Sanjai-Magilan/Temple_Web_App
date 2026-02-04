@@ -23,17 +23,23 @@ exports.userDashboard = async (req, res) => {
 
     // --- 1. GET COUNTS (General Stats) ---
     const [donationsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM donations WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM donations d
+       WHERE d.user_id = ? AND d.payment_id IS NOT NULL AND 
+       d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 
     const [hallBookingsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM hall_bookings WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM hall_bookings hb
+       WHERE hb.user_id = ? AND hb.payment_id IS NOT NULL AND
+       hb.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 
     const [poojaBookingsCount] = await pool.execute(
-      'SELECT COUNT(*) as count FROM pooja_bookings WHERE user_id = ?',
+      `SELECT COUNT(*) as count FROM pooja_bookings pb
+       WHERE pb.user_id = ? AND pb.payment_id IS NOT NULL AND
+       pb.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`,
       [userId]
     );
 

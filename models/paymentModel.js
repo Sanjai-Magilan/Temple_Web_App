@@ -153,14 +153,14 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
       query = `SELECT * FROM payments 
                WHERE user_id = ? 
                ORDER BY created_at DESC 
-               LIMIT ${limit} OFFSET ?`;
-      params = [userId, limit, offset];
+               LIMIT ${limit} OFFSET ${offset}`;
+      params = [Number(userId)];
     } else {
       // Admin view - get all payments
       query = `SELECT * FROM payments 
                ORDER BY created_at DESC 
-               LIMIT ? OFFSET ?`;
-      params = [limit, offset];
+               LIMIT ${limit} OFFSET ${offset}`;
+      params = [];
     }
     const [rows] = await pool.execute(query, params);
     return rows;

@@ -160,7 +160,7 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
        WHERE user_id = ?
        ORDER BY created_at DESC
       LIMIT ${limit} OFFSET ${offset}`,
-      [userId]
+      [userId],
     );
     return rows;
   } catch (error) {

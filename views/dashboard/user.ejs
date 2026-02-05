@@ -1,170 +1,128 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Temple Management</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">
-                <i class="bi bi-speedometer2"></i> Dashboard
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <small class="text-muted">Welcome, <%= user.first_name %>!</small>
-                <% } %>
-            </h2>
-        </div>
+    <%- include('../partials/header') %>
+    <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+    <main class="container">
+        <h1 class="welcome-text">Welcome, <%= user && user.first_name ? user.first_name : 'Devotee' %></h1>
+
+        <div class="stats-grid">
+            
+            <div class="stat-card">
+                <div class="stat-label">Upcoming Pooja</div>
+                <div class="stat-value">
+                    <%= upcomingPooja ? upcomingPooja.pooja_name : "None" %>
+                </div>
+            </div>
+
+           <div class="stat-card">
+    <div class="stat-label">Upcoming Event</div>
+    <div class="stat-value">
+        <%= upcomingHall ? upcomingHall.hall_name : '-' %>
     </div>
+</div>
 
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-primary">
-                <div class="card-body">
-                    <i class="bi bi-heart-fill text-danger fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof donationsCount !== 'undefined' ? donationsCount : 0 %></h5>
-                    <p class="card-text text-muted small">Donations</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-success">
-                <div class="card-body">
-                    <i class="bi bi-calendar-check-fill text-success fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof hallBookingsCount !== 'undefined' ? hallBookingsCount : 0 %></h5>
-                    <p class="card-text text-muted small">Hall Bookings</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-warning">
-                <div class="card-body">
-                    <i class="bi bi-stars text-warning fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof poojaBookingsCount !== 'undefined' ? poojaBookingsCount : 0 %></h5>
-                    <p class="card-text text-muted small">Pooja Bookings</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-info">
-                <div class="card-body">
-                    <i class="bi bi-wallet2 text-info fs-1"></i>
-                    <h5 class="card-title mt-2">₹<%= typeof totalSpent !== 'undefined' ? totalSpent.toLocaleString() : '0' %></h5>
-                    <p class="card-text text-muted small">Total Spent</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+            <div class="stat-card">
+                <div class="stat-label">Total Donation</div>
+                <div class="stat-value">
+                    ₹<%= totalDonation.toLocaleString('en-IN') %>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <a href="/donations/new" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-heart"></i><br>
-                                <small>Make Donation</small>
-                            </a>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Family Members</div>
+                <div class="stat-value">
+                    <%= familyCount %> Members
+                </div>
+            </div>
+        </div> 
+
+        <div class="details-grid">
+            
+            <div class="detail-card">
+                <h3>Upcoming Pooja Details</h3>
+                
+                <% if (upcomingPooja) { %>
+                    <div class="detail-content">
+                        <div class="detail-row">
+                            <span class="detail-label">Pooja Name</span>
+                            <span class="detail-value"><%= upcomingPooja.pooja_name %></span>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/bookings/hall/new" class="btn btn-outline-success w-100">
-                                <i class="bi bi-calendar-plus"></i><br>
-                                <small>Book Hall</small>
-                            </a>
+                        <div class="detail-row">
+                            <span class="detail-label">Date</span>
+                            <span class="detail-value">
+                                <%= new Date(upcomingPooja.booking_date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }) %>
+                            </span>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/bookings/pooja/new" class="btn btn-outline-warning w-100">
-                                <i class="bi bi-star"></i><br>
-                                <small>Book Pooja</small>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/profile" class="btn btn-outline-info w-100">
-                                <i class="bi bi-person"></i><br>
-                                <small>My Profile</small>
-                            </a>
+                        <div class="detail-row">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value"><%= upcomingPooja.booking_time || '6:00 AM' %></span>
                         </div>
                     </div>
+                    <div class="detail-note">Please arrive 15 minutes before the scheduled time. Dress code applies.</div>
+                <% } else { %>
+                    <div class="detail-content" style="display: flex; align-items: center; justify-content: center;">
+                        <p style="color: #777;">You have no upcoming poojas scheduled.</p>
+                    </div>
+                    <div class="detail-note">Visit the booking page to schedule a service.</div>
+                <% } %>
+
+                <div class="detail-footer">
+                    <span class="footer-text">Next scheduled service</span>
+                    <a href="/bookings/pooja" class="view-link">View Details</a>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Donations</h5>
-                </div>
-                <div class="card-body">
-                    <% if (typeof recentDonations !== 'undefined' && recentDonations.length > 0) { %>
-                        <div class="list-group list-group-flush">
-                            <% recentDonations.forEach(donation => { %>
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-1">₹<%= donation.amount.toLocaleString() %></h6>
-                                            <small class="text-muted"><%= donation.donation_type %> - <%= new Date(donation.created_at).toLocaleDateString() %></small>
-                                        </div>
-                                        <span class="badge bg-<%= donation.payment_status === 'completed' ? 'success' : 'warning' %>">
-                                            <%= donation.payment_status || 'pending' %>
+            <div class="detail-card">
+                <h3>Recent Bookings</h3>
+                
+                <div class="detail-content">
+                    <% if (recentBookings && recentBookings.length > 0) { %>
+                        <div class="booking-list">
+                            <% recentBookings.forEach(booking => { %>
+                                <div class="booking-item">
+                                    <div class="booking-info">
+                                        <span class="booking-id">
+                                            #<%= booking.booking_number ? booking.booking_number : 'ID-PENDING' %>
+                                        </span>
+                                        <span class="booking-date">
+                                            <%= booking.hall_name ? booking.hall_name : booking.pooja_name %> | 
+                                            <%= new Date(booking.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %>
+                                        </span>
+                                    </div>
+                                    <div class="booking-status">
+                                        <span class="status-badge <%= booking.status === 'confirmed' ? 'status-success' : 'status-pending' %>">
+                                            <%= booking.status %>
                                         </span>
                                     </div>
                                 </div>
                             <% }); %>
                         </div>
-                        <a href="/donations" class="btn btn-sm btn-outline-primary mt-3 w-100">View All</a>
                     <% } else { %>
-                        <p class="text-muted text-center mb-0">No donations yet</p>
-                        <a href="/donations/new" class="btn btn-sm btn-primary mt-3 w-100">Make Your First Donation</a>
+                        <p style="color: #777;">No recent bookings found.</p>
                     <% } %>
                 </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Recent Bookings</h5>
-                </div>
-                <div class="card-body">
-                    <% if (typeof recentBookings !== 'undefined' && recentBookings.length > 0) { %>
-                        <div class="list-group list-group-flush">
-                            <% recentBookings.forEach(booking => { %>
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1"><%= booking.type === 'pooja' ? booking.pooja_name : booking.hall_name %></h6>
-                                            <small class="text-muted"><%= new Date(booking.booking_date || booking.created_at).toLocaleDateString() %></small>
-                                        </div>
-                                        <div class="ms-2 text-end">
-                                            <div>
-                                                <span class="badge bg-<%= booking.payment_status === 'completed' ? 'success' : booking.payment_status === 'pending' ? 'warning' : 'secondary' %>">
-                                                    <%= booking.payment_status || 'pending' %>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        </div>
-                        <div class="mt-3">
-                            <a href="/bookings/hall" class="btn btn-sm btn-outline-success me-2">Hall Bookings</a>
-                            <a href="/bookings/pooja" class="btn btn-sm btn-outline-warning">Pooja Bookings</a>
-                        </div>
-                    <% } else { %>
-                        <p class="text-muted text-center mb-0">No bookings yet</p>
-                        <div class="mt-3">
-                            <a href="/bookings/hall/new" class="btn btn-sm btn-success me-2">Book Hall</a>
-                            <a href="/bookings/pooja/new" class="btn btn-sm btn-warning">Book Pooja</a>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<%- include('../partials/footer') %>
+                <div class="detail-footer">
+                    <span class="footer-text">Manage your bookings</span>
+                    <a href="/bookings/hall" class="view-link">View Full History</a>
+
+                </div>
+            </div>
+
+        </div> </main>
+
+    <%- include('../partials/footer') %>
+
+</body>
+</html>

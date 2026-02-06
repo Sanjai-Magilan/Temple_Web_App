@@ -22,3 +22,9 @@ implemented
 implemented
     update donation UI
     -kamalesh
+implemented
+    removd role from the profile and home page
+    - Dharshini   
+Implemented  
+    Update pooja booking UI  
+    - Joyal Augustin 

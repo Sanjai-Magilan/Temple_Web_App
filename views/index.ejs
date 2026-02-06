@@ -1,105 +1,56 @@
 <%- include('partials/header') %>
-<%- include('partials/landing-nav', { user: typeof user !=='undefined' ? user : null }) %>
+    <%- include('partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
-<!-- HERO -->
-<section class="landing-hero">
-    <div class="landing-hero-layout">
+        <div class="container mt-5 mb-5">
+            <div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
+                        <div class="card-body text-center p-5" style="background-color: #fff;">
+                            <div class="mb-4">
+                                <h1 class="display-5 fw-bold mb-3">Temple Management System</h1>
+                                <p class="lead text-muted">
+                                    Welcome to Temple Management System
+                                </p>
+                            </div>
 
-        <!-- LEFT : HERO CONTENT -->
-        <div class="landing-hero-content">
-            <h1>Shri Temple</h1>
-
-            <p class="landing-hero-tagline">
-                A place of devotion, tradition, and community.
-            </p>
-
-            <p class="landing-hero-description">
-                Shri Temple stands as a center of spiritual heritage and cultural
-                continuity. The temple hosts daily poojas, special rituals, and
-                community gatherings, offering devotees a peaceful space to
-                connect, reflect, and participate in sacred practices.
-            </p>
-
-            <div class="landing-hero-actions">
-                <% if(!user){ %>
-                    <a href="/register" class="btn landing-hero-secondary">Register</a>
-                    <a href="/login" class="btn landing-hero-primary">Login</a>
-                <% }else { %>
-                    <a href="/Dashboard" class="btn landing-hero-primary">Dashboard</a>
-                <% } %>
+                            <% if (typeof user !=='undefined' && user) { %>
+                                <div class="alert alert-success mt-4 p-4"
+                                    style="background-color: #d1e7dd; border-color: #badbcc; color: #0f5132;">
+                                    <h4 class="alert-heading mb-3">Welcome, <%= user.first_name %>!</h4>
+                                    <p class="mb-3">You are logged in as <strong>
+                                            <%= user.role %>
+                                        </strong></p>
+                                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                        <a href="/dashboard" class="btn btn-primary btn-lg px-4 gap-3">Go to
+                                            Dashboard</a>
+                                        <% if (user.role==='admin' ) { %>
+                                            <a href="/admin" class="btn btn-outline-primary btn-lg px-4">Admin Panel</a>
+                                            <% } %>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">Not you? <a href="/logout"
+                                                class="text-decoration-none">Logout</a></small>
+                                    </div>
+                                </div>
+                                <% } else { %>
+                                    <div class="d-grid gap-3 col-md-10 mx-auto mt-5">
+                                        <a href="/login" class="btn btn-primary btn-lg py-3 shadow-sm">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                                        </a>
+                                        <a href="/register" class="btn btn-outline-primary btn-lg py-3 shadow-sm">
+                                            <i class="bi bi-person-plus me-2"></i> Create Account
+                                        </a>
+                                    </div>
+                                    <p class="text-muted mt-4 mb-0 small">
+                                        By continuing, you agree to our <a href="#" class="text-decoration-none">Terms
+                                            of Service</a> and <a href="#" class="text-decoration-none">Privacy
+                                            Policy</a>.
+                                    </p>
+                                    <% } %>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- RIGHT : LATEST UPDATES -->
-        <aside class="landing-updates-panel">
-            <h3>Latest Updates</h3>
-
-            <ul class="landing-updates-list">
-                <li>
-                    <span class="badge">NEW</span>
-                    Senior Citizens / Physically challenged quota for
-                    April-2026 has been completed.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    Darshan & Accommodation quota to the SRIVANI Trust
-                    (Rs. 10,000/-) donors for April 2026 will be available
-                    w.e.f 23.01.2026, 11:00 AM onwards.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    SRIVANI Trust Break Darshan tickets (800/day) will be
-                    available online from 09:00 AM to 02:00 PM for same-day
-                    darshan.
-                </li>
-
-                <li>
-                    To generate Digital passbook for donations made before
-                    September 2016, please <a href="#">click here</a>.
-                </li>
-
-                <li>
-                    To enable self service for existing donors,
-                    please <a href="#">click here</a>.
-                </li>
-                <li>
-                    <span class="badge">NEW</span>
-                    Senior Citizens / Physically challenged quota for
-                    April-2026 has been completed.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    Darshan & Accommodation quota to the SRIVANI Trust
-                    (Rs. 10,000/-) donors for April 2026 will be available
-                    w.e.f 23.01.2026, 11:00 AM onwards.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    SRIVANI Trust Break Darshan tickets (800/day) will be
-                    available online from 09:00 AM to 02:00 PM for same-day
-                    darshan.
-                </li>
-
-                <li>
-                    To generate Digital passbook for donations made before
-                    September 2016, please <a href="#">click here</a>.
-                </li>
-
-                <li>
-                    To enable self service for existing donors,
-                    please <a href="#">click here</a>.
-                </li>
-            </ul>
-        </aside>
-
-    </div>
-</section>
-
-
-<script src="/js/landing.js"></script>
-
-<%- include('partials/footer') %>
+        <%- include('partials/footer') %>

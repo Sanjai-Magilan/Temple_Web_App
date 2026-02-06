@@ -150,7 +150,7 @@ exports.register = async (req, res) => {
 exports.showLogin = (req, res) => {
   // Redirect if already logged in
   if (req.user) {
-    return res.redirect('/dashboard');
+    return res.redirect("/");
   }
   res.render("auth/login", {
     title: "Login",

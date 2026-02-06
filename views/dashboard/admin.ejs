@@ -132,21 +132,24 @@
                     <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Pending Approvals</h5>
                 </div>
                 <div class="card-body">
-                    <% if (typeof pendingBookings !== 'undefined' && pendingBookings.length > 0) { %>
+                                        <% if (typeof pendingBookings !== 'undefined' && pendingBookings.length > 0) { %>
                         <div class="list-group list-group-flush">
                             <% pendingBookings.forEach(booking => { %>
                                 <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
                                             <h6 class="mb-1"><%= booking.booking_number || booking.pooja_name || booking.hall_name %></h6>
-                                            <small class="text-muted"><%= new Date(booking.booking_date).toLocaleDateString() %></small>
+                                            <small class="text-muted"><%= new Date(booking.booking_date || booking.created_at).toLocaleDateString() %></small>
                                         </div>
-                                        <span class="badge bg-warning">Pending</span>
+                                        <div class="ms-2 text-end">
+                                            <span class="badge bg-<%= booking.payment_status === 'completed' ? 'success' : booking.payment_status === 'pending' ? 'warning' : 'secondary' %>">
+                                                Payment: <%= booking.payment_status || 'pending' %>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             <% }); %>
-                        </div>
-                    <% } else { %>
+                        <% } else { %>
                         <p class="text-muted text-center mb-0">No pending approvals</p>
                     <% } %>
                 </div>
@@ -156,6 +159,3 @@
 </div>
 
 <%- include('../partials/footer') %>
-
-
-

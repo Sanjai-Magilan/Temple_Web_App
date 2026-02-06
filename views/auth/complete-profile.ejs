@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+      <div class="card shadow">
+        <div class="card-body p-4">
+          <h3 class="text-center mb-3">Complete Your Profile</h3>
+          <p class="text-muted text-center mb-4">Add your phone number and family details to continue.</p>
+
+          <% if (error) { %>
+            <div class="alert alert-danger" role="alert">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <form action="/complete-profile" method="POST">
+            <!-- Phone Number (Required) -->
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone Number *</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phone"
+                name="phone"
+                placeholder="Enter phone number"
+                required
+              />
+            </div>
+
+            <hr class="my-4">
+            <h5 class="mb-3">Family Details (Optional)</h5>
+
+            <!-- Family Name -->
+            <div class="mb-3">
+              <label for="family_name" class="form-label">Family Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="family_name"
+                name="family_name"
+                placeholder="Enter family name"
+              />
+            </div>
+
+            <!-- Address -->
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                rows="2"
+                placeholder="Enter address"
+              ></textarea>
+            </div>
+
+            <!-- City -->
+            <div class="mb-3">
+              <label for="city" class="form-label">City</label>
+              <input
+                type="text"
+                class="form-control"
+                id="city"
+                name="city"
+                placeholder="Enter city"
+              />
+            </div>
+
+            <!-- State -->
+            <div class="mb-3">
+              <label for="state" class="form-label">State</label>
+              <input
+                type="text"
+                class="form-control"
+                id="state"
+                name="state"
+                placeholder="Enter state"
+              />
+            </div>
+
+            <!-- Pincode -->
+            <div class="mb-3">
+              <label for="pincode" class="form-label">Pincode</label>
+              <input
+                type="text"
+                class="form-control"
+                id="pincode"
+                name="pincode"
+                placeholder="Enter pincode"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

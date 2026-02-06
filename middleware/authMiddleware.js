@@ -43,7 +43,7 @@ exports.verifyToken = async (req, res, next) => {
       last_name: user.last_name,
       role: user.role,
     };
-
+    console.log("COOKIE TOKEN:", req.cookies.token);
     next();
   } catch (error) {
     res.clearCookie("token");

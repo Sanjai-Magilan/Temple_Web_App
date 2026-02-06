@@ -182,11 +182,9 @@ exports.hasConfirmedOverlap = async ({
     const [rows] = await pool.execute(
       `SELECT hb.id
        FROM hall_bookings hb
-       INNER JOIN payments p ON hb.payment_id = p.id
        WHERE hb.hall_name = ?
          AND hb.booking_date = ?
          AND hb.status IN ('confirmed', 'completed')
-         AND p.status = 'completed'
          AND hb.start_time < ?
          AND hb.end_time > ?
          AND (? IS NULL OR hb.id <> ?)

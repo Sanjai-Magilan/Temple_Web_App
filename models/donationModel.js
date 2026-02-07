@@ -175,3 +175,31 @@ exports.getAllDonations = async (limit = 50, offset = 0, search = null) => {
   }
 };
 
+exports.getReceiptDetails = async (donationId) => {
+  const [rows] = await pool.execute(
+    `SELECT d.*, 
+            p.status AS payment_status,
+            p.payment_method,
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.currency,
+            u.first_name,
+            u.last_name,
+            u.email,
+            u.phone
+     FROM donations d
+     LEFT JOIN payments p ON d.payment_id = p.id
+     LEFT JOIN users u ON d.user_id = u.id
+     WHERE d.id = ?`,
+    [donationId],
+  );
+
+  return rows[0] || null;
+};
+
+exports.updateReceiptData = async (donationId, receiptData) => {
+  await pool.execute(
+    "UPDATE donations SET receipt_data = ?, receipt_generated = 1 WHERE id = ?",
+    [JSON.stringify(receiptData), donationId],
+  );
+};

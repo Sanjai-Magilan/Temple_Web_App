@@ -111,6 +111,17 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.path.endsWith("/receipt")) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  }),
+);
+
 // Start server
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);

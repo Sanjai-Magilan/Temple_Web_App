@@ -111,6 +111,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+// Middleware
 app.use(
   compression({
     filter: (req, res) => {
@@ -121,6 +123,10 @@ app.use(
     },
   }),
 );
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Start server
 app.listen(PORT, () => {

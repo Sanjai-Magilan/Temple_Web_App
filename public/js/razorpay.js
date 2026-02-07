@@ -14,40 +14,42 @@ class RazorpayPayment {
    */
   async initCheckout(orderData) {
     const self = this;
-    
+
     const options = {
       key: this.razorpayKey,
       amount: orderData.amount * 100, // Convert to paise
-      currency: 'INR',
-      name: 'Temple Management',
-      description: orderData.description || 'Payment',
+      currency: "INR",
+      name: "Temple Management",
+      description: orderData.description || "Payment",
       order_id: orderData.order_id,
-      handler: async function(response) {
+      handler: async function (response) {
         await self.verifyPayment(response, orderData);
       },
       prefill: {
-        name: orderData.name || '',
-        email: orderData.email || '',
-        contact: orderData.phone || ''
+        name: orderData.name || "",
+        email: orderData.email || "",
+        contact: orderData.phone || "",
       },
       theme: {
-        color: '#3399cc'
+        color: "#3399cc",
       },
       modal: {
-        ondismiss: function() {
+        ondismiss: function () {
           if (self.options.onCancel) {
             self.options.onCancel();
           }
-        }
-      }
+        },
+      },
     };
 
     const razorpay = new Razorpay(options);
-    razorpay.on('payment.failed', function(response) {
+    razorpay.on("payment.failed", function (response) {
       if (self.options.onFailure) {
         self.options.onFailure(response);
       } else {
-        window.location.href = '/payment/failure?error=' + encodeURIComponent(response.error.description);
+        window.location.href =
+          "/payment/failure?error=" +
+          encodeURIComponent(response.error.description);
       }
     });
 
@@ -59,18 +61,18 @@ class RazorpayPayment {
    */
   async verifyPayment(response, orderData) {
     try {
-      const verifyResponse = await fetch('/payment/verify', {
-        method: 'POST',
+      const verifyResponse = await fetch("/payment/verify", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           order_id: response.razorpay_order_id,
           payment_id: response.razorpay_payment_id,
           signature: response.razorpay_signature,
-          payment_type: orderData.payment_type
-        })
+          payment_type: orderData.payment_type,
+        }),
       });
 
       const result = await verifyResponse.json();
@@ -80,9 +82,10 @@ class RazorpayPayment {
           this.options.onSuccess(result);
         } else {
           // Redirect to success page
-          const redirectUrl = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
+          const redirectUrl = "/bookings/pooja"; //`/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
           if (orderData.successUrl) {
-            window.location.href = orderData.successUrl + redirectUrl.split('?')[1];
+            window.location.href =
+              orderData.successUrl + redirectUrl.split("?")[1];
           } else {
             window.location.href = redirectUrl;
           }
@@ -91,15 +94,16 @@ class RazorpayPayment {
         if (this.options.onFailure) {
           this.options.onFailure(result);
         } else {
-          window.location.href = '/payment/failure?error=' + encodeURIComponent(result.message);
+          window.location.href =
+            "/payment/failure?error=" + encodeURIComponent(result.message);
         }
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
+      console.error("Payment verification error:", error);
       if (this.options.onFailure) {
-        this.options.onFailure({ message: 'Payment verification failed' });
+        this.options.onFailure({ message: "Payment verification failed" });
       } else {
-        window.location.href = '/payment/failure?error=Verification failed';
+        window.location.href = "/payment/failure?error=Verification failed";
       }
     }
   }
@@ -112,24 +116,24 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
   try {
     // Create order on server
     const orderResponse = await fetch(`/payment/${paymentType}/order`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
-      body: JSON.stringify(paymentData)
+      credentials: "include",
+      body: JSON.stringify(paymentData),
     });
 
     const orderResult = await orderResponse.json();
 
     if (!orderResult.success) {
-      throw new Error(orderResult.message || 'Failed to create payment order');
+      throw new Error(orderResult.message || "Failed to create payment order");
     }
 
     // Initialize Razorpay checkout
     const razorpayPayment = new RazorpayPayment({
       key: orderResult.key,
-      ...options
+      ...options,
     });
 
     await razorpayPayment.initCheckout({
@@ -138,22 +142,19 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
       description: paymentData.description || `${paymentType} payment`,
       payment_type: paymentType,
       ...orderResult,
-      ...options
+      ...options,
     });
   } catch (error) {
-    console.error('Payment initiation error:', error);
+    console.error("Payment initiation error:", error);
     if (options.onFailure) {
       options.onFailure({ message: error.message });
     } else {
-      alert('Payment initiation failed: ' + error.message);
+      alert("Payment initiation failed: " + error.message);
     }
   }
 }
 
 // Export for use in other scripts
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = { RazorpayPayment, initiatePayment };
 }
-
-
-

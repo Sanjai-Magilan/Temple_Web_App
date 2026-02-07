@@ -36,5 +36,18 @@ router.get(
   authMiddleware.verifyToken,
   poojaBookingController.showNew,
 );
+router.get(
+  "/bookings/pooja/:id/receipt",
+  authMiddleware.verifyToken,
+  poojaBookingController.downloadReceipt,
+);
+
+
+router.get(
+  "/bookings/hall/:id/receipt",
+  authMiddleware.verifyToken,
+  hallBookingController.downloadReceipt,
+);
+
 
 module.exports = router;

@@ -156,10 +156,13 @@ exports.updateStatus = async (bookingId, status, cancellationReason = null) => {
 exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM hall_bookings 
-       WHERE user_id = ?
-       ORDER BY created_at DESC
-      LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT hb.*, p.status AS payment_status, p.payment_method, p.currency,
+              p.payment_id AS razorpay_payment_id, p.order_id
+       FROM hall_bookings hb
+       LEFT JOIN payments p ON hb.payment_id = p.id
+       WHERE hb.user_id = ?
+       ORDER BY hb.created_at DESC
+       LIMIT ${limit} OFFSET ${offset}`,
       [userId],
     );
     return rows;
@@ -167,4 +170,25 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
     console.error("Error getting user hall bookings:", error);
     throw error;
   }
+};
+
+exports.getReceiptDetails = async (bookingId) => {
+  const [rows] = await pool.execute(
+    `SELECT hb.*,
+            p.status AS payment_status,
+            p.payment_method,
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.currency,
+            u.first_name,
+            u.last_name,
+            u.email,
+            u.phone
+     FROM hall_bookings hb
+     LEFT JOIN payments p ON hb.payment_id = p.id
+     LEFT JOIN users u ON hb.user_id = u.id
+     WHERE hb.id = ?`,
+    [bookingId],
+  );
+  return rows[0] || null;
 };

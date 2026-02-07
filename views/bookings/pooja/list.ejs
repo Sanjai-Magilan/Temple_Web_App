@@ -222,6 +222,15 @@ body {
 Booked on:
 <%= new Date(booking.created_at).toLocaleDateString() %>
 </small>
+ <% if (booking.payment_status === 'completed') { %>
+    <div class="mt-2">
+      <a class="btn btn-sm btn-gold" href="/bookings/pooja/<%= booking.id %>/receipt">
+        <i class="bi bi-download me-1"></i> Download Receipt
+      </a>
+    </div>
+  <% } else { %>
+    <div class="text-muted small mt-2">Receipt available after payment</div>
+  <% } %>
 
 </div>
 

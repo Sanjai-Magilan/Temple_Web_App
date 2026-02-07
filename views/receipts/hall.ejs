@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Hall Booking Receipt</title>
+    <style>
+      body { font-family: "Times New Roman", serif; color: #1a1a1a; }
+      .receipt { border: 2px solid #a78b4a; padding: 24px; }
+      .header { text-align: center; margin-bottom: 16px; }
+      .title { font-size: 24px; font-weight: bold; }
+      .subtitle { font-size: 14px; }
+      .meta { margin-top: 12px; font-size: 12px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+      td { padding: 6px 4px; vertical-align: top; }
+      .label { width: 35%; color: #555; }
+      .amount { font-size: 18px; font-weight: bold; }
+      .footer { margin-top: 24px; font-size: 12px; text-align: center; color: #666; }
+    </style>
+  </head>
+  <body>
+    <div class="receipt">
+      <div class="header">
+        <div class="title">Temple Hall Booking Receipt</div>
+        <div class="subtitle">Your Temple Name, City</div>
+        <div class="meta">
+          Receipt No: <%= receipt.receipt_number %> |
+          Date: <%= receipt.receipt_date %>
+        </div>
+      </div>
+
+      <table>
+        <tr><td class="label">Booked By</td><td><%= receipt.user_name %></td></tr>
+        <tr><td class="label">Email</td><td><%= receipt.user_email %></td></tr>
+        <tr><td class="label">Phone</td><td><%= receipt.user_phone %></td></tr>
+        <tr><td class="label">Booking No</td><td><%= receipt.booking_number %></td></tr>
+        <tr><td class="label">Hall</td><td><%= receipt.hall_name %></td></tr>
+        <tr><td class="label">Booking Date</td><td><%= receipt.booking_date %></td></tr>
+        <tr><td class="label">Time</td><td><%= receipt.start_time %> - <%= receipt.end_time %></td></tr>
+        <tr><td class="label">Event Type</td><td><%= receipt.event_type || "-" %></td></tr>
+        <tr><td class="label">Guests</td><td><%= receipt.expected_guests || "-" %></td></tr>
+        <tr><td class="label">Amount</td><td class="amount"><%= receipt.amount_formatted %></td></tr>
+        <tr><td class="label">Payment Method</td><td><%= receipt.payment_method || "-" %></td></tr>
+        <tr><td class="label">Payment ID</td><td><%= receipt.payment_id || "-" %></td></tr>
+        <tr><td class="label">Order ID</td><td><%= receipt.order_id || "-" %></td></tr>
+      </table>
+
+      <div class="footer">
+        Thank you for your booking. This is a computer-generated receipt.
+      </div>
+    </div>
+  </body>
+</html>

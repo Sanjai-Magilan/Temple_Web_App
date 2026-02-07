@@ -437,3 +437,11 @@ exports.handleWebhook = async (req, res) => {
       .json({ success: false, message: "Webhook processing failed" });
   }
 };
+
+exports.renderSuccess = (req, res) => {
+  res.render("payment/success", { title: "Payment Success" });
+};
+
+exports.renderFailure = (req, res) => {
+  res.render("payment/failure", { title: "Payment Failed" });
+};

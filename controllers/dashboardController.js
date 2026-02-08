@@ -21,7 +21,7 @@ exports.userDashboard = async (req, res) => {
 
     const userId = req.user.id;
 
-    // Get counts - only count completed payments
+    // --- 1. GET COUNTS (General Stats) ---
     const [donationsCount] = await pool.execute(
       `SELECT COUNT(*) as count FROM donations d
        WHERE d.user_id = ? AND d.payment_id IS NOT NULL AND 
@@ -43,62 +43,72 @@ exports.userDashboard = async (req, res) => {
       [userId]
     );
 
-    const [totalSpentResult] = await pool.execute(
-      `SELECT COALESCE(SUM(amount), 0) as total FROM payments 
-       WHERE user_id = ? AND status = 'completed'`,
-      [userId]
+    // --- 2. GET TOTAL DONATION (Specific for "Total Donation" Card) ---
+    const [totalDonationResult] = await pool.execute(
+      `SELECT COALESCE(SUM(amount), 0) as total FROM donations
+       WHERE user_id = ?`, 
+       [userId]
     );
 
-    // Get recent donations
-    const recentDonations = await donationModel.getUserDonations(userId, 5, 0);
-
-    // Get recent bookings (combine hall and pooja)
-        // Get recent bookings with payment status (combine hall and pooja)
-    const [recentHallBookingsData] = await pool.execute(
-      `SELECT hb.*, p.status as payment_status 
-       FROM hall_bookings hb
-       LEFT JOIN payments p ON hb.payment_id = p.id
-       WHERE hb.user_id = ?
-       ORDER BY hb.created_at DESC
-       LIMIT 3`,
-      [userId]
+    // --- 3. GET FAMILY MEMBERS COUNT (Specific for "Family" Card) ---
+    const [familyResult] = await pool.execute(
+        'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?', 
+        [userId]
     );
+    const familyCount = familyResult[0].count;
 
-    const [recentPoojaBookingsData] = await pool.execute(
-      `SELECT pb.*, p.status as payment_status 
-       FROM pooja_bookings pb
-       LEFT JOIN payments p ON pb.payment_id = p.id
-       WHERE pb.user_id = ?
-       ORDER BY pb.created_at DESC
-       LIMIT 3`,
-      [userId]
+    // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
+    const [upcomingPoojaResult] = await pool.execute(
+        `SELECT * FROM pooja_bookings 
+         WHERE user_id = ? AND booking_date >= CURDATE() 
+         ORDER BY booking_date ASC LIMIT 1`,
+        [userId]
     );
+    const upcomingPooja = upcomingPoojaResult.length > 0 ? upcomingPoojaResult[0] : null;
 
-    // Format bookings with type indicator
-    const recentHallBookings = recentHallBookingsData.map(booking => ({
-      ...booking,
-      type: 'hall'
-    }));
+// --- 5. GET UPCOMING HALL BOOKING (FUTURE EVENT) ---
+const [upcomingHallResult] = await pool.execute(
+  `SELECT * FROM hall_bookings 
+   WHERE user_id = ? AND booking_date >= CURDATE()
+   ORDER BY booking_date ASC 
+   LIMIT 1`,
+  [userId]
+);
 
-    const recentPoojaBookings = recentPoojaBookingsData.map(booking => ({
-      ...booking,
-      type: 'pooja'
-    }));
+const upcomingHall = upcomingHallResult.length > 0
+  ? upcomingHallResult[0]
+  : null;
+
+
+    // --- 6. GET RECENT ACTIVITY (For tables/history if needed) ---
+    const recentDonations = await donationModel.getUserDonations(userId, 1, 0);
+    const recentHallBookings = await hallBookingModel.getUserBookings(userId, 3, 0);
+    const recentPoojaBookings = await poojaBookingModel.getUserBookings(userId, 1, 0);
 
     const recentBookings = [...recentHallBookings, ...recentPoojaBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 5);
+      .slice(0, 3);
 
+
+    // --- RENDER ---
     res.render('dashboard/user', {
       title: 'Dashboard',
       user: req.user,
+      
+      // Dynamic Data for Dashboard Cards
+      upcomingPooja: upcomingPooja, 
+      upcomingHall: upcomingHall,
+      totalDonation: parseFloat(totalDonationResult[0].total) || 0,
+      familyCount: familyCount,
+      
+      // Other data for sidebar/footer/history
       donationsCount: donationsCount[0].count,
       hallBookingsCount: hallBookingsCount[0].count,
       poojaBookingsCount: poojaBookingsCount[0].count,
-      totalSpent: parseFloat(totalSpentResult[0].total) || 0,
       recentDonations: recentDonations,
       recentBookings: recentBookings
     });
+
   } catch (error) {
     console.error('Error loading user dashboard:', error);
     res.status(500).render('errors/500', {
@@ -109,7 +119,7 @@ exports.userDashboard = async (req, res) => {
 };
 
 /**
- * Admin Dashboard
+ * Admin Dashboard (No changes made here)
  */
 exports.adminDashboard = async (req, res) => {
   try {
@@ -120,25 +130,33 @@ exports.adminDashboard = async (req, res) => {
       });
     }
 
-    // Get counts
     const [totalUsers] = await pool.execute('SELECT COUNT(*) as count FROM users WHERE role = "user"');
-    const [totalDonations] = await pool.execute('SELECT COUNT(*) as count FROM donations');
+    const [totalDonations] = await pool.execute(
+      `SELECT COUNT(*) as count FROM donations d
+       WHERE d.payment_id IS NOT NULL AND 
+       d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`
+    );
+    
     const [totalBookings] = await pool.execute(
-      'SELECT (SELECT COUNT(*) FROM hall_bookings) + (SELECT COUNT(*) FROM pooja_bookings) as count'
+      `SELECT 
+        (SELECT COUNT(*) FROM hall_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) + 
+        (SELECT COUNT(*) FROM pooja_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) 
+       as count`
     );
     const [totalRevenue] = await pool.execute(
       `SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'completed'`
     );
 
-    // Get recent payments
     const recentPayments = await paymentModel.getUserPayments(null, 10, 0);
-
-    // Get pending bookings
     const [pendingHallBookings] = await pool.execute(
       'SELECT * FROM hall_bookings WHERE status = "pending" ORDER BY created_at DESC LIMIT 5'
     );
     const [pendingPoojaBookings] = await pool.execute(
-      'SELECT * FROM pooja_bookings WHERE status = "pending" ORDER BY created_at DESC LIMIT 5'
+      `SELECT pb.*, p.status as payment_status 
+       FROM pooja_bookings pb
+       LEFT JOIN payments p ON pb.payment_id = p.id
+       WHERE pb.status = "pending" 
+       ORDER BY pb.created_at DESC LIMIT 5`
     );
     const pendingBookings = [...pendingHallBookings, ...pendingPoojaBookings]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -161,6 +179,3 @@ exports.adminDashboard = async (req, res) => {
     });
   }
 };
-
-
-

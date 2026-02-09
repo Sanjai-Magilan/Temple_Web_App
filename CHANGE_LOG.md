@@ -31,3 +31,6 @@ Implemented
 Implemented
     Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
     - Deepikaa
+Implemented
+    cancel booking after the payment cancel(frontend)
+    - Dharshini

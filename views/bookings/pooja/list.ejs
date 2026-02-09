@@ -179,13 +179,13 @@ body {
     </div>
   </div>
 
-  <% if (bookings.length > 0) { %>
+  <% if (bookings.some(b => b.status === 'confirmed')) { %>
 
   <!-- ===== CARD GRID ===== -->
 
   <div class="row">
 
-    <% bookings.forEach(booking => { %>
+    <% bookings.filter(booking => booking.status === 'confirmed').forEach(booking => { %>
 
     <div class="col-12 col-md-6 col-lg-4 mb-4">
 

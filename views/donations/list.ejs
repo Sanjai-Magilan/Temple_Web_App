@@ -208,9 +208,9 @@
                 </div>
             </div>
 
-            <% if (typeof donations !=='undefined' && donations.length> 0) { %>
+            <% if (typeof donations !== 'undefined' && donations.some(d => d.payment_status === 'completed')) { %>
                 <div class="row">
-                    <% donations.forEach(donation=> { %>
+                    <% donations.filter(donation => donation.payment_status === 'completed').forEach(donation => { %>
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="card h-100 shadow-sm">
                                 <div class="card-header text-white"

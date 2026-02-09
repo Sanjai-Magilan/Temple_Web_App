@@ -217,9 +217,10 @@
             </div>
 
             <!-- Booking List -->
-            <% if (typeof bookings !=='undefined' && bookings.length> 0) { %>
+            <% if (typeof bookings !== 'undefined' && bookings.some(b => b.status === 'confirmed')) { %>
                 <div class="row">
-                    <% bookings.sort((a, b)=> new Date(b.created_at) - new Date(a.created_at)).forEach(booking => { %>
+                    <% bookings .filter(booking => booking.status === 'confirmed').sort((a, b)=> new Date(b.created_at) - new Date(a.created_at)).forEach(booking => { %>
+
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="card h-100 shadow-sm border-0"
                                 style="border-radius: 15px; overflow: hidden; background: #FFFBF5;">

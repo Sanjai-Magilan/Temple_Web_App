@@ -414,7 +414,7 @@ document.getElementById("poojaBookingForm").addEventListener("submit", async fun
 
       onSuccess: (result) => {
         redirected = true;
-        window.location.href = "/bookings/pooja";
+        window.location.href = "/payment/success?payment_id=" + result.payment_id;
       },
 
       onFailure: () => {

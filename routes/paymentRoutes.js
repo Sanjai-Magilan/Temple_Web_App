@@ -54,7 +54,4 @@ router.post(
   paymentController.handleWebhook,
 );
 
-router.get("/success", paymentController.renderSuccess);
-router.get("/failure", paymentController.renderFailure);
-
 module.exports = router;

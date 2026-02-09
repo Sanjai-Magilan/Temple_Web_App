@@ -121,6 +121,21 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Invalid booking amount" });
     }
 
+    //Block booking if there is a confirmed booking with overlapping time slot
+    const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+      hall_name,
+      booking_date,
+      start_time,
+      end_time,
+    });
+
+    if (hasConflict) {
+      return res.status(409).json({
+        success: false,
+        message: "Selected time slot is already booked.",
+      });
+    }
+
     // Create Razorpay order
     const options = {
       amount: bookingAmount * 100, // Convert to paise
@@ -342,6 +357,31 @@ exports.verifyPayment = async (req, res) => {
         // Donation receipt is already generated during creation
         // No additional update needed
       } else if (payment.payment_type === "hall_booking") {
+        const booking = await hallBookingModel.findById(payment.related_id);
+
+        if (booking) {
+          const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+            hall_name: booking.hall_name,
+            booking_date: booking.booking_date,
+            start_time: booking.start_time,
+            end_time: booking.end_time,
+            excludeBookingId: booking.id,
+          });
+
+          if (hasConflict) {
+            await hallBookingModel.updateStatus(
+              booking.id,
+              "cancelled",
+              "Time slot already booked",
+            );
+            return res.status(409).json({
+              success: false,
+              message:
+                "Time slot already booked. Payment received; admin will contact you.",
+            });
+          }
+        }
+
         await hallBookingModel.updateStatus(payment.related_id, "confirmed");
       } else if (payment.payment_type === "pooja_booking") {
         await poojaBookingModel.updateStatus(payment.related_id, "confirmed");
@@ -416,6 +456,29 @@ exports.handleWebhook = async (req, res) => {
       // Update related records
       if (existingPayment.related_id) {
         if (existingPayment.payment_type === "hall_booking") {
+          const booking = await hallBookingModel.findById(
+            existingPayment.related_id,
+          );
+
+          if (booking) {
+            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+              hall_name: booking.hall_name,
+              booking_date: booking.booking_date,
+              start_time: booking.start_time,
+              end_time: booking.end_time,
+              excludeBookingId: booking.id,
+            });
+
+            if (hasConflict) {
+              await hallBookingModel.updateStatus(
+                booking.id,
+                "cancelled",
+                "Time slot already booked",
+              );
+              return res.json({ success: true });
+            }
+          }
+
           await hallBookingModel.updateStatus(
             existingPayment.related_id,
             "confirmed",
@@ -438,10 +501,61 @@ exports.handleWebhook = async (req, res) => {
   }
 };
 
-exports.renderSuccess = (req, res) => {
-  res.render("payment/success", { title: "Payment Success" });
+/**
+ * Display payment success page
+ */
+exports.paymentSuccess = async (req, res) => {
+  try {
+    const { payment_id, order_id } = req.query;
+    
+    if (!payment_id && !order_id) {
+      return res.status(400).render('errors/400', {
+        title: 'Bad Request',
+        message: 'Payment ID or Order ID is required.',
+      });
+    }
+    
+    // Fetch payment details from database
+    let paymentDetails = null;
+    if (payment_id) {
+      paymentDetails = await paymentModel.findByPaymentId(payment_id);
+    } else if (order_id) {
+      paymentDetails = await paymentModel.findByOrderId(order_id);
+    }
+    
+    res.render('payment/success', {
+      title: 'Payment Success',
+      payment_id: payment_id || null,
+      order_id: order_id || null,
+      paymentDetails: paymentDetails,
+    });
+  } catch (error) {
+    console.error('Error rendering payment success page:', error);
+    res.status(500).render('errors/500', {
+      title: 'Server Error',
+      message: 'An error occurred while processing your request.',
+    });
+  }
 };
 
-exports.renderFailure = (req, res) => {
-  res.render("payment/failure", { title: "Payment Failed" });
+/**
+ * Display payment failure page
+ */
+exports.paymentFailure = async (req, res) => {
+  try {
+    const { payment_id, order_id, error } = req.query;
+    
+    res.render('payment/failure', {
+      title: 'Payment Failed',
+      payment_id: payment_id || null,
+      order_id: order_id || null,
+      error: error || 'Payment could not be processed.',
+    });
+  } catch (error) {
+    console.error('Error rendering payment failure page:', error);
+    res.status(500).render('errors/500', {
+      title: 'Server Error',
+      message: 'An error occurred while processing your request.',
+    });
+  }
 };

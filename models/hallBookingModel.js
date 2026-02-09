@@ -171,24 +171,40 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
+/**
+ * Check if a paid/confirmed booking overlaps a given slot
+ */
+exports.hasConfirmedOverlap = async ({
+  hall_name,
+  booking_date,
+  start_time,
+  end_time,
+  excludeBookingId = null,
+}) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT hb.id
+       FROM hall_bookings hb
+       WHERE hb.hall_name = ?
+         AND hb.booking_date = ?
+         AND hb.status IN ('confirmed', 'completed')
+         AND hb.start_time < ?
+         AND hb.end_time > ?
+         AND (? IS NULL OR hb.id <> ?)
+       LIMIT 1`,
+      [
+        hall_name,
+        booking_date,
+        end_time,
+        start_time,
+        excludeBookingId,
+        excludeBookingId,
+      ],
+    );
 
-exports.getReceiptDetails = async (bookingId) => {
-  const [rows] = await pool.execute(
-    `SELECT hb.*,
-            p.status AS payment_status,
-            p.payment_method,
-            p.payment_id AS razorpay_payment_id,
-            p.order_id,
-            p.currency,
-            u.first_name,
-            u.last_name,
-            u.email,
-            u.phone
-     FROM hall_bookings hb
-     LEFT JOIN payments p ON hb.payment_id = p.id
-     LEFT JOIN users u ON hb.user_id = u.id
-     WHERE hb.id = ?`,
-    [bookingId],
-  );
-  return rows[0] || null;
+    return rows.length > 0;
+  } catch (error) {
+    console.error("Error checking hall booking overlap:", error);
+    throw error;
+  }
 };

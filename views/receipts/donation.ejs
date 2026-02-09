@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Donation Receipt</title>
+    <style>
+      body {
+        font-family: "Times New Roman", serif;
+        color: #1a1a1a;
+      }
+      .receipt {
+        border: 2px solid #a78b4a;
+        padding: 24px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 16px;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .subtitle {
+        font-size: 14px;
+      }
+      .meta {
+        margin-top: 12px;
+        font-size: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      td {
+        padding: 6px 4px;
+        vertical-align: top;
+      }
+      .label {
+        width: 35%;
+        color: #555;
+      }
+      .amount {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .footer {
+        margin-top: 24px;
+        font-size: 12px;
+        text-align: center;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt">
+      <div class="header">
+        <div class="title">Temple Donation Receipt</div>
+        <div class="subtitle">Your Temple Name, City</div>
+        <div class="meta">
+          Receipt No: <%= receipt.receipt_number %> |
+          Date: <%= receipt.receipt_date %>
+        </div>
+      </div>
+
+      <table>
+        <tr>
+          <td class="label">Donor Name</td>
+          <td><%= receipt.donor_name %></td>
+        </tr>
+        <tr>
+          <td class="label">Email</td>
+          <td><%= receipt.donor_email %></td>
+        </tr>
+        <tr>
+          <td class="label">Phone</td>
+          <td><%= receipt.donor_phone %></td>
+        </tr>
+        <tr>
+          <td class="label">Donation Type</td>
+          <td><%= receipt.donation_type %></td>
+        </tr>
+        <tr>
+          <td class="label">Purpose</td>
+          <td><%= receipt.purpose || "-" %></td>
+        </tr>
+        <tr>
+          <td class="label">Amount</td>
+          <td class="amount"><%= receipt.amount_formatted %></td>
+        </tr>
+        <tr>
+          <td class="label">Payment Method</td>
+          <td><%= receipt.payment_method || "-" %></td>
+        </tr>
+        <tr>
+          <td class="label">Payment ID</td>
+          <td><%= receipt.payment_id || "-" %></td>
+        </tr>
+        <tr>
+          <td class="label">Order ID</td>
+          <td><%= receipt.order_id || "-" %></td>
+        </tr>
+      </table>
+
+      <div class="footer">
+        Thank you for your contribution. This is a computer-generated receipt.
+      </div>
+    </div>
+  </body>
+</html>

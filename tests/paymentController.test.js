@@ -79,5 +79,50 @@ describe("Payment Controller", () => {
     });
   });
 
+  /* ----------------------------------
+   * CREATE HALL BOOKING ORDER
+   * ---------------------------------- */
+  describe("createHallBookingOrder", () => {
+    test("should block overlapping booking", async () => {
+      req.body = {
+        hall_name: "Main Hall",
+        booking_date: "2026-02-10",
+        start_time: "10:00",
+        end_time: "12:00",
+        amount: 1000,
+      };
+
+      hallBookingModel.hasConfirmedOverlap.mockResolvedValue(true);
+
+      await paymentController.createHallBookingOrder(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+    });
+
+    test("should create hall booking order successfully", async () => {
+      req.body = {
+        hall_name: "Main Hall",
+        booking_date: "2026-02-10",
+        start_time: "10:00",
+        end_time: "12:00",
+        amount: 1000,
+      };
+
+      hallBookingModel.hasConfirmedOverlap.mockResolvedValue(false);
+      razorpay.orders.create.mockResolvedValue({ id: "order_hall" });
+      paymentModel.create.mockResolvedValue(20);
+      hallBookingModel.create.mockResolvedValue({
+        id: 7,
+        booking_number: "HALL-001",
+      });
+
+      await paymentController.createHallBookingOrder(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true }),
+      );
+    });
+  });
+
   
 });

@@ -30,4 +30,50 @@ describe("Pooja Booking Controller", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+  // =========================
+  // Tests for list()
+  // =========================
+  describe("list()", () => {
+    test("should redirect to /login if user is not authenticated", async () => {
+      req.user = null;
+
+      await poojaBookingController.list(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith("/login");
+      expect(poojaBookingModel.getUserBookings).not.toHaveBeenCalled();
+    });
+
+    test("should fetch bookings and render pooja booking list page", async () => {
+      const mockBookings = [
+        { id: 1, pooja_name: "Abhishekam" },
+        { id: 2, pooja_name: "Archana" },
+      ];
+
+      poojaBookingModel.getUserBookings.mockResolvedValue(mockBookings);
+
+      await poojaBookingController.list(req, res);
+
+      expect(poojaBookingModel.getUserBookings).toHaveBeenCalledWith(1, 50, 0);
+      expect(res.render).toHaveBeenCalledWith("bookings/pooja/list", {
+        title: "Pooja Bookings",
+        user: req.user,
+        bookings: mockBookings,
+      });
+    });
+
+    test("should render 500 error page if model throws error", async () => {
+      poojaBookingModel.getUserBookings.mockRejectedValue(
+        new Error("Database error"),
+      );
+
+      await poojaBookingController.list(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith("errors/500", {
+        title: "Server Error",
+        message: "Failed to load pooja bookings",
+      });
+    });
+  });
+
 });

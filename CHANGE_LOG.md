@@ -31,3 +31,6 @@ Implemented
 Implemented
     Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
     - Deepikaa
+Implemented
+    Payment Controller Jest Test
+    - Miruthul

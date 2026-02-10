@@ -152,5 +152,81 @@ describe("Payment Controller", () => {
     });
   });
 
-  
+  /* ----------------------------------
+   * VERIFY PAYMENT
+   * ---------------------------------- */
+  describe("verifyPayment", () => {
+    test("should reject invalid signature", async () => {
+      req.body = {
+        order_id: "order_1",
+        payment_id: "pay_1",
+        signature: "invalid",
+      };
+
+      razorpay.verifyPaymentSignature.mockReturnValue(false);
+
+      await paymentController.verifyPayment(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    test("should verify and complete payment", async () => {
+      req.body = {
+        order_id: "order_1",
+        payment_id: "pay_1",
+        signature: "valid",
+      };
+
+      razorpay.verifyPaymentSignature.mockReturnValue(true);
+      paymentModel.findByPaymentId.mockResolvedValue(null);
+      paymentModel.findByOrderId.mockResolvedValue({
+        related_id: 5,
+        payment_type: "pooja_booking",
+      });
+
+      razorpay.payments.fetch.mockResolvedValue({
+        status: "captured",
+        method: "upi",
+      });
+
+      await paymentController.verifyPayment(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true }),
+      );
+    });
+  });
+
+  /* ----------------------------------
+   * PAYMENT SUCCESS PAGE
+   * ---------------------------------- */
+  describe("paymentSuccess", () => {
+    test("should render success page", async () => {
+      req.query = { payment_id: "pay_123" };
+      paymentModel.findByPaymentId.mockResolvedValue({ status: "completed" });
+
+      await paymentController.paymentSuccess(req, res);
+
+      expect(res.render).toHaveBeenCalledWith(
+        "payment/success",
+        expect.any(Object),
+      );
+    });
+  });
+
+  /* ----------------------------------
+   * PAYMENT FAILURE PAGE
+   * ---------------------------------- */
+  describe("paymentFailure", () => {
+    test("should render failure page", async () => {
+      req.query = { payment_id: "pay_123" };
+
+      await paymentController.paymentFailure(req, res);
+
+      expect(res.render).toHaveBeenCalledWith(
+        "payment/failure",
+        expect.any(Object),
+      );
+    });
+  });
 });

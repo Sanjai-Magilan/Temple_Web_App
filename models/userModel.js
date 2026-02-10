@@ -288,3 +288,18 @@ exports.updatePassword = async (userId, newPassword) => {
     [passwordHash, userId],
   );
 };
+
+/**
+ * Get all users
+ */
+exports.getAllUsers = async () => {
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id, first_name, last_name, email, phone, role, created_at, is_active FROM users ORDER BY created_at DESC"
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error getting all users:", error);
+    throw error;
+  }
+};

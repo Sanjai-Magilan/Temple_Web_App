@@ -4,10 +4,10 @@
 
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/authController");
-const validationMiddleware = require("../middleware/validationMiddleware");
-const authMiddleware = require("../middleware/authMiddleware");
-const jwtUtils = require("../utils/jwt");
+const authController = require("../../controllers/authController");
+const validationMiddleware = require("../../middleware/validationMiddleware");
+const authMiddleware = require("../../middleware/authMiddleware");
+const jwtUtils = require("../../utils/jwt");
 const passport = require("passport");
 
 // Registration routes

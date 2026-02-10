@@ -19,7 +19,7 @@ exports.manageUsers = async (req, res) => {
 
     const users = await userModel.getAllUsers();
 
-    res.render('dashboard/users', {
+    res.render('admin/users', {
       title: 'Manage Users',
       user: req.user,
       users: users

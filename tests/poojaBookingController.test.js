@@ -76,4 +76,41 @@ describe("Pooja Booking Controller", () => {
     });
   });
 
+  // =========================
+  // Tests for showNew()
+  // =========================
+  describe("showNew()", () => {
+    test("should redirect to /login if user is not authenticated", () => {
+      req.user = null;
+
+      poojaBookingController.showNew(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith("/login");
+    });
+
+    test("should render pooja booking form for authenticated user", () => {
+      poojaBookingController.showNew(req, res);
+
+      expect(res.render).toHaveBeenCalledWith("bookings/pooja/new", {
+        title: "Book a Pooja",
+        user: req.user,
+        error: null,
+      });
+    });
+
+    test("should render 500 error page if exception occurs", () => {
+      // Force render to throw error
+      res.render.mockImplementation(() => {
+        throw new Error("Render error");
+      });
+
+      poojaBookingController.showNew(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith("errors/500", {
+        title: "Server Error",
+        message: "Failed to load pooja booking form",
+      });
+    });
+  });
 });

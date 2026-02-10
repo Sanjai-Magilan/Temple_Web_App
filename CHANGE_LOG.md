@@ -34,4 +34,6 @@ Implemented
 Implemented
     Pooja booking controller jest test
     - Miruthul
-    
+Implemented
+    Payment Controller Jest Test
+    - Miruthul

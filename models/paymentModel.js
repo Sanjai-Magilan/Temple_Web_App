@@ -195,7 +195,7 @@ exports.getAllPayments = async () => {
     const [rows] = await pool.execute(
       `SELECT *
        FROM payments
-       ORDER BY payment_date DESC`
+       ORDER BY created_at DESC`
     );
 
     return rows;

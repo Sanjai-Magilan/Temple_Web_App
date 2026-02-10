@@ -4,8 +4,8 @@
 
 const express = require('express');
 const router = express.Router();
-const donationController = require('../controllers/donationController');
-const authMiddleware = require('../middleware/authMiddleware');
+const donationController = require('../../controllers/donationController');
+const authMiddleware = require('../../middleware/authMiddleware');
 
 // List donations
 router.get('/donations', authMiddleware.verifyToken, donationController.list);

@@ -5,8 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
-const familyController = require('../controllers/familyController');
-const authMiddleware = require('../middleware/authMiddleware');
+const familyController = require('../../controllers/familyController');
+const authMiddleware = require('../../middleware/authMiddleware');
 
 // All family routes require authentication
 router.use(authMiddleware.verifyToken);

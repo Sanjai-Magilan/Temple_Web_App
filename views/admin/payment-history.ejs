@@ -1,2 +1,71 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="admin-container">
+
+    <h2 class="page-title">Payment History</h2>
+
+    <div class="search-container">
+
+        <form method="GET" action="/admin/payment-history" class="search-form">
+
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search by Payment ID, User ID, Status..." 
+                value="<%= typeof search !== 'undefined' ? search : '' %>"
+                class="search-input"
+            >
+
+            <button type="submit" class="search-btn">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <% if (payments && payments.length > 0) { %>
+
+        <div class="table-wrapper">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>User ID</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Method</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <% payments.forEach(payment => { %>
+                        <tr>
+                            <td><%= payment.payment_id %></td>
+                            <td><%= payment.user_id %></td>
+                            <td>₹ <%= payment.amount %></td>
+                            <td><%= payment.status %></td>
+                            <td><%= payment.payment_method %></td>
+                            <td><%= payment.formatted_date %></td>
+                        </tr>
+                    <% }) %>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    <% } else { %>
+
+        <p class="no-data">No payment records found.</p>
+
+    <% } %>
+
+</div>
+
+<%- include('../partials/footer') %>

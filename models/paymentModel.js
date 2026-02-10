@@ -185,3 +185,23 @@ exports.paymentExists = async (paymentId) => {
     throw error;
   }
 };
+
+/**
+ * Get All Payments
+ */
+exports.getAllPayments = async () => {
+  try {
+
+    const [rows] = await pool.execute(
+      `SELECT *
+       FROM payments
+       ORDER BY payment_date DESC`
+    );
+
+    return rows;
+
+  } catch (error) {
+    console.error("Error fetching payment history:", error);
+    throw error;
+  }
+};

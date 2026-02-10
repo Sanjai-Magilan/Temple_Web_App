@@ -18,6 +18,9 @@ router.get('/admin', authMiddleware.verifyToken, authMiddleware.requireRole('adm
 // Manage Users
 router.get('/admin/users', authMiddleware.verifyToken, authMiddleware.requireRole('admin'), adminDashboardController.manageUsers);
 
+//Payment History
+router.get('/admin/payments', authMiddleware.verifyToken, authMiddleware.requireRole('admin'), adminDashboardController.paymentHistory);
+
 module.exports = router;
 
 

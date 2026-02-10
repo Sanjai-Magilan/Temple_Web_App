@@ -32,3 +32,35 @@ exports.manageUsers = async (req, res) => {
     });
   }
 };
+
+/**
+ * Payment History
+ */
+exports.paymentHistory = async (req, res) => {
+  try {
+
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).render('errors/403', {
+        title: 'Forbidden',
+        message: 'Admin access required'
+      });
+    }
+
+    const payments = await paymentModel.getAllPayments();
+
+    res.render('admin/payment-history', {
+      title: 'Payment History',
+      user: req.user,
+      payments: payments
+    });
+
+  } catch (error) {
+    console.error('Error loading payment history:', error);
+
+    res.status(500).render('errors/500', {
+      title: 'Server Error',
+      message: 'Failed to load payment history'
+    });
+  }
+};
+

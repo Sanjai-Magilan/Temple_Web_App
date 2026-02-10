@@ -28,3 +28,6 @@ implemented
 Implemented  
     Update pooja booking UI  
     - Joyal Augustin 
+Implemented
+    Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
+    - Deepikaa

@@ -32,5 +32,8 @@ Implemented
     Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
     - Deepikaa
 Implemented
+    Pooja booking controller jest test
+    - Miruthul
+Implemented
     Payment Controller Jest Test
     - Miruthul

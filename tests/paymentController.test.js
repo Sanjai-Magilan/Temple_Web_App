@@ -124,5 +124,33 @@ describe("Payment Controller", () => {
     });
   });
 
+  /* ----------------------------------
+   * CREATE POOJA BOOKING ORDER
+   * ---------------------------------- */
+  describe("createPoojaBookingOrder", () => {
+    test("should create pooja booking order", async () => {
+      req.body = {
+        pooja_name: "Abhishekam",
+        booking_date: "2026-02-10",
+        booking_time: "09:00",
+        devotee_name: "Miruthul",
+        amount: 500,
+      };
+
+      razorpay.orders.create.mockResolvedValue({ id: "order_pooja" });
+      paymentModel.create.mockResolvedValue(30);
+      poojaBookingModel.create.mockResolvedValue({
+        id: 9,
+        booking_number: "POOJA-001",
+      });
+
+      await paymentController.createPoojaBookingOrder(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true }),
+      );
+    });
+  });
+
   
 });

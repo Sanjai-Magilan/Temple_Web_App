@@ -25,4 +25,49 @@ describe('Family Controller Tests', () => {
     jest.clearAllMocks();
   });
 
+  // =============================
+  // listMembers
+  // =============================
+
+  describe('listMembers', () => {
+
+    test('should render empty family if none found', async () => {
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+      familyModel.findByUserId.mockResolvedValue([]);
+
+      const req = mockRequest();
+      const res = mockResponse();
+
+      await familyController.listMembers(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('family/list', expect.objectContaining({
+        family: null,
+        members: [],
+        isHead: false
+      }));
+    });
+
+    test('should render family members if found', async () => {
+      const mockFamily = { id: 10 };
+      const mockMembers = [{ id: 1, name: 'Test' }];
+
+      familyModel.findByHeadUserId.mockResolvedValue(mockFamily);
+      familyModel.getMembers.mockResolvedValue(mockMembers);
+      familyModel.isHead.mockResolvedValue(true);
+
+      const req = mockRequest();
+      const res = mockResponse();
+
+      await familyController.listMembers(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('family/list', expect.objectContaining({
+        family: mockFamily,
+        members: mockMembers,
+        isHead: true
+      }));
+    });
+
+  });
+
+ 
 });

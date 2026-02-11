@@ -1,10 +1,9 @@
-// Mock donationModel
 jest.mock('../models/donationModel');
 
 const donationController = require('../controllers/donationController');
 const donationModel = require('../models/donationModel');
 
-// Helper to mock response
+// Helper function to mock Express response
 const mockResponse = () => {
   const res = {};
   res.render = jest.fn().mockReturnValue(res);
@@ -15,13 +14,13 @@ const mockResponse = () => {
 
 describe('Donation Controller Tests', () => {
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  // -----------------------
+  // ===============================
   // LIST FUNCTION TESTS
-  // -----------------------
+  // ===============================
 
   describe('list()', () => {
 
@@ -70,6 +69,9 @@ describe('Donation Controller Tests', () => {
 
       const res = mockResponse();
 
+      // Silence console.error for cleaner test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
       await donationController.list(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
@@ -77,12 +79,16 @@ describe('Donation Controller Tests', () => {
         title: 'Server Error',
         message: 'Failed to load donations'
       });
+
+      consoleSpy.mockRestore();
     });
+
   });
 
-  // -----------------------
+
+  // ===============================
   // showNew FUNCTION TESTS
-  // -----------------------
+  // ===============================
 
   describe('showNew()', () => {
 
@@ -118,18 +124,26 @@ describe('Donation Controller Tests', () => {
 
       const res = mockResponse();
 
-      // Force render to throw error
-      res.render.mockImplementation(() => {
-        throw new Error('Render Error');
-      });
+      // Silence console.error
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      // First render throws error, second render works
+      res.render = jest
+        .fn()
+        .mockImplementationOnce(() => {
+          throw new Error('Render Error');
+        })
+        .mockImplementationOnce(() => res);
 
       donationController.showNew(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenCalledWith('errors/500', {
+      expect(res.render).toHaveBeenLastCalledWith('errors/500', {
         title: 'Server Error',
         message: 'Failed to load donation form'
       });
+
+      consoleSpy.mockRestore();
     });
 
   });

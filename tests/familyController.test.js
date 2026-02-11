@@ -100,5 +100,47 @@ describe('Family Controller Tests', () => {
 
   });
 
+  // =============================
+  // addMember
+  // =============================
+
+  describe('addMember', () => {
+
+    test('should validate missing name', async () => {
+      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+
+      const req = mockRequest({
+        body: { member_name: '', relationship: 'son' }
+      });
+
+      const res = mockResponse();
+
+      await familyController.addMember(req, res);
+
+      expect(res.render).toHaveBeenCalled();
+    });
+
+    test('should add member and redirect', async () => {
+      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+      familyModel.addMember.mockResolvedValue(true);
+
+      const req = mockRequest({
+        body: {
+          member_name: 'John',
+          relationship: 'son'
+        }
+      });
+
+      const res = mockResponse();
+
+      await familyController.addMember(req, res);
+
+      expect(familyModel.addMember).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith('/family?success=member_added');
+    });
+
+  });
 
 });

@@ -69,5 +69,36 @@ describe('Family Controller Tests', () => {
 
   });
 
- 
+  // =============================
+  // showAddMember
+  // =============================
+
+  describe('showAddMember', () => {
+
+    test('should redirect if no family', async () => {
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+
+      const req = mockRequest();
+      const res = mockResponse();
+
+      await familyController.showAddMember(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith('/family?error=no_family');
+    });
+
+    test('should deny access if not head', async () => {
+      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(false);
+
+      const req = mockRequest();
+      const res = mockResponse();
+
+      await familyController.showAddMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+  });
+
+
 });

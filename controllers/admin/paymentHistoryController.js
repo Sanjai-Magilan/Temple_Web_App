@@ -6,6 +6,7 @@ const paymentModel = require('../../models/paymentModel');
 exports.paymentHistory = async (req, res) => {
   try {
 
+    // ADMIN CHECK
     if (!req.user || req.user.role !== 'admin') {
       return res.status(403).render('errors/403', {
         title: 'Forbidden',
@@ -13,8 +14,23 @@ exports.paymentHistory = async (req, res) => {
       });
     }
 
-    const payments = await paymentModel.getAllPayments();
+    // ✅ GET QUERY PARAMS
+    const {
+      search = "",
+      status = "",
+      sort = "created_at",
+      order = "DESC"
+    } = req.query;
 
+    // ✅ PASS TO MODEL
+    const payments = await paymentModel.getAllPayments({
+      search,
+      status,
+      sort,
+      order
+    });
+
+    // FORMAT DATE
     payments.forEach(p => {
       p.formatted_date = new Date(p.created_at).toLocaleString('en-IN', {
         day:'2-digit',
@@ -28,10 +44,15 @@ exports.paymentHistory = async (req, res) => {
     res.render('admin/payment-history', {
       title: 'Payment History',
       user: req.user,
-      payments: payments
+      payments,
+      search,
+      status,
+      sort,
+      order
     });
 
   } catch (error) {
+
     console.error('Error loading payment history:', error);
 
     res.status(500).render('errors/500', {

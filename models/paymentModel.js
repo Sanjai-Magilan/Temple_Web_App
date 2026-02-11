@@ -189,14 +189,47 @@ exports.paymentExists = async (paymentId) => {
 /**
  * Get All Payments
  */
-exports.getAllPayments = async () => {
+exports.getAllPayments = async ({
+  search = "",
+  status = "",
+  sort = "created_at",
+  order = "DESC"
+}) => {
+
   try {
 
-    const [rows] = await pool.execute(
-      `SELECT *
-       FROM payments
-       ORDER BY created_at DESC`
-    );
+    // ✅ Allow only specific columns (security)
+    const allowedSortColumns = ["created_at", "amount", "payment_id", "user_id"];
+    const sortColumn = allowedSortColumns.includes(sort) ? sort : "created_at";
+
+    // ✅ Allow only ASC / DESC
+    const sortOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
+    let query = `SELECT * FROM payments WHERE 1=1`;
+    const params = [];
+
+    // ✅ SEARCH
+    if (search && search.trim() !== "") {
+      query += `
+        AND (
+          payment_id LIKE ?
+          OR user_id LIKE ?
+          OR status LIKE ?
+        )
+      `;
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    // ✅ FILTER STATUS
+    if (status && status.trim() !== "") {
+      query += ` AND status = ?`;
+      params.push(status);
+    }
+
+    // ✅ SORT
+    query += ` ORDER BY ${sortColumn} ${sortOrder}`;
+
+    const [rows] = await pool.execute(query, params);
 
     return rows;
 
@@ -205,3 +238,4 @@ exports.getAllPayments = async () => {
     throw error;
   }
 };
+

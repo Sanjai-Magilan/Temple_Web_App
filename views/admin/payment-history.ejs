@@ -1,68 +1,154 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
-<div class="admin-container">
+<div class="container py-4">
 
-    <h2 class="page-title">Payment History</h2>
+    <!-- PAGE TITLE -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Payment History</h2>
+    </div>
 
-    <div class="search-container">
+    <!-- SEARCH BAR -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
 
-        <form method="GET" action="/admin/payment-history" class="search-form">
+            <form method="GET" action="/admin/payments" class="row g-2">
 
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search by Payment ID, User ID, Status..." 
-                value="<%= typeof search !== 'undefined' ? search : '' %>"
-                class="search-input"
-            >
+                <div class="col-md-10">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search by Payment ID, User ID, Status..."
+                        value="<%= search || '' %>"
+                        class="form-control"
+                    >
+                </div>
 
-            <button type="submit" class="search-btn">
-                Search
-            </button>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
 
-        </form>
+            </form>
 
+        </div>
     </div>
 
 
     <% if (payments && payments.length > 0) { %>
 
-        <div class="table-wrapper">
-            <table class="admin-table">
+        <!-- TABLE CARD -->
+        <div class="card shadow-sm">
+            <div class="table-responsive">
 
-                <thead>
-                    <tr>
-                        <th>Payment ID</th>
-                        <th>User ID</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Method</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
+                <table class="table table-hover align-middle mb-0">
 
-                <tbody>
-
-                    <% payments.forEach(payment => { %>
+                    <thead class="table-light">
                         <tr>
-                            <td><%= payment.payment_id %></td>
-                            <td><%= payment.user_id %></td>
-                            <td>₹ <%= payment.amount %></td>
-                            <td><%= payment.status %></td>
-                            <td><%= payment.payment_method %></td>
-                            <td><%= payment.formatted_date %></td>
+
+                            <th>
+                              <a class="text-decoration-none text-dark fw-semibold"
+                                 href="?search=<%= search || '' %>&sort=payment_id&order=<%= sort==='payment_id' && order==='ASC' ? 'DESC' : 'ASC' %>">
+                                 
+                                 Payment ID
+
+                                 <% if(sort === 'payment_id'){ %>
+                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
+                                 <% }else { %>
+                                        <i class="bi bi-arrow-down-up text-muted"></i>
+
+                                <% } %>
+                              </a>
+                            </th>
+
+                            <th>
+                              <a class="text-decoration-none text-dark fw-semibold"
+                                 href="?search=<%= search || '' %>&sort=user_id&order=<%= sort==='user_id' && order==='ASC' ? 'DESC' : 'ASC' %>">
+                                 
+                                 User ID
+
+                                 <% if(sort === 'user_id'){ %>
+                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
+                                 <% }else { %>
+                                        <i class="bi bi-arrow-down-up text-muted"></i>
+
+                                <% } %>
+                              </a>
+                            </th>
+
+                            <th>
+                              <a class="text-decoration-none text-dark fw-semibold"
+                                 href="?search=<%= search || '' %>&sort=amount&order=<%= sort==='amount' && order==='ASC' ? 'DESC' : 'ASC' %>">
+                                 
+                                 Amount
+
+                                 <% if(sort === 'amount'){ %>
+                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
+                                 <% }else { %>
+                                        <i class="bi bi-arrow-down-up text-muted"></i>
+
+                                <% } %>
+                              </a>
+                            </th>
+
+                            <th>Status</th>
+                            <th>Method</th>
+
+                            <th>
+                              <a class="text-decoration-none text-dark fw-semibold"
+                                 href="?search=<%= search || '' %>&sort=created_at&order=<%= sort==='created_at' && order==='ASC' ? 'DESC' : 'ASC' %>">
+                                 
+                                 Date
+
+                                 <% if(sort === 'user_id'){ %>
+                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
+                                 <% }else { %>
+                                        <i class="bi bi-arrow-down-up text-muted"></i>
+
+                                <% } %>
+                              </a>
+                            </th>
+
                         </tr>
-                    <% }) %>
+                    </thead>
 
-                </tbody>
+                    <tbody>
 
-            </table>
+                        <% payments.forEach(payment => { %>
+                            <tr>
+                                <td><%= payment.payment_id %></td>
+                                <td><%= payment.user_id %></td>
+                                <td>₹ <%= payment.amount %></td>
+
+                                <!-- STATUS BADGE -->
+                                <td>
+                                    <% if(payment.status === 'completed'){ %>
+                                        <span class="badge bg-success">Completed</span>
+                                    <% } else if(payment.status === 'pending'){ %>
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    <% } else { %>
+                                        <span class="badge bg-danger">Failed</span>
+                                    <% } %>
+                                </td>
+
+                                <td><%= payment.payment_method %></td>
+                                <td><%= payment.formatted_date %></td>
+                            </tr>
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
         </div>
 
     <% } else { %>
 
-        <p class="no-data">No payment records found.</p>
+        <div class="alert alert-warning">
+            No payment records found.
+        </div>
 
     <% } %>
 

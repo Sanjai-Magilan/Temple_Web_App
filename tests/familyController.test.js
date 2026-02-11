@@ -143,4 +143,174 @@ describe('Family Controller Tests', () => {
 
   });
 
+  // =============================
+  // showEditMember
+  // =============================
+
+  describe('showEditMember', () => {
+
+    test('should return 404 if member not found', async () => {
+      familyModel.getMemberById.mockResolvedValue(null);
+
+      const req = mockRequest({ params: { id: 5 } });
+      const res = mockResponse();
+
+      await familyController.showEditMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+  });
+
+  // =============================
+  // editMember
+  // =============================
+
+  describe('editMember', () => {
+
+    test('should validate missing relationship', async () => {
+      const mockMember = { id: 5, family_id: 1 };
+
+      familyModel.getMemberById.mockResolvedValue(mockMember);
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+
+      const req = mockRequest({
+        params: { id: 5 },
+        body: { member_name: 'John', relationship: '' }
+      });
+
+      const res = mockResponse();
+
+      await familyController.editMember(req, res);
+
+      expect(res.render).toHaveBeenCalled();
+    });
+
+    test('should update member successfully', async () => {
+      const mockMember = { id: 5, family_id: 1 };
+
+      familyModel.getMemberById.mockResolvedValue(mockMember);
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+      familyModel.updateMember.mockResolvedValue(true);
+
+      const req = mockRequest({
+        params: { id: 5 },
+        body: { member_name: 'John', relationship: 'son' }
+      });
+
+      const res = mockResponse();
+
+      await familyController.editMember(req, res);
+
+      expect(familyModel.updateMember).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith('/family?success=member_updated');
+    });
+
+  });
+
+  // =============================
+  // deleteMember
+  // =============================
+
+  describe('deleteMember', () => {
+
+    test('should return 404 if member not found', async () => {
+      familyModel.getMemberById.mockResolvedValue(null);
+
+      const req = mockRequest({ params: { id: 5 } });
+      const res = mockResponse();
+
+      await familyController.deleteMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test('should prevent deleting head', async () => {
+      familyModel.getMemberById.mockResolvedValue({
+        id: 1,
+        family_id: 1,
+        relationship: 'head'
+      });
+
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+
+      const req = mockRequest({ params: { id: 1 } });
+      const res = mockResponse();
+
+      await familyController.deleteMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    test('should delete member successfully', async () => {
+      familyModel.getMemberById.mockResolvedValue({
+        id: 2,
+        family_id: 1,
+        relationship: 'son'
+      });
+
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+      familyModel.deleteMember.mockResolvedValue(true);
+
+      const req = mockRequest({ params: { id: 2 } });
+      const res = mockResponse();
+
+      await familyController.deleteMember(req, res);
+
+      expect(familyModel.deleteMember).toHaveBeenCalledWith(2);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        success: true
+      }));
+    });
+
+  });
+
+  // =============================
+  // viewMember
+  // =============================
+
+  describe('viewMember', () => {
+
+    test('should deny access if not head or member', async () => {
+      familyModel.getMemberById.mockResolvedValue({
+        id: 1,
+        family_id: 1
+      });
+
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(false);
+      familyModel.isMember.mockResolvedValue(false);
+
+      const req = mockRequest({ params: { id: 1 } });
+      const res = mockResponse();
+
+      await familyController.viewMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test('should render view page if access allowed', async () => {
+      const mockMember = { id: 1, family_id: 1 };
+
+      familyModel.getMemberById.mockResolvedValue(mockMember);
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+      familyModel.isMember.mockResolvedValue(false);
+
+      const req = mockRequest({ params: { id: 1 } });
+      const res = mockResponse();
+
+      await familyController.viewMember(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('family/view', expect.objectContaining({
+        member: mockMember
+      }));
+    });
+
+  });
+
 });

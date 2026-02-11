@@ -91,6 +91,60 @@ describe('Dashboard Controller', () => {
     });
 
   });
+ // ================================
+  // ADMIN DASHBOARD TESTS
+  // ================================
+
+  describe('adminDashboard', () => {
+
+    test('should return 403 if user is not admin', async () => {
+      const req = { user: { role: 'user' } };
+      const res = mockResponse();
+
+      await dashboardController.adminDashboard(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.render).toHaveBeenCalledWith('errors/403', expect.any(Object));
+    });
+
+    test('should render admin dashboard for admin user', async () => {
+      const req = { user: { role: 'admin' } };
+      const res = mockResponse();
+
+      pool.execute
+        .mockResolvedValueOnce([[{ count: 10 }]]) // totalUsers
+        .mockResolvedValueOnce([[{ count: 5 }]])  // totalDonations
+        .mockResolvedValueOnce([[{ count: 8 }]])  // totalBookings
+        .mockResolvedValueOnce([[{ total: 25000 }]]) // totalRevenue
+        .mockResolvedValueOnce([[{ id: 1, status: 'pending', created_at: new Date() }]]) // pendingHall
+        .mockResolvedValueOnce([[{ id: 2, status: 'pending', created_at: new Date() }]]); // pendingPooja
+
+      paymentModel.getUserPayments.mockResolvedValue([{ id: 100 }]);
+
+      await dashboardController.adminDashboard(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('dashboard/admin', expect.objectContaining({
+        title: 'Admin Dashboard',
+        totalUsers: 10,
+        totalDonations: 5,
+        totalBookings: 8,
+        totalRevenue: 25000
+      }));
+    });
+
+    test('should handle admin dashboard errors', async () => {
+      const req = { user: { role: 'admin' } };
+      const res = mockResponse();
+
+      pool.execute.mockRejectedValue(new Error('DB Error'));
+
+      await dashboardController.adminDashboard(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith('errors/500', expect.any(Object));
+    });
+
+  });
 
  
 });

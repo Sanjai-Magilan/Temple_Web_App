@@ -763,3 +763,16 @@ body {
 .auth-footer a:hover {
     text-decoration: underline;
 }
+
+
+/*contact icon css*/
+.contact-icon {
+  color: #d1b570;
+  font-size: 1.2rem;
+  transition: 0.2s ease;
+}
+
+.contact-icon:hover {
+  color: #b89c55; /* slightly darker gold */
+  transform: scale(1.15);
+}

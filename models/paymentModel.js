@@ -186,56 +186,72 @@ exports.paymentExists = async (paymentId) => {
   }
 };
 
-/**
- * Get All Payments
- */
 exports.getAllPayments = async ({
-  search = "",
-  status = "",
-  sort = "created_at",
-  order = "DESC"
+  search,
+  filter,
+  sort,
+  order
 }) => {
 
-  try {
+  let query = `SELECT * FROM payments WHERE 1=1`;
+  let values = [];
 
-    // ✅ Allow only specific columns (security)
-    const allowedSortColumns = ["created_at", "amount", "payment_id", "user_id"];
-    const sortColumn = allowedSortColumns.includes(sort) ? sort : "created_at";
+  /* ===============================
+     SEARCH
+  =============================== */
 
-    // ✅ Allow only ASC / DESC
-    const sortOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
-
-    let query = `SELECT * FROM payments WHERE 1=1`;
-    const params = [];
-
-    // ✅ SEARCH
-    if (search && search.trim() !== "") {
-      query += `
-        AND (
-          payment_id LIKE ?
-          OR user_id LIKE ?
-          OR status LIKE ?
-        )
-      `;
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-
-    // ✅ FILTER STATUS
-    if (status && status.trim() !== "") {
-      query += ` AND status = ?`;
-      params.push(status);
-    }
-
-    // ✅ SORT
-    query += ` ORDER BY ${sortColumn} ${sortOrder}`;
-
-    const [rows] = await pool.execute(query, params);
-
-    return rows;
-
-  } catch (error) {
-    console.error("Error fetching payment history:", error);
-    throw error;
+  if (search) {
+    query += `
+      AND (
+        payment_id LIKE ?
+        OR user_id LIKE ?
+        OR status LIKE ?
+      )
+    `;
+    values.push(
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`
+    );
   }
+
+  /* ===============================
+     FILTER DROPDOWN
+  =============================== */
+
+  if (filter === "completed") {
+    query += ` AND status = 'completed'`;
+  }
+
+  if (filter === "recent") {
+    sort = "created_at";
+    order = "DESC";
+  }
+
+  if (filter === "high") {
+    sort = "amount";
+    order = "DESC";
+  }
+
+  if (filter === "low") {
+    sort = "amount";
+    order = "ASC";
+  }
+
+  /* ===============================
+     SORTING
+  =============================== */
+
+  query += ` ORDER BY ${sort} ${order}`;
+
+
+  /* ===============================
+     EXECUTE QUERY
+  =============================== */
+
+  const [rows] = await pool.query(query, values);
+
+  return rows;
 };
+
 

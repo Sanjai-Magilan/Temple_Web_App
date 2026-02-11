@@ -12,28 +12,79 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
 
-            <form method="GET" action="/admin/payments" class="row g-2">
+            <form method="GET" action="/admin/payments" class="row g-2 align-items-center">
 
-                <div class="col-md-10">
+                <!-- SEARCH INPUT -->
+                <div class="col-md-8">
                     <input 
                         type="text" 
-                        name="search" 
-                        placeholder="Search by Payment ID, User ID, Status..."
+                        name="search"
                         value="<%= search || '' %>"
+                        placeholder="Search by Payment ID, User ID, Status..."
                         class="form-control"
                     >
                 </div>
 
+                <!-- SEARCH BUTTON -->
                 <div class="col-md-2 d-grid">
                     <button type="submit" class="btn btn-primary">
                         Search
                     </button>
                 </div>
 
+                <!-- FILTER DROPDOWN -->
+                <div class="col-md-2 d-grid">
+
+                    <div class="dropdown">
+
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100"
+                                type="button"
+                                data-bs-toggle="dropdown">
+
+                            Filter
+                        </button>
+
+                        <ul class="dropdown-menu">
+
+                            <li>
+                                <a class="dropdown-item"
+                                href="?search=<%= search || '' %>&filter=recent">
+                                Recent Payments
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                href="?search=<%= search || '' %>&filter=completed">
+                                Payment Completed
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                href="?search=<%= search || '' %>&filter=high">
+                                Higher Amounts
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                href="?search=<%= search || '' %>&filter=low">
+                                Lower Amounts
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
             </form>
 
         </div>
     </div>
+
 
 
     <% if (payments && payments.length > 0) { %>
@@ -53,12 +104,7 @@
                                  
                                  Payment ID
 
-                                 <% if(sort === 'payment_id'){ %>
-                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
-                                 <% }else { %>
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-
-                                <% } %>
+                    
                               </a>
                             </th>
 
@@ -68,12 +114,7 @@
                                  
                                  User ID
 
-                                 <% if(sort === 'user_id'){ %>
-                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
-                                 <% }else { %>
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-
-                                <% } %>
+                                 
                               </a>
                             </th>
 
@@ -83,12 +124,7 @@
                                  
                                  Amount
 
-                                 <% if(sort === 'amount'){ %>
-                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
-                                 <% }else { %>
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-
-                                <% } %>
+                                 
                               </a>
                             </th>
 
@@ -101,12 +137,7 @@
                                  
                                  Date
 
-                                 <% if(sort === 'user_id'){ %>
-                                    <i class="bi bi-arrow-<%= order === 'ASC' ? 'up' : 'down' %>"></i>
-                                 <% }else { %>
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-
-                                <% } %>
+                                 
                               </a>
                             </th>
 

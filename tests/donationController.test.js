@@ -80,5 +80,58 @@ describe('Donation Controller Tests', () => {
     });
   });
 
- 
+  // -----------------------
+  // showNew FUNCTION TESTS
+  // -----------------------
+
+  describe('showNew()', () => {
+
+    test('should redirect to /login if user not authenticated', () => {
+      const req = { user: null };
+      const res = mockResponse();
+
+      donationController.showNew(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith('/login');
+    });
+
+    test('should render donation form if authenticated', () => {
+      const req = {
+        user: { id: 1, name: 'Test User' }
+      };
+
+      const res = mockResponse();
+
+      donationController.showNew(req, res);
+
+      expect(res.render).toHaveBeenCalledWith('donations/new', {
+        title: 'Make a Donation',
+        user: req.user,
+        error: null
+      });
+    });
+
+    test('should render 500 page if error occurs in showNew()', () => {
+      const req = {
+        user: { id: 1 }
+      };
+
+      const res = mockResponse();
+
+      // Force render to throw error
+      res.render.mockImplementation(() => {
+        throw new Error('Render Error');
+      });
+
+      donationController.showNew(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith('errors/500', {
+        title: 'Server Error',
+        message: 'Failed to load donation form'
+      });
+    });
+
+  });
+
 });

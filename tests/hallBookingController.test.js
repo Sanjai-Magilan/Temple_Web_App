@@ -84,5 +84,32 @@ describe("Hall Booking Controller", () => {
     });
   });
 
- 
+  // =========================
+// SHOW NEW BOOKING FORM
+// =========================
+describe("showNew()", () => {
+  test("should redirect to /login if user not authenticated", () => {
+    const req = mockRequest({ user: null });
+    const res = mockResponse();
+
+    hallBookingController.showNew(req, res);
+
+    expect(res.redirect).toHaveBeenCalledWith("/login");
+  });
+
+  test("should render new booking form if authenticated", () => {
+    const req = mockRequest({
+      user: { id: 10, name: "Test User" },
+    });
+    const res = mockResponse();
+
+    hallBookingController.showNew(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("bookings/hall/new", {
+      title: "Book a Hall",
+      user: req.user,
+      error: null,
+    });
+  });
+});
 });

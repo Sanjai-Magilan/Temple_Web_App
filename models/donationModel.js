@@ -123,3 +123,32 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
+exports.getReceiptData = async (donationId) => {
+  const [rows] = await pool.execute(
+    `SELECT d.*, 
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.payment_method,
+            p.status AS payment_status,
+            p.currency,
+            p.amount AS payment_amount,
+            p.created_at AS payment_created_at,
+            p.updated_at AS payment_updated_at,
+            u.first_name, u.last_name, u.email, u.phone
+     FROM donations d
+     LEFT JOIN payments p ON d.payment_id = p.id
+     LEFT JOIN users u ON d.user_id = u.id
+     WHERE d.id = ?`,
+    [donationId],
+  );
+  return rows[0] || null;
+};
+
+exports.updateReceiptJson = async (donationId, receiptJson) => {
+  await pool.execute(
+    `UPDATE donations 
+     SET receipt_json = ?, receipt_generated = 1, updated_at = NOW()
+     WHERE id = ?`,
+    [JSON.stringify(receiptJson), donationId],
+  );
+};

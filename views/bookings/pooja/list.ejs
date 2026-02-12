@@ -259,6 +259,15 @@ body {
 
         <div class="card-footer">
           Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
+          <% if (booking.payment_status === "completed") { %>
+          <div class="mt-2">
+            <a href="/bookings/pooja/<%= booking.id %>/receipt"
+               class="btn btn-sm btn-outline-warning w-100"
+               style="color: #bfa15f; border-color: #bfa15f; font-weight: 500;">
+              <i class="bi bi-download me-1"></i> Download Receipt
+            </a>
+          </div>
+          <% } %>
         </div>
 
       </div>

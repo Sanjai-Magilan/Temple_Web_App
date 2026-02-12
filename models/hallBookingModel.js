@@ -40,6 +40,7 @@ const generateBookingNumber = async (connection) => {
  */
 exports.create = async (bookingData) => {
   const connection = await pool.getConnection();
+
   try {
     await connection.beginTransaction();
 
@@ -47,9 +48,9 @@ exports.create = async (bookingData) => {
 
     const [result] = await connection.execute(
       `INSERT INTO hall_bookings 
-       (booking_number, user_id, family_id, hall_name, booking_date, start_time, end_time, 
-        event_type, event_description, expected_guests, amount, payment_id, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+ (booking_number, user_id, family_id, hall_name, booking_date, start_time, end_time, 
+  event_type, event_description, expected_guests, food_required, food_meals, amount, payment_id, status)
+ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         bookingNumber,
         bookingData.user_id,
@@ -61,6 +62,8 @@ exports.create = async (bookingData) => {
         bookingData.event_type || null,
         bookingData.event_description || null,
         bookingData.expected_guests || null,
+        bookingData.food_required ? 1 : 0,
+        bookingData.food_meals || null,
         bookingData.amount,
         bookingData.payment_id || null,
         bookingData.status || "pending",
@@ -156,17 +159,17 @@ exports.updateStatus = async (bookingId, status, cancellationReason = null) => {
 exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT pb.*, p.status AS payment_status, p.payment_method
-       FROM pooja_bookings pb
-       LEFT JOIN payments p ON pb.payment_id = p.id
-       WHERE pb.user_id = ?
-       ORDER BY pb.created_at DESC
+      `SELECT hb.*, p.status AS payment_status, p.payment_method
+       FROM hall_bookings hb
+       LEFT JOIN payments p ON hb.payment_id = p.id
+       WHERE hb.user_id = ?
+       ORDER BY hb.created_at DESC
        LIMIT ${limit} OFFSET ${offset}`,
       [userId],
     );
     return rows;
   } catch (error) {
-    console.error("Error getting user pooja bookings:", error);
+    console.error("Error getting user hall bookings:", error);
     throw error;
   }
 };
@@ -231,36 +234,6 @@ exports.getReceiptData = async (bookingId) => {
 exports.updateReceiptJson = async (bookingId, receiptJson) => {
   await pool.execute(
     `UPDATE hall_bookings
-     SET receipt_json = ?, updated_at = NOW()
-     WHERE id = ?`,
-    [JSON.stringify(receiptJson), bookingId],
-  );
-};
-
-exports.getReceiptData = async (bookingId) => {
-  const [rows] = await pool.execute(
-    `SELECT pb.*,
-            p.payment_id AS razorpay_payment_id,
-            p.order_id,
-            p.payment_method,
-            p.status AS payment_status,
-            p.currency,
-            p.amount AS payment_amount,
-            p.created_at AS payment_created_at,
-            p.updated_at AS payment_updated_at,
-            u.first_name, u.last_name, u.email, u.phone
-     FROM pooja_bookings pb
-     LEFT JOIN payments p ON pb.payment_id = p.id
-     LEFT JOIN users u ON pb.user_id = u.id
-     WHERE pb.id = ?`,
-    [bookingId],
-  );
-  return rows[0] || null;
-};
-
-exports.updateReceiptJson = async (bookingId, receiptJson) => {
-  await pool.execute(
-    `UPDATE pooja_bookings
      SET receipt_json = ?, updated_at = NOW()
      WHERE id = ?`,
     [JSON.stringify(receiptJson), bookingId],

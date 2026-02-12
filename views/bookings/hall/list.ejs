@@ -477,27 +477,24 @@
                 // Prepare Description with Food Details
                 let baseDescription = document.getElementById('event_description').value;
 
-                if (foodYes) {
-                    const meals = [];
-                    if (document.getElementById('meal_breakfast').checked) meals.push('Breakfast');
-                    if (document.getElementById('meal_lunch').checked) meals.push('Lunch');
-                    if (document.getElementById('meal_dinner').checked) meals.push('Dinner');
+                //const foodYes = document.getElementById('food_yes').checked;
+const meals = [];
+if (document.getElementById('meal_breakfast').checked) meals.push('Breakfast');
+if (document.getElementById('meal_lunch').checked) meals.push('Lunch');
+if (document.getElementById('meal_dinner').checked) meals.push('Dinner');
 
-                    baseDescription += `\n\n--- Food Arrangements ---\nRequired: Yes\nMeals: ${meals.join(', ')}`;
-                } else {
-                    baseDescription += `\n\n--- Food Arrangements ---\nRequired: No`;
-                }
-
-                const formData = {
-                    hall_name: document.getElementById('hall_name').value,
-                    booking_date: document.getElementById('booking_date').value,
-                    start_time: document.getElementById('start_time').value,
-                    end_time: document.getElementById('end_time').value,
-                    event_type: document.getElementById('event_type').value,
-                    event_description: baseDescription,
-                    expected_guests: document.getElementById('expected_guests').value,
-                    amount: document.getElementById('amount').value
-                };
+const formData = {
+  hall_name: document.getElementById('hall_name').value,
+  booking_date: document.getElementById('booking_date').value,
+  start_time: document.getElementById('start_time').value,
+  end_time: document.getElementById('end_time').value,
+  event_type: document.getElementById('event_type').value,
+  event_description: baseDescription,
+  expected_guests: document.getElementById('expected_guests').value,
+  amount: document.getElementById('amount').value,
+  food_required: foodYes ? 1 : 0,
+  food_meals: foodYes ? meals : []
+};
 
                 try {
                     // Note: initiatePayment must be available in the global scope (e.g. from footer scripts)

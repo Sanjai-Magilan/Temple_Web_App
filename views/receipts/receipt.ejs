@@ -171,6 +171,10 @@
         <div class="value"><%= receipt.details.event_type || "NA" %></div>
         <div class="label">Guests</div>
         <div class="value"><%= receipt.details.expected_guests || "NA" %></div>
+        <div class="label">Food Required</div>
+        <div class="value"><%= receipt.details.food_required ? "Yes" : "No" %></div>
+        <div class="label">Meals</div>
+        <div class="value"><%= receipt.details.food_meals && receipt.details.food_meals.length ? receipt.details.food_meals.join(", ") : "NA" %></div>
       </div>
     </div>
     <% } %>
@@ -191,6 +195,8 @@
         <div class="value"><%= receipt.details.gotra || "NA" %></div>
         <div class="label">Nakshatra</div>
         <div class="value"><%= receipt.details.nakshatra || "NA" %></div>
+        <div class="label">Special Instructions</div>
+        <div class="value"><%= receipt.details.special_instructions || "NA" %></div>
       </div>
     </div>
     <% } %>

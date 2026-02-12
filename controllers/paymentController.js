@@ -97,7 +97,7 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Please login to book a hall" });
     }
 
-    const {
+        const {
       hall_name,
       booking_date,
       start_time,
@@ -106,7 +106,25 @@ exports.createHallBookingOrder = async (req, res) => {
       event_description,
       expected_guests,
       amount,
+      food_required,
+      food_meals,
     } = req.body;
+
+    const foodRequired =
+      food_required === true ||
+      food_required === 1 ||
+      food_required === "1" ||
+      food_required === "yes";
+
+    const mealsArray = Array.isArray(food_meals)
+      ? food_meals
+      : typeof food_meals === "string"
+        ? food_meals.split(",")
+        : [];
+
+    const foodMealsCsv = foodRequired
+      ? mealsArray.map((m) => String(m).trim()).filter(Boolean).join(", ")
+      : null;
 
     // Validate required fields
     if (!hall_name || !booking_date || !start_time || !end_time || !amount) {
@@ -163,7 +181,7 @@ exports.createHallBookingOrder = async (req, res) => {
     });
 
     // Create hall booking record
-    const booking = await hallBookingModel.create({
+        const booking = await hallBookingModel.create({
       user_id: req.user.id,
       family_id: null,
       hall_name,
@@ -173,6 +191,8 @@ exports.createHallBookingOrder = async (req, res) => {
       event_type: event_type || null,
       event_description: event_description || null,
       expected_guests: expected_guests || null,
+      food_required: foodRequired ? 1 : 0,
+      food_meals: foodMealsCsv,
       amount: bookingAmount,
       payment_id: paymentId,
       status: "pending",

@@ -73,7 +73,6 @@ main,
 /* Mobile-first responsive design */
 .container {
     padding: 15px;
-    max-width: 100%;
 }
 
 /* Card styles */
@@ -114,6 +113,7 @@ main,
 /* Hide spin buttons globally for any input with .amount-input class */
 .amount-input {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .amount-input::-webkit-outer-spin-button,
@@ -238,6 +238,7 @@ footer {
         display: none !important;
     }
 }
+
 /* POoja Booking UI */
 
 
@@ -455,6 +456,59 @@ footer {
     font-weight: 500;
 }
 
-.auth-footer a:hover {
-    text-decoration: underline;
+
+/* =========================
+   MOBILE RESPONSIVENESS
+========================= */
+
+@media (max-width: 768px) {
+
+    /* General Container Padding */
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Auth Page Adjustments */
+    .auth-wrapper {
+        padding: 1rem;
+        margin-top: 3.5rem;
+        /* Space for fixed navbar if present */
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    .auth-title {
+        font-size: 1.75rem;
+    }
+
+    .auth-form {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    /* Further reductions for small mobile */
+    .auth-card {
+        padding: 1.25rem;
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+    }
+
+    .btn-auth {
+        padding: 0.6rem;
+        font-size: 0.95rem;
+    }
+
+    /* Login/Register Form Grid to Single Column */
+    #registerForm div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
 }

@@ -70,26 +70,26 @@
                         </form>
                         <% } else { %>
                             <form action="/register" method="POST" class="auth-form" id="registerForm">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                    <div>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
                                         <label for="first_name" class="auth-label">First Name *</label>
                                         <input type="text" id="first_name" name="first_name" required class="auth-input"
                                             value="<%= typeof formData !== 'undefined' ? formData.first_name : '' %>">
                                     </div>
-                                    <div>
+                                    <div class="col-12 col-md-6">
                                         <label for="last_name" class="auth-label">Last Name *</label>
                                         <input type="text" id="last_name" name="last_name" required class="auth-input"
                                             value="<%= typeof formData !== 'undefined' ? formData.last_name : '' %>">
                                     </div>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                    <div>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
                                         <label for="email" class="auth-label">Email Address *</label>
                                         <input type="email" id="email" name="email" required class="auth-input"
                                             value="<%= typeof formData !== 'undefined' ? formData.email : '' %>">
                                     </div>
-                                    <div>
+                                    <div class="col-12 col-md-6">
                                         <label for="phone" class="auth-label">Phone Number *</label>
                                         <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}"
                                             maxlength="10" class="auth-input"
@@ -98,13 +98,13 @@
                                     </div>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                    <div>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
                                         <label for="password" class="auth-label">Password *</label>
                                         <input type="password" id="password" name="password" required minlength="6"
                                             class="auth-input" placeholder="Min 6 chars">
                                     </div>
-                                    <div>
+                                    <div class="col-12 col-md-6">
                                         <label for="confirm_password" class="auth-label">Confirm Password *</label>
                                         <input type="password" id="confirm_password" name="confirm_password" required
                                             class="auth-input">
@@ -135,18 +135,18 @@
                                             style="resize: none;"><%= typeof formData !== 'undefined' ? formData.address : '' %></textarea>
                                     </div>
 
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
-                                        <div>
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-4">
                                             <label for="city" class="auth-label">City</label>
                                             <input type="text" id="city" name="city" class="auth-input"
                                                 value="<%= typeof formData !== 'undefined' ? formData.city : '' %>">
                                         </div>
-                                        <div>
+                                        <div class="col-12 col-md-4">
                                             <label for="state" class="auth-label">State</label>
                                             <input type="text" id="state" name="state" class="auth-input"
                                                 value="<%= typeof formData !== 'undefined' ? formData.state : '' %>">
                                         </div>
-                                        <div>
+                                        <div class="col-12 col-md-4">
                                             <label for="pincode" class="auth-label">Pincode</label>
                                             <input type="text" id="pincode" name="pincode" class="auth-input"
                                                 value="<%= typeof formData !== 'undefined' ? formData.pincode : '' %>">

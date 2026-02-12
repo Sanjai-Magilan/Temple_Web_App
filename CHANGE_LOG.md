@@ -18,7 +18,10 @@ implemented
     - kabil  
 implemented  
     updated landing page UI  
-    - loki  
+    - loki 
+implemented
+    dashboard page UI
+    -karmugilan
 implemented
     update donation UI
     -kamalesh
@@ -39,3 +42,5 @@ implemented
 implemented   
     update hall booking UI  
     - kamalesh  
+
+Clear the bug in the 

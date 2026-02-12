@@ -433,13 +433,30 @@
             // Submission
             document.getElementById('hallBookingForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
+                const MAX_HALL_AMOUNT = 500000; // ₹5,00,000
+                    const bookingAmount = Number(document.getElementById('amount').value);
+
+                    if (bookingAmount > MAX_HALL_AMOUNT) {
+                        showAlert(
+                            'warning',
+                            'Booking Limit Exceeded',
+                            'Maximum hall booking amount allowed is ₹5,00,000'
+                        );
+                        return;
+                    }
+
 
                 // Validate Food Selection
                 const foodYes = document.getElementById('food_yes').checked;
                 if (foodYes) {
                     const hasMeal = ['meal_breakfast', 'meal_lunch', 'meal_dinner'].some(id => document.getElementById(id).checked);
                     if (!hasMeal) {
-                        alert('Please select at least one meal option if food is required.');
+                        showAlert(
+                            'warning',
+                            'Meal Selection Required',
+                            'Please select at least one meal option if food is required.'
+                        );
+
                         return;
                     }
                 }
@@ -477,16 +494,25 @@
                 try {
                     await initiatePayment('hall-booking', formData, {
                         onSuccess: (result) => {
-                            window.location.href = '/payment/success?payment_id=' + result.payment_id;
+                            showAlert(
+    'success',
+    'Booking Successful',
+    'Your hall booking has been confirmed!'
+);
+
+setTimeout(() => {
+    window.location.href = '/payment/success?payment_id=' + result.payment_id;
+}, 1500);
+
                         },
                         onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
+                            showAlert('error', 'Payment Failed', error.message);
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalText;
                         }
                     });
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    showAlert('error', 'Error', error.message);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                 }

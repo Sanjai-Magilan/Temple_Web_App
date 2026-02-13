@@ -23,6 +23,22 @@ router.get(
   authMiddleware.verifyToken,
   hallBookingController.showNew,
 );
+
+// Continue and cancel routes for hall bookings
+router.get(
+  "/bookings/hall/continue/:id",
+  authMiddleware.verifyToken,
+  hallBookingController.continuePayment
+);
+
+router.delete(
+  "/bookings/hall/cancel/:id",
+  authMiddleware.verifyToken,
+  hallBookingController.cancelBooking
+);
+
+
+
 //router.get("/bookings/hall/new", (req, res) => res.send("OK"));
 
 // Pooja booking routes

@@ -261,6 +261,17 @@
                                                 </span>
                                                 <span class="badge bg-light text-dark border ms-2">₹<%=
                                                         booking.amount.toLocaleString() %></span>
+                                                <% if(booking.status === 'pending') { %>
+                                                <span class="badge bg-light text-dark border ms-2">
+                                                    <button class="btn btn-sm btn-success" onclick="window.location.href='/bookings/hall/pay/<%= booking.id %>'">
+                                                        Continue
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-danger" onclick="cancelBooking(<%= booking.id %>, this)">
+                                                        Cancel
+                                                    </button>
+                                                </span> 
+                                                <% } %>
                                             </div>
                                 </div>
                                 <div class="card-footer bg-transparent border-top-0">
@@ -543,6 +554,34 @@
                     submitBtn.innerHTML = originalText;
                 }
             });
+            function cancelBooking(id, btn) {
+
+                if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+                fetch(`/bookings/hall/cancel/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.success) {
+
+                        // Remove card from UI
+                        btn.closest(".card").remove();
+
+                    } else {
+                        alert("Failed to cancel booking");
+                    }
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Server error");
+                });
+            }
         </script>
 
         <%- include('../../partials/footer') %>

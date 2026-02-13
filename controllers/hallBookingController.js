@@ -52,3 +52,58 @@ exports.showNew = (req, res) => {
     });
   }
 };
+
+exports.continuePayment = async (req, res) => {
+
+    const bookingId = req.params.id;
+
+    try {
+
+        // Fetch booking
+        const [rows] = await db.execute(
+            "SELECT * FROM hall_bookings WHERE id = ?",
+            [bookingId]
+        );
+
+        if (!rows.length) {
+            return res.redirect("/bookings");
+        }
+
+        // Render payment page
+        res.render("payment", {
+            booking: rows[0]
+        });
+
+    } catch (err) {
+
+        console.error(err);
+        res.redirect("/bookings");
+    }
+};
+
+exports.cancelBooking = async (req, res) => {
+
+    const bookingId = req.params.id;
+    console.log("Cancel Booking ID:", bookingId);
+
+    try {
+
+        console.log(hallBookingModel.findById(bookingId))
+        const result = await hallBookingModel.cancelBookingById(bookingId);
+
+        if (result > 0) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false, message: "Booking not found" });
+        }
+
+    } catch (err) {
+
+        console.error("Controller Error (cancelBooking):", err);
+
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};

@@ -458,13 +458,36 @@
             // Submission
             document.getElementById('hallBookingForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
+                // ===== Hall Booking Amount Limit Validation =====
+                const MAX_HALL_AMOUNT = 50000; // ₹50,000 limit
+
+                const amount = parseFloat(document.getElementById('amount').value || 0);
+
+            if (amount > MAX_HALL_AMOUNT) {
+                showAlert(
+                    'warning',
+                    'Booking Limit Exceeded',
+                    'Maximum hall booking amount allowed is ₹50,000'
+                );
+
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').innerHTML = 'Proceed to Payment →';
+                return;
+            }
+
+
 
                 // Validate Food Selection
                 const foodYes = document.getElementById('food_yes').checked;
                 if (foodYes) {
                     const hasMeal = ['meal_breakfast', 'meal_lunch', 'meal_dinner'].some(id => document.getElementById(id).checked);
                     if (!hasMeal) {
-                        alert('Please select at least one meal option if food is required.');
+                        showAlert(
+                        'warning',
+                        'Meal Selection Required',
+                        'Please select at least one meal option if food is required.'
+                    );
+
                         return;
                     }
                 }
@@ -505,16 +528,25 @@ const formData = {
                     await initiatePayment('hall-booking', formData, {
                         onSuccess: (result) => {
                             // Redirect to the booking history list as requested
-                            window.location.href = '/bookings/hall';
+                            showAlert(
+                                'success',
+                                'Booking Confirmed',
+                                'Your hall has been booked successfully!'
+                            );
+
+                            setTimeout(() => {
+                                window.location.href = '/bookings/hall';
+                            }, 1500);
+
                         },
                         onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
+                            showAlert('error', 'Payment Failed', error.message);
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalText;
                         }
                     });
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    showAlert('error', 'Error', error.message);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                 }

@@ -115,7 +115,7 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Please login to book a hall" });
     }
 
-        const {
+    const {
       hall_name,
       booking_date,
       start_time,
@@ -141,7 +141,10 @@ exports.createHallBookingOrder = async (req, res) => {
         : [];
 
     const foodMealsCsv = foodRequired
-      ? mealsArray.map((m) => String(m).trim()).filter(Boolean).join(", ")
+      ? mealsArray
+          .map((m) => String(m).trim())
+          .filter(Boolean)
+          .join(", ")
       : null;
 
     // Validate required fields
@@ -202,7 +205,7 @@ exports.createHallBookingOrder = async (req, res) => {
     });
 
     // Create hall booking record
-        const booking = await hallBookingModel.create({
+    const booking = await hallBookingModel.create({
       user_id: req.user.id,
       family_id: null,
       hall_name,
@@ -371,6 +374,13 @@ exports.verifyPayment = async (req, res) => {
 
     // Fetch payment details from Razorpay
     const razorpayPayment = await razorpay.payments.fetch(payment_id);
+
+    if (!razorpayPayment || !razorpayPayment.status) {
+      return res.status(502).json({
+        success: false,
+        message: "Unable to fetch payment status from Razorpay",
+      });
+    }
 
     // Find payment record by order_id
     const payment = await paymentModel.findByOrderId(order_id);

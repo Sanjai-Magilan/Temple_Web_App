@@ -1,0 +1,117 @@
+<% if (poojaBookings.length> 0) { %>
+    <div class="table-responsive bg-white rounded shadow-sm p-3">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking Ref</th>
+                    <th>User Details</th>
+                    <th>Pooja Details</th>
+                    <th>Date & Time</th>
+                    <th>Payment Info</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% poojaBookings.forEach(booking=> { %>
+                    <tr>
+                        <td>
+                            <span class="fw-bold text-dark">
+                                <%= booking.booking_number %>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="fw-bold">
+                                <%= booking.user_name %>
+                            </div>
+                            <div class="small text-muted">User ID: <%= booking.user_id %>
+                            </div>
+                            <div class="small text-muted">
+                                <%= booking.user_email %>
+                            </div>
+                            <% if(booking.devotee_name) { %>
+                                <div class="small fst-italic mt-1">Devotee: <%= booking.devotee_name %>
+                                </div>
+                                <% } %>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary">
+                                <%= booking.pooja_name %>
+                            </div>
+                            <% if(booking.gotra) { %>
+                                <div class="small">Gotra: <%= booking.gotra %>
+                                </div>
+                                <% } %>
+                        </td>
+                        <td>
+                            <div><i class="bi bi-calendar3 me-1"></i>
+                                <%= new Date(booking.booking_date).toLocaleDateString() %>
+                            </div>
+                            <div class="small text-muted"><i class="bi bi-clock me-1"></i>
+                                <%= booking.booking_time %>
+                            </div>
+                        </td>
+                        <td>
+                            <% if (booking.razorpay_payment_id) { %>
+                                <div class="fw-bold text-dark text-break">
+                                    <%= booking.razorpay_payment_id %>
+                                </div>
+                                <% } else { %>
+                                    <span class="text-muted small">N/A</span>
+                                    <% } %>
+                                        <div class="mt-1">₹<%= booking.amount.toLocaleString() %>
+                                        </div>
+                        </td>
+                        <td>
+                            <% let badgeClass='bg-secondary' ; if (booking.status==='confirmed' )
+                                badgeClass='bg-success' ; else if (booking.status==='pending' )
+                                badgeClass='bg-warning text-dark' ; else if (booking.status==='cancelled' )
+                                badgeClass='bg-danger' ; %>
+                                <span class="badge <%= badgeClass %> rounded-pill">
+                                    <%= booking.status.toUpperCase() %>
+                                </span>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+    </div>
+    <% } else { %>
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1 mb-3"></i>
+            <p>No Pooja Bookings found matching your criteria.</p>
+        </div>
+        <% } %>
+
+            <% if (typeof poojaPagination !=='undefined' && poojaPagination.totalPages> 1) { %>
+                <nav aria-label="Pooja bookings pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous -->
+                        <li class="page-item <%= !poojaPagination.hasPrevPage ? 'disabled' : '' %>">
+                            <a class="page-link" href="#" data-page="<%= poojaPagination.currentPage - 1 %>"
+                                onclick="return changePage('pooja', this.getAttribute('data-page'))"
+                                aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        <% for(let i=1; i <=poojaPagination.totalPages; i++) { %>
+                            <li class="page-item <%= poojaPagination.currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="#" data-page="<%= i %>"
+                                    onclick="return changePage('pooja', this.getAttribute('data-page'))">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+
+                                <!-- Next -->
+                                <li class="page-item <%= !poojaPagination.hasNextPage ? 'disabled' : '' %>">
+                                    <a class="page-link" href="#" data-page="<%= poojaPagination.currentPage + 1 %>"
+                                        onclick="return changePage('pooja', this.getAttribute('data-page'))"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                    </ul>
+                </nav>
+                <% } %>

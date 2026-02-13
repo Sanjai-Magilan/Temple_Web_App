@@ -74,6 +74,13 @@ const buildReceiptJson = (type, record) => {
       is_anonymous: Boolean(record.is_anonymous),
     };
   } else if (type === "hall_booking") {
+    const foodMeals = record.food_meals
+      ? record.food_meals
+          .split(",")
+          .map((m) => m.trim())
+          .filter(Boolean)
+      : [];
+
     base.details = {
       booking_id: record.id,
       booking_number: record.booking_number || "",
@@ -84,6 +91,8 @@ const buildReceiptJson = (type, record) => {
       event_type: record.event_type || "",
       expected_guests: record.expected_guests || "",
       event_description: record.event_description || "",
+      food_required: Boolean(record.food_required),
+      food_meals: foodMeals,
     };
   } else if (type === "pooja_booking") {
     base.details = {

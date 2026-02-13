@@ -7,10 +7,10 @@ const router = express.Router();
 const hallBookingController = require("../controllers/hallBookingController");
 const poojaBookingController = require("../controllers/poojaBookingController");
 const authMiddleware = require("../middleware/authMiddleware");
-const logger = require('../utils/logger')
- logger.info("hallBookingController:", hallBookingController);
- logger.info("poojaBookingController:", poojaBookingController);
- logger.info("authMiddleware:", authMiddleware);
+const logger = require("../utils/logger");
+logger.info("hallBookingController:", hallBookingController);
+logger.info("poojaBookingController:", poojaBookingController);
+logger.info("authMiddleware:", authMiddleware);
 
 // Hall booking routes
 router.get(
@@ -28,16 +28,14 @@ router.get(
 router.get(
   "/bookings/hall/continue/:id",
   authMiddleware.verifyToken,
-  hallBookingController.continuePayment
+  hallBookingController.continuePayment,
 );
 
 router.delete(
   "/bookings/hall/cancel/:id",
   authMiddleware.verifyToken,
-  hallBookingController.cancelBooking
+  hallBookingController.cancelBooking,
 );
-
-
 
 //router.get("/bookings/hall/new", (req, res) => res.send("OK"));
 

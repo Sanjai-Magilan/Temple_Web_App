@@ -263,12 +263,14 @@
                                                         booking.amount.toLocaleString() %></span>
                                                 <% if(booking.status === 'pending') { %>
                                                 <span class="badge bg-light text-dark border ms-2">
-                                                    <button class="btn btn-sm btn-success" onclick="window.location.href='/bookings/hall/pay/<%= booking.id %>'">
-                                                        Continue
+                                                    <button class="btn btn-sm btn-success" 
+                                                    onclick="window.location.href='/bookings/hall/pay/<%= booking.id %>'">
+                                                    Continue
                                                     </button>
 
-                                                    <button class="btn btn-sm btn-danger" onclick="cancelBooking(<%= booking.id %>, this)">
-                                                        Cancel
+                                                    <button class="btn btn-sm btn-danger" 
+                                                    onclick="cancelBooking(<%= booking.id %>, this)">
+                                                    Cancel
                                                     </button>
                                                 </span> 
                                                 <% } %>

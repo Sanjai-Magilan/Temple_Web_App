@@ -55,32 +55,3 @@ exports.showNew = (req, res) => {
 
 
 
-
-/**
- * Admin list donations
- */
-exports.adminList = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 20;
-    const offset = (page - 1) * limit;
-    const search = req.query.search || null;
-
-    const result = await donationModel.getAllDonations(limit, offset, search);
-
-    res.render('donations/admin_list', {
-      title: 'Donation Management',
-      user: req.user,
-      donations: result.donations,
-      currentPage: page,
-      totalPages: Math.ceil(result.total / limit),
-      search: search
-    });
-  } catch (error) {
-    console.error('Error loading donations for admin:', error);
-    res.status(500).render('errors/500', {
-      title: 'Server Error',
-      message: 'Failed to load donations'
-    });
-  }
-};

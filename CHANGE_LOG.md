@@ -28,3 +28,18 @@ implemented
 Implemented  
     Update pooja booking UI  
     - Joyal Augustin 
+Implemented
+    Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
+    - Deepikaa
+Implemented
+    Pooja booking controller jest test
+    - Miruthul
+Implemented
+    Payment Controller Jest Test
+    - Miruthul
+Implemented
+    Family Controller Jest Test
+    - Miruthul
+Implemented
+    Donation Controller Jest Test & Hall booking Controller test
+    - Miruthul

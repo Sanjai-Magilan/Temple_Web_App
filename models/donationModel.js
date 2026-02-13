@@ -123,55 +123,32 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
-
-/**
- * Get all donations (admin)
- */
-exports.getAllDonations = async (limit = 50, offset = 0, search = null) => {
-  try {
-    let query = `
-      SELECT d.*, p.status as payment_status, p.payment_method, 
-             u.first_name, u.last_name, u.email
-      FROM donations d
-      LEFT JOIN payments p ON d.payment_id = p.id
-      LEFT JOIN users u ON d.user_id = u.id
-    `;
-
-    let params = [];
-
-    if (search) {
-      query += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?`;
-      const searchParam = `%${search}%`;
-      params.push(searchParam, searchParam, searchParam, searchParam);
-    }
-
-    query += ` ORDER BY d.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
-
-    const [rows] = await pool.execute(query, params);
-
-    // Also get total count for pagination
-    let countQuery = `
-      SELECT COUNT(*) as count 
-      FROM donations d
-      LEFT JOIN users u ON d.user_id = u.id
-    `;
-
-    let countParams = [];
-    if (search) {
-      countQuery += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ?`;
-      const searchParam = `%${search}%`;
-      countParams.push(searchParam, searchParam, searchParam, searchParam);
-    }
-
-    const [countRows] = await pool.execute(countQuery, countParams);
-
-    return {
-      donations: rows,
-      total: countRows[0].count
-    };
-  } catch (error) {
-    console.error("Error getting all donations:", error);
-    throw error;
-  }
+exports.getReceiptData = async (donationId) => {
+  const [rows] = await pool.execute(
+    `SELECT d.*, 
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.payment_method,
+            p.status AS payment_status,
+            p.currency,
+            p.amount AS payment_amount,
+            p.created_at AS payment_created_at,
+            p.updated_at AS payment_updated_at,
+            u.first_name, u.last_name, u.email, u.phone
+     FROM donations d
+     LEFT JOIN payments p ON d.payment_id = p.id
+     LEFT JOIN users u ON d.user_id = u.id
+     WHERE d.id = ?`,
+    [donationId],
+  );
+  return rows[0] || null;
 };
 
+exports.updateReceiptJson = async (donationId, receiptJson) => {
+  await pool.execute(
+    `UPDATE donations 
+     SET receipt_json = ?, receipt_generated = 1, updated_at = NOW()
+     WHERE id = ?`,
+    [JSON.stringify(receiptJson), donationId],
+  );
+};

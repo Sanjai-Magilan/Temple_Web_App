@@ -264,12 +264,12 @@
                                                 <% if(booking.status === 'pending') { %>
                                                 <span class="badge bg-light text-dark border ms-2">
                                                     <button class="btn btn-sm btn-success" 
-                                                    onclick="window.location.href='/bookings/hall/pay/<%= booking.id %>'">
+                                                    onclick="resumeHallPayment('<%= booking.id %>', this)">
                                                     Continue
                                                     </button>
 
                                                     <button class="btn btn-sm btn-danger" 
-                                                    onclick="cancelBooking(<%= booking.id %>, this)">
+                                                    onclick="cancelBooking('<%= booking.id %>', this)">
                                                     Cancel
                                                     </button>
                                                 </span> 
@@ -583,6 +583,69 @@
                     console.error(err);
                     alert("Server error");
                 });
+            }
+        </script>
+
+        <script>
+            function resumeHallPayment(id, btn) {
+                const originalText = btn ? btn.innerHTML : "";
+
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                }
+
+                fetch(`/bookings/hall/continue/${id}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include"
+                })
+                    .then(async (res) => {
+                        const data = await res.json();
+                        if (!res.ok || !data.success) {
+                            throw new Error(data.message || "Failed to resume payment");
+                        }
+                        return data;
+                    })
+                    .then((data) => {
+                        if (typeof RazorpayPayment !== "function") {
+                            throw new Error("Payment function not loaded. Please contact support.");
+                        }
+
+                        const razorpayPayment = new RazorpayPayment({
+                            key: data.key,
+                            onSuccess: () => {
+                                window.location.href = "/bookings/hall";
+                            },
+                            onFailure: (error) => {
+                                alert("Payment failed: " + (error.message || "Unknown error"));
+                                if (btn) {
+                                    btn.disabled = false;
+                                    btn.innerHTML = originalText;
+                                }
+                            },
+                            onCancel: () => {
+                                if (btn) {
+                                    btn.disabled = false;
+                                    btn.innerHTML = originalText;
+                                }
+                            }
+                        });
+
+                        return razorpayPayment.initCheckout({
+                            order_id: data.order_id,
+                            amount: data.amount,
+                            description: data.description || "Hall booking payment",
+                            payment_type: "hall-booking"
+                        });
+                    })
+                    .catch((err) => {
+                        alert("Error: " + err.message);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = originalText;
+                        }
+                    });
             }
         </script>
 

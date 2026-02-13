@@ -316,6 +316,7 @@
                 try {
                     await initiatePayment('donation', formData, {
                         onSuccess: (result) => {
+                            alert("Payment completed successfully.");
                             window.location.href = '/payment/success?payment_id=' + result.payment_id;
                         },
                         onFailure: (error) => {

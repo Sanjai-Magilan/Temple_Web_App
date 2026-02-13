@@ -413,9 +413,10 @@ document.getElementById("poojaBookingForm").addEventListener("submit", async fun
     await initiatePayment("pooja-booking", formData, {
 
       onSuccess: (result) => {
-        redirected = true;
-        window.location.href = "/payment/success?payment_id=" + result.payment_id;
-      },
+  redirected = true;
+  //alert("Payment completed successfully.");
+  window.location.href = "/bookings/pooja";
+},
 
       onFailure: () => {
         submitBtn.disabled = false;

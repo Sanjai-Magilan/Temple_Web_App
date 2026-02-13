@@ -429,7 +429,7 @@
                     }
                 });
             });
-
+            
             // Submission
             document.getElementById('hallBookingForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -486,16 +486,17 @@
                 try {
                     await initiatePayment('hall-booking', formData, {
                         onSuccess: (result) => {
+                            window.alert("Payment completed successfully.");
                             window.location.href = '/payment/success?payment_id=' + result.payment_id;
                         },
                         onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
+                            window.alert('Payment failed: ' + error.message);
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalText;
                         }
                     });
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    window.alert('Error: ' + error.message);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                 }

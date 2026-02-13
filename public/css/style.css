@@ -16,7 +16,9 @@
 * {
     box-sizing: border-box;
 }
-html,body{
+
+html,
+body {
     margin: 0;
     min-height: 100vh;
 }
@@ -47,7 +49,7 @@ body {
     align-items: center;
     height: 70px;
     width: 100%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* LEFT */
@@ -203,7 +205,7 @@ body {
     border: 1px solid #e0d8c8;
     border-radius: 8px;
     width: 160px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     display: none;
     flex-direction: column;
     overflow: hidden;
@@ -346,12 +348,12 @@ body {
 .landing-nav-primary {
     background: var(--accent);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .landing-nav-primary:hover {
     background: #bfa889;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* =========================
@@ -406,11 +408,11 @@ body {
 .landing-hero-primary {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .landing-hero-secondary {
-    background: rgba(255,255,255,0.85);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid var(--accent);
 }
 
@@ -436,8 +438,9 @@ body {
     border-radius: 26px;
     padding: 26px 28px;
     max-height: 520px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
-    height: 480px;   /* fixed height = more scroll */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    height: 480px;
+    /* fixed height = more scroll */
     overflow-y: auto;
 }
 
@@ -455,7 +458,7 @@ body {
 }
 
 .landing-updates-panel::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.15);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 6px;
 }
 
@@ -543,6 +546,7 @@ body {
 .footer-bottom-links a:hover {
     color: #2c2c2c;
 }
+
 /* POoja Booking UI */
 
 
@@ -767,12 +771,187 @@ body {
 
 /*contact icon css*/
 .contact-icon {
-  color: #d1b570;
-  font-size: 1.2rem;
-  transition: 0.2s ease;
+    color: #d1b570;
+    font-size: 1.2rem;
+    transition: 0.2s ease;
 }
 
 .contact-icon:hover {
-  color: #b89c55; /* slightly darker gold */
-  transform: scale(1.15);
+    color: #b89c55;
+    /* slightly darker gold */
+    transform: scale(1.15);
+}
+
+/* =========================
+   MOBILE NAVIGATION
+========================= */
+
+/* Mobile Menu Button - Hidden by default */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.mobile-menu-btn span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: #333;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Landing specific override */
+.landing-navbar .mobile-menu-btn {
+    order: -1;
+    /* Move to left */
+}
+
+/* Hamburger Animation */
+.mobile-menu-btn.open span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-btn.open span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* =========================
+   MEDIA QUERIES
+========================= */
+
+/* TABLET & MOBILE (Max Width: 992px) */
+@media (max-width: 992px) {
+
+    .nav-bar,
+    .landing-navbar {
+        padding: 0 20px;
+    }
+
+    .temple-brand {
+        display: none;
+        /* Hide brand text on smaller screens if needed to save space */
+    }
+
+    .temple-logo {
+        font-size: 24px;
+    }
+
+    /* Mobile Menu Button Visible */
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    /* Navigation Links - Mobile View */
+    .nav-links,
+    .landing-nav-links {
+        position: fixed;
+        top: 70px;
+        /* Below navbar */
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 40px;
+        transition: left 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .nav-links.active,
+    .landing-nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li,
+    .landing-nav-links a {
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .nav-links li:not(:last-child)::after {
+        content: none;
+        /* Remove separators */
+    }
+
+    .nav-links a,
+    .landing-nav-links a {
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        width: 100%;
+    }
+
+    /* Hide auth buttons in landing nav and move to menu if needed, 
+       or keep them visible if space permits. For now, keeping them visible
+       but adjusting layout */
+    .landing-auth-buttons {
+        display: flex;
+    }
+
+    .landing-hero-layout {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+        gap: 30px;
+    }
+
+    .landing-hero-content {
+        padding: 0;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .landing-hero-actions {
+        justify-content: center;
+    }
+
+    .landing-hero h1 {
+        font-size: 36px;
+        /* Smaller heading */
+    }
+
+    .landing-updates-panel {
+        height: auto;
+        max-height: 400px;
+    }
+}
+
+/* MOBILE ONLY (Max Width: 576px) */
+@media (max-width: 576px) {
+    .landing-auth-buttons .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .nav-user-name,
+    .nav-user-role {
+        display: none;
+        /* Hide user info text on very small screens, keep avatar */
+    }
+
+    .temple-brand-name {
+        font-size: 16px;
+    }
+
+    .landing-hero-content h1 {
+        font-size: 32px;
+    }
+
+    .landing-hero-tagline {
+        font-size: 16px;
+    }
 }

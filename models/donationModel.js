@@ -114,10 +114,19 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
        LEFT JOIN payments p ON d.payment_id = p.id
        WHERE d.user_id = ?
        ORDER BY d.created_at DESC
-       LIMIT ${limit} OFFSET ${offset}`,
+       LIMIT ? OFFSET ?`,
+      [userId, String(limit), String(offset)],
+    );
+
+    const [countRows] = await pool.execute(
+      "SELECT COUNT(*) as count FROM donations WHERE user_id = ?",
       [userId],
     );
-    return rows;
+
+    return {
+      donations: rows,
+      total: countRows[0].count,
+    };
   } catch (error) {
     console.error("Error getting user donations:", error);
     throw error;
@@ -151,4 +160,61 @@ exports.updateReceiptJson = async (donationId, receiptJson) => {
      WHERE id = ?`,
     [JSON.stringify(receiptJson), donationId],
   );
+};
+
+/**
+ * Get all donations (for admin)
+ */
+exports.getAllDonations = async (limit = 20, offset = 0, search = "") => {
+  try {
+    let query = `
+       SELECT d.*, p.status as payment_status, p.payment_method,
+              u.first_name, u.last_name, u.email
+       FROM donations d
+       LEFT JOIN payments p ON d.payment_id = p.id
+       LEFT JOIN users u ON d.user_id = u.id
+    `;
+
+    const params = [];
+
+    if (search) {
+      query += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?`;
+      const searchParam = `%${search}%`;
+      params.push(searchParam, searchParam, searchParam);
+    }
+
+    query += ` ORDER BY d.created_at DESC LIMIT ? OFFSET ?`;
+    // Ensure params are numbers but passed as strings if library demands, 
+    // but mysql2 usually handles numbers fine. The error 'Incorrect arguments to mysqld_stmt_execute'
+    // often means one of the params is NaN or undefined or an object. 
+    // Let's force them to be strings just in case, or verify they are numbers.
+    // Actually, LIMIT requires integers.
+    params.push(String(limit), String(offset));
+
+    const [rows] = await pool.execute(query, params);
+
+    // Get total count for pagination
+    let countQuery = `
+       SELECT COUNT(*) as count 
+       FROM donations d
+       LEFT JOIN users u ON d.user_id = u.id
+    `;
+    const countParams = [];
+
+    if (search) {
+      countQuery += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?`;
+      const searchParam = `%${search}%`;
+      countParams.push(searchParam, searchParam, searchParam);
+    }
+
+    const [countRows] = await pool.execute(countQuery, countParams);
+
+    return {
+      donations: rows,
+      total: countRows[0].count,
+    };
+  } catch (error) {
+    console.error("Error getting all donations:", error);
+    throw error;
+  }
 };

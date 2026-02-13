@@ -9,6 +9,14 @@ const authMiddleware = require("../../middleware/authMiddleware");
 const receiptController = require("../../controllers/receiptController");
 
 // List donations
+router.get(
+  "/admin/donations",
+  (req, res, next) => { console.log('Hit /admin/donations'); next(); },
+  authMiddleware.verifyToken,
+  authMiddleware.requireRole("admin"),
+  donationController.listAdmin,
+);
+
 router.get("/donations", authMiddleware.verifyToken, donationController.list);
 
 // New donation form

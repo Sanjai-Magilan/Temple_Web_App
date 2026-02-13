@@ -7,34 +7,8 @@
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover !important;
-            font-family: 'Inter', sans-serif !important;
+            /* font-family: 'Inter', sans-serif !important; */
             min-height: 100vh;
-        }
-
-        /* Navbar transparency and color overrides */
-        .navbar {
-            background: linear-gradient(90deg, #2c241b, #8c7b65) !important;
-            /* Brown/Gold Gradient */
-            border-bottom: 1px solid rgba(191, 161, 95, 0.3);
-            /* Premium gold border */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .navbar-brand,
-        .nav-link {
-            color: #f0f0f0 !important;
-        }
-
-        .nav-link:hover {
-            color: #bfa15f !important;
-        }
-
-        .navbar-toggler {
-            border-color: rgba(191, 161, 95, 0.5) !important;
-        }
-
-        .navbar-toggler-icon {
-            filter: invert(1) sepia(1) saturate(5) hue-rotate(5deg);
         }
 
         /* Page Title styling */
@@ -356,6 +330,27 @@
             document.getElementById('donationForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
 
+                const MAX_DONATION = 500000; // ₹5,00,000
+                    const amount = Number(document.getElementById('amount').value);
+
+                    if (amount > MAX_DONATION) {
+                        Swal.fire({
+                        icon: 'warning',
+                        title: 'Donation Limit Exceeded',
+                        html: `
+                            <p style="font-size:15px;">
+                                Maximum donation allowed is
+                                <b style="color:#bfa15f;">₹5,00,000</b>
+                            </p>
+                        `,
+                        confirmButtonText: 'Okay',
+                        confirmButtonColor: '#bfa15f'
+                    });
+
+                        return;
+                    }
+
+
                 const submitBtn = document.getElementById('submitBtn');
                 const originalText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
@@ -381,13 +376,14 @@
                             window.location.href = '/donations';
                         },
                         onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
+                            showAlert('error', 'Payment Failed', error.message);
+
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalText;
                         }
                     });
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    showAlert('error', 'Error', error.message);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                 }

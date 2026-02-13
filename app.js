@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const passport = require("passport");
 const logger = require("./utils/logger");
+const helmet = require("helmet");
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// app.use(helmet());
 
 // Session configuration
 app.use(

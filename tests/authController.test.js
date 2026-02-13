@@ -95,7 +95,7 @@ describe('Auth Controller - Login', () => {
     await authController.login(req, res);
 
     expect(res.cookie).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalledWith('/');
+    expect(res.redirect).toHaveBeenCalledWith('/dashboard');
   });
 });
 

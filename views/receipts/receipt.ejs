@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Temple Receipt</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Work+Sans:wght@300;400;600&display=swap");
+    :root {
+      --ink: #2d2318;
+      --gold: #b8924b;
+      --sand: #f7f0e4;
+      --clay: #efe3cf;
+      --line: #d8c5a1;
+    }
+    body {
+      margin: 0;
+      font-family: "Work Sans", sans-serif;
+      color: var(--ink);
+      background: var(--sand);
+    }
+    .receipt {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border: 2px solid var(--line);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+    .header {
+      background: linear-gradient(135deg, #f4e8d5, #fdf7ee);
+      border-bottom: 2px solid var(--line);
+      padding: 28px 32px 22px;
+      text-align: center;
+    }
+    .temple-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 30px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 0 0 6px;
+    }
+    .temple-meta {
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      color: #5b4a33;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 14px;
+      background: var(--gold);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    .section {
+      padding: 22px 32px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .section:last-child {
+      border-bottom: 0;
+    }
+    .title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 20px;
+      margin: 0 0 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 22px;
+      font-size: 13px;
+    }
+    .label {
+      color: #6a5840;
+      font-weight: 600;
+    }
+    .value {
+      color: #2d2318;
+    }
+    .amount {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .footer {
+      padding: 18px 32px 26px;
+      text-align: center;
+      font-size: 11px;
+      color: #6a5840;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="header">
+      <h1 class="temple-name"><%= receipt.temple.name %></h1>
+      <div class="temple-meta">
+        <%= receipt.temple.address %><br />
+        <%= receipt.temple.phone %> <%= receipt.temple.email ? " | " + receipt.temple.email : "" %>
+      </div>
+      <div class="badge">Official Receipt</div>
+    </div>
+
+    <div class="section">
+      <div class="title">Receipt Details</div>
+      <div class="grid">
+        <div class="label">Receipt Number</div>
+        <div class="value"><%= receipt.receipt_number %></div>
+        <div class="label">Type</div>
+        <div class="value"><%= receipt.receipt_type %></div>
+        <div class="label">Issued At</div>
+        <div class="value"><%= receipt.issued_at %></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Devotee</div>
+      <div class="grid">
+        <div class="label">Name</div>
+        <div class="value"><%= receipt.payer.name %></div>
+        <div class="label">Email</div>
+        <div class="value"><%= receipt.payer.email || "NA" %></div>
+        <div class="label">Phone</div>
+        <div class="value"><%= receipt.payer.phone || "NA" %></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Payment</div>
+      <div class="grid">
+        <div class="label">Payment ID</div>
+        <div class="value"><%= receipt.payment.payment_id %></div>
+        <div class="label">Order ID</div>
+        <div class="value"><%= receipt.payment.order_id %></div>
+        <div class="label">Method</div>
+        <div class="value"><%= receipt.payment.method %></div>
+        <div class="label">Status</div>
+        <div class="value"><%= receipt.payment.status %></div>
+        <div class="label">Amount</div>
+        <div class="value amount">INR <%= receipt.payment.amount %></div>
+      </div>
+    </div>
+
+    <% if (receipt.receipt_type === "donation") { %>
+    <div class="section">
+      <div class="title">Donation Details</div>
+      <div class="grid">
+        <div class="label">Type</div>
+        <div class="value"><%= receipt.details.donation_type %></div>
+        <div class="label">Purpose</div>
+        <div class="value"><%= receipt.details.purpose || "NA" %></div>
+        <div class="label">Anonymous</div>
+        <div class="value"><%= receipt.details.is_anonymous ? "Yes" : "No" %></div>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (receipt.receipt_type === "hall_booking") { %>
+    <div class="section">
+      <div class="title">Hall Booking</div>
+      <div class="grid">
+        <div class="label">Hall</div>
+        <div class="value"><%= receipt.details.hall_name %></div>
+        <div class="label">Date</div>
+        <div class="value"><%= receipt.details.booking_date %></div>
+        <div class="label">Time</div>
+        <div class="value"><%= receipt.details.start_time %> - <%= receipt.details.end_time %></div>
+        <div class="label">Event</div>
+        <div class="value"><%= receipt.details.event_type || "NA" %></div>
+        <div class="label">Guests</div>
+        <div class="value"><%= receipt.details.expected_guests || "NA" %></div>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (receipt.receipt_type === "pooja_booking") { %>
+    <div class="section">
+      <div class="title">Pooja Booking</div>
+      <div class="grid">
+        <div class="label">Pooja</div>
+        <div class="value"><%= receipt.details.pooja_name %></div>
+        <div class="label">Date</div>
+        <div class="value"><%= receipt.details.booking_date %></div>
+        <div class="label">Time</div>
+        <div class="value"><%= receipt.details.booking_time %></div>
+        <div class="label">Devotee</div>
+        <div class="value"><%= receipt.details.devotee_name %></div>
+        <div class="label">Gotra</div>
+        <div class="value"><%= receipt.details.gotra || "NA" %></div>
+        <div class="label">Nakshatra</div>
+        <div class="value"><%= receipt.details.nakshatra || "NA" %></div>
+      </div>
+    </div>
+    <% } %>
+
+    <div class="footer">
+      This is a computer generated receipt. Please keep it for future reference.
+    </div>
+  </div>
+</body>
+</html>

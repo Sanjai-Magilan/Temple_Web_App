@@ -114,19 +114,41 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
   try {
     // Create order on server
     const orderResponse = await fetch(`/payment/${paymentType}/order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(paymentData)
-    });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  credentials: 'include',
+  body: JSON.stringify(paymentData)
+});
 
-    const orderResult = await orderResponse.json();
+const orderResult = await orderResponse.json();
 
-    if (!orderResult.success) {
-      throw new Error(orderResult.message || 'Failed to create payment order');
-    }
+      // Handle backend validation errors properly
+      if (!orderResponse.ok) {
+
+        // Donation limit
+        if (paymentType === 'donation') {
+          showAlert(
+            'warning',
+            'Donation Limit Exceeded',
+            orderResult.message || 'Donation amount cannot exceed ₹5,00,000.'
+          );
+        }
+
+        // Hall booking limit
+        else if (paymentType === 'hall-booking') {
+          showAlert(
+            'warning',
+            'Hall Booking Limit Exceeded',
+            orderResult.message || 'Hall booking amount cannot exceed the allowed limit.'
+          );
+        }
+
+        return; // 
+      }
+
+
 
     // Initialize Razorpay checkout
     const razorpayPayment = new RazorpayPayment({
@@ -147,7 +169,7 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
     if (options.onFailure) {
       options.onFailure({ message: error.message });
     } else {
-      alert('Payment initiation failed: ' + error.message);
+      showAlert('error', 'Payment Initiation Failed', error.message);
     }
   }
 }

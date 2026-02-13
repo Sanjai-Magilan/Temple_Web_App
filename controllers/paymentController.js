@@ -2,6 +2,10 @@
  * Payment Controller
  * Handles Razorpay payment initiation and verification
  */
+const PAYMENT_LIMITS = {
+  donation: 500000,
+  hall_booking: 50000
+};
 
 const razorpay = require("../config/razorpay");
 const paymentModel = require("../models/paymentModel");
@@ -26,11 +30,12 @@ exports.createDonationOrder = async (req, res) => {
 
     // Validate amount
     const donationAmount = parseFloat(amount);
-    if (!donationAmount || donationAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid donation amount" });
-    }
+    if (donationAmount > PAYMENT_LIMITS.donation) {
+    return res.status(400).json({
+    success: false,
+    message: "Donation amount cannot exceed ₹5,00,000"
+  });
+}
 
     // Create Razorpay order
     const options = {
@@ -79,11 +84,24 @@ exports.createDonationOrder = async (req, res) => {
       receipt_number: donation.receipt_number,
     });
   } catch (error) {
-    console.error("Error creating donation order:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to create payment order" });
-  }
+  console.error("Error creating donation order:", error);
+
+      // Razorpay amount limit error
+      if (
+        error?.error?.code === 'BAD_REQUEST_ERROR' &&
+        error?.error?.description?.includes('Amount exceeds')
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Check the amount please"
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to create payment order"
+      });
+    }
 };
 
 /**
@@ -97,7 +115,7 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Please login to book a hall" });
     }
 
-        const {
+    const {
       hall_name,
       booking_date,
       start_time,
@@ -123,7 +141,10 @@ exports.createHallBookingOrder = async (req, res) => {
         : [];
 
     const foodMealsCsv = foodRequired
-      ? mealsArray.map((m) => String(m).trim()).filter(Boolean).join(", ")
+      ? mealsArray
+          .map((m) => String(m).trim())
+          .filter(Boolean)
+          .join(", ")
       : null;
 
     // Validate required fields
@@ -134,11 +155,14 @@ exports.createHallBookingOrder = async (req, res) => {
     }
 
     const bookingAmount = parseFloat(amount);
-    if (!bookingAmount || bookingAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid booking amount" });
-    }
+    // Max limit validation for hall booking
+    if (bookingAmount > PAYMENT_LIMITS.hall_booking) {
+    return res.status(400).json({
+    success: false,
+    message: "Hall booking amount cannot exceed ₹50,000"
+  });
+}
+
 
     //Block booking if there is a confirmed booking with overlapping time slot
     const hasConflict = await hallBookingModel.hasConfirmedOverlap({
@@ -181,7 +205,7 @@ exports.createHallBookingOrder = async (req, res) => {
     });
 
     // Create hall booking record
-        const booking = await hallBookingModel.create({
+    const booking = await hallBookingModel.create({
       user_id: req.user.id,
       family_id: null,
       hall_name,
@@ -251,12 +275,6 @@ exports.createPoojaBookingOrder = async (req, res) => {
     }
 
     const bookingAmount = parseFloat(amount);
-    if (!bookingAmount || bookingAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid booking amount" });
-    }
-
     // Create Razorpay order
     const options = {
       amount: bookingAmount * 100, // Convert to paise
@@ -356,6 +374,13 @@ exports.verifyPayment = async (req, res) => {
 
     // Fetch payment details from Razorpay
     const razorpayPayment = await razorpay.payments.fetch(payment_id);
+
+    if (!razorpayPayment || !razorpayPayment.status) {
+      return res.status(502).json({
+        success: false,
+        message: "Unable to fetch payment status from Razorpay",
+      });
+    }
 
     // Find payment record by order_id
     const payment = await paymentModel.findByOrderId(order_id);

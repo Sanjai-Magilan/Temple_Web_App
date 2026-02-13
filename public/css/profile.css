@@ -6,7 +6,7 @@
 
 /* Header */
 .profile-card .card-header {
-  background: linear-gradient(135deg, #0d6efd, #0a58ca);
+  background: linear-gradient(135deg, #d1b570, #d1b570);
 }
 
 /* Inputs */
@@ -16,8 +16,8 @@
 }
 
 .profile-card .form-control:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+  border-color: #d1b570;
+  box-shadow: 0 0 0 0.15rem rgba(209, 181, 112, 0.25);
 }
 
 /* Edit button */
@@ -27,7 +27,7 @@
 
 #editBtn:hover {
   background-color: #ffffff;
-  color: #0d6efd;
+  color: #d1b570;
 }
 
 /* Save button */

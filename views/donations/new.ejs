@@ -131,6 +131,18 @@
             color: #b0a69a;
         }
 
+        /* Hide spinner for number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         /* Amount Input specifically */
         .amount-wrapper {
             position: relative;
@@ -297,60 +309,39 @@
             </div>
         </div>
 
-       <script>
-document.getElementById('donationForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+        <script>
+            document.getElementById('donationForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
 
-    const MAX_DONATION = 500000; // 
-    const amount = Number(document.getElementById('amount').value);
+                const submitBtn = document.getElementById('submitBtn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
-    // ✅ LIMIT CHECK (THIS WAS MISSING)
-    if (amount > MAX_DONATION) {
-        showAlert(
-            'warning',
-            'Donation Limit Exceeded',
-            'Maximum donation allowed is <b style="color:#bfa15f;">₹5,00,000</b>'
-        );
-        return;
-    }
+                const formData = {
+                    amount: document.getElementById('amount').value,
+                    donation_type: document.getElementById('donation_type').value,
+                    purpose: document.getElementById('purpose').value,
 
-    //  continue normal payment
-    const submitBtn = document.getElementById('submitBtn');
-    const originalText = submitBtn.innerHTML;
+                };
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Processing...';
-
-    const formData = {
-        amount,
-        donation_type: document.getElementById('donation_type').value,
-        purpose: document.getElementById('purpose').value,
-        is_anonymous: false
-    };
-
-    try {
-        await initiatePayment('donation', formData, {
-            onSuccess: () => {
-                window.location.href = '/donations';
-            },
-            onFailure: (error) => {
-                showAlert(
-                    'error',
-                    'Payment Failed',
-                    error.message || 'Something went wrong'
-                );
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
-    } catch (error) {
-        showAlert('error', 'Error', error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }
-});
-</script>
-
-        
+                try {
+                    await initiatePayment('donation', formData, {
+                        onSuccess: (result) => {
+                            window.location.href = '/payment/success?payment_id=' + result.payment_id;
+                        },
+                        onFailure: (error) => {
+                            alert('Payment failed: ' + error.message);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                        }
+                    });
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        </script>
 
         <%- include('../partials/footer') %>

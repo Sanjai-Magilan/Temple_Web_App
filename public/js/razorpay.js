@@ -75,19 +75,21 @@ class RazorpayPayment {
 
       const result = await verifyResponse.json();
 
-      if (result.success) {
-        if (this.options.onSuccess) {
-          this.options.onSuccess(result);
-        } else {
-          // Redirect to success page
-          const redirectUrl = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
-          if (orderData.successUrl) {
-            window.location.href = orderData.successUrl + redirectUrl.split('?')[1];
-          } else {
-            window.location.href = redirectUrl;
-          }
-        }
-      } else {
+     if (result.success) {
+  if (this.options.onSuccess) {
+    this.options.onSuccess(result);
+  }
+
+  // Redirect to success page or provided successUrl
+  const redirectUrl = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
+  if (orderData.successUrl) {
+    const query = redirectUrl.split("?")[1];
+    const separator = orderData.successUrl.includes("?") ? "&" : "?";
+    window.location.href = orderData.successUrl + separator + query;
+  } else if (!this.options.onSuccess) {
+    window.location.href = redirectUrl;
+  }
+} else {
         if (this.options.onFailure) {
           this.options.onFailure(result);
         } else {

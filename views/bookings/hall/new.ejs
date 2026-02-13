@@ -469,6 +469,12 @@
                 // Prepare Description with Food Details
                 let baseDescription = document.getElementById('event_description').value;
 
+                const meals = [];
+                if (document.getElementById('meal_breakfast').checked) meals.push('Breakfast');
+                if (document.getElementById('meal_lunch').checked) meals.push('Lunch');
+                if (document.getElementById('meal_dinner').checked) meals.push('Dinner');
+
+
                 if (foodYes) {
                     const meals = [];
                     if (document.getElementById('meal_breakfast').checked) meals.push('Breakfast');
@@ -480,16 +486,19 @@
                     baseDescription += `\n\n--- Food Arrangements ---\nRequired: No`;
                 }
 
-                const formData = {
-                    hall_name: document.getElementById('hall_name').value,
-                    booking_date: document.getElementById('booking_date').value,
-                    start_time: document.getElementById('start_time').value,
-                    end_time: document.getElementById('end_time').value,
-                    event_type: document.getElementById('event_type').value,
-                    event_description: baseDescription,
-                    expected_guests: document.getElementById('expected_guests').value,
-                    amount: document.getElementById('amount').value
-                };
+               
+            const formData = {
+            hall_name: document.getElementById('hall_name').value,
+  booking_date: document.getElementById('booking_date').value,
+  start_time: document.getElementById('start_time').value,
+  end_time: document.getElementById('end_time').value,
+  event_type: document.getElementById('event_type').value,
+  event_description: baseDescription,
+  expected_guests: document.getElementById('expected_guests').value,
+  amount: document.getElementById('amount').value,
+  food_required: foodYes ? 1 : 0,
+  food_meals: foodYes ? meals : []
+};
 
                 try {
                     await initiatePayment('hall-booking', formData, {

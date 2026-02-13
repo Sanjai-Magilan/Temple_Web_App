@@ -25,7 +25,8 @@
                     <a href="/register" class="btn landing-hero-secondary">Register</a>
                     <a href="/login" class="btn landing-hero-primary">Login</a>
                 <% }else { %>
-                    <a href="/Dashboard" class="btn landing-hero-primary">Dashboard</a>
+                    <a href= "<%= user.role == 'admin' ? '/admin' : '/dashboard' %>" 
+                        class="btn landing-hero-primary">Dashboard</a>
                 <% } %>
             </div>
         </div>

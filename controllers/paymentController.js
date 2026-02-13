@@ -13,6 +13,7 @@ const donationModel = require("../models/donationModel");
 const hallBookingModel = require("../models/hallBookingModel");
 const poojaBookingModel = require("../models/poojaBookingModel");
 const { verifyPaymentSignature } = require("../config/razorpay");
+const receiptService = require("../utils/receiptService");
 
 /**
  * Create Razorpay order for donation
@@ -114,7 +115,7 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Please login to book a hall" });
     }
 
-    const {
+        const {
       hall_name,
       booking_date,
       start_time,
@@ -123,7 +124,25 @@ exports.createHallBookingOrder = async (req, res) => {
       event_description,
       expected_guests,
       amount,
+      food_required,
+      food_meals,
     } = req.body;
+
+    const foodRequired =
+      food_required === true ||
+      food_required === 1 ||
+      food_required === "1" ||
+      food_required === "yes";
+
+    const mealsArray = Array.isArray(food_meals)
+      ? food_meals
+      : typeof food_meals === "string"
+        ? food_meals.split(",")
+        : [];
+
+    const foodMealsCsv = foodRequired
+      ? mealsArray.map((m) => String(m).trim()).filter(Boolean).join(", ")
+      : null;
 
     // Validate required fields
     if (!hall_name || !booking_date || !start_time || !end_time || !amount) {
@@ -183,7 +202,7 @@ exports.createHallBookingOrder = async (req, res) => {
     });
 
     // Create hall booking record
-    const booking = await hallBookingModel.create({
+        const booking = await hallBookingModel.create({
       user_id: req.user.id,
       family_id: null,
       hall_name,
@@ -193,6 +212,8 @@ exports.createHallBookingOrder = async (req, res) => {
       event_type: event_type || null,
       event_description: event_description || null,
       expected_guests: expected_guests || null,
+      food_required: foodRequired ? 1 : 0,
+      food_meals: foodMealsCsv,
       amount: bookingAmount,
       payment_id: paymentId,
       status: "pending",
@@ -396,10 +417,19 @@ exports.verifyPayment = async (req, res) => {
             });
           }
         }
-
         await hallBookingModel.updateStatus(payment.related_id, "confirmed");
       } else if (payment.payment_type === "pooja_booking") {
         await poojaBookingModel.updateStatus(payment.related_id, "confirmed");
+      }
+    }
+
+    if (razorpayPayment.status === "captured" && payment.related_id) {
+      if (payment.payment_type === "donation") {
+        await receiptService.ensureDonationReceiptJsonById(payment.related_id);
+      } else if (payment.payment_type === "hall_booking") {
+        await receiptService.ensureHallReceiptJsonById(payment.related_id);
+      } else if (payment.payment_type === "pooja_booking") {
+        await receiptService.ensurePoojaReceiptJsonById(payment.related_id);
       }
     }
 
@@ -505,6 +535,22 @@ exports.handleWebhook = async (req, res) => {
           );
         }
       }
+
+      if (existingPayment.related_id) {
+        if (existingPayment.payment_type === "donation") {
+          await receiptService.ensureDonationReceiptJsonById(
+            existingPayment.related_id,
+          );
+        } else if (existingPayment.payment_type === "hall_booking") {
+          await receiptService.ensureHallReceiptJsonById(
+            existingPayment.related_id,
+          );
+        } else if (existingPayment.payment_type === "pooja_booking") {
+          await receiptService.ensurePoojaReceiptJsonById(
+            existingPayment.related_id,
+          );
+        }
+      }
     }
 
     res.json({ success: true });
@@ -522,14 +568,14 @@ exports.handleWebhook = async (req, res) => {
 exports.paymentSuccess = async (req, res) => {
   try {
     const { payment_id, order_id } = req.query;
-    
+
     if (!payment_id && !order_id) {
-      return res.status(400).render('errors/400', {
-        title: 'Bad Request',
-        message: 'Payment ID or Order ID is required.',
+      return res.status(400).render("errors/400", {
+        title: "Bad Request",
+        message: "Payment ID or Order ID is required.",
       });
     }
-    
+
     // Fetch payment details from database
     let paymentDetails = null;
     if (payment_id) {
@@ -537,18 +583,18 @@ exports.paymentSuccess = async (req, res) => {
     } else if (order_id) {
       paymentDetails = await paymentModel.findByOrderId(order_id);
     }
-    
-    res.render('payment/success', {
-      title: 'Payment Success',
+
+    res.render("payment/success", {
+      title: "Payment Success",
       payment_id: payment_id || null,
       order_id: order_id || null,
       paymentDetails: paymentDetails,
     });
   } catch (error) {
-    console.error('Error rendering payment success page:', error);
-    res.status(500).render('errors/500', {
-      title: 'Server Error',
-      message: 'An error occurred while processing your request.',
+    console.error("Error rendering payment success page:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "An error occurred while processing your request.",
     });
   }
 };
@@ -559,18 +605,18 @@ exports.paymentSuccess = async (req, res) => {
 exports.paymentFailure = async (req, res) => {
   try {
     const { payment_id, order_id, error } = req.query;
-    
-    res.render('payment/failure', {
-      title: 'Payment Failed',
+
+    res.render("payment/failure", {
+      title: "Payment Failed",
       payment_id: payment_id || null,
       order_id: order_id || null,
-      error: error || 'Payment could not be processed.',
+      error: error || "Payment could not be processed.",
     });
   } catch (error) {
-    console.error('Error rendering payment failure page:', error);
-    res.status(500).render('errors/500', {
-      title: 'Server Error',
-      message: 'An error occurred while processing your request.',
+    console.error("Error rendering payment failure page:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "An error occurred while processing your request.",
     });
   }
 };

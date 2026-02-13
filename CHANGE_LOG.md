@@ -37,3 +37,6 @@ Implemented
 Implemented
     Payment Controller Jest Test
     - Miruthul
+Implemented
+    manage booking for admin
+    - kamalesh

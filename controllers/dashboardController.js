@@ -46,42 +46,42 @@ exports.userDashboard = async (req, res) => {
     // --- 2. GET TOTAL DONATION (Specific for "Total Donation" Card) ---
     const [totalDonationResult] = await pool.execute(
       `SELECT COALESCE(SUM(amount), 0) as total FROM donations
-       WHERE user_id = ?`, 
-       [userId]
+       WHERE user_id = ?`,
+      [userId]
     );
 
     // --- 3. GET FAMILY MEMBERS COUNT (Specific for "Family" Card) ---
     const [familyResult] = await pool.execute(
-        'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?', 
-        [userId]
+      'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
+      [userId]
     );
     const familyCount = familyResult[0].count;
 
     // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
     const [upcomingPoojaResult] = await pool.execute(
-        `SELECT * FROM pooja_bookings 
+      `SELECT * FROM pooja_bookings 
          WHERE user_id = ? AND booking_date >= CURDATE() 
          ORDER BY booking_date ASC LIMIT 1`,
-        [userId]
+      [userId]
     );
     const upcomingPooja = upcomingPoojaResult.length > 0 ? upcomingPoojaResult[0] : null;
 
-// --- 5. GET UPCOMING HALL BOOKING (FUTURE EVENT) ---
-const [upcomingHallResult] = await pool.execute(
-  `SELECT * FROM hall_bookings 
+    // --- 5. GET UPCOMING HALL BOOKING (FUTURE EVENT) ---
+    const [upcomingHallResult] = await pool.execute(
+      `SELECT * FROM hall_bookings 
    WHERE user_id = ? AND booking_date >= CURDATE()
    ORDER BY booking_date ASC 
    LIMIT 1`,
-  [userId]
-);
+      [userId]
+    );
 
-const upcomingHall = upcomingHallResult.length > 0
-  ? upcomingHallResult[0]
-  : null;
+    const upcomingHall = upcomingHallResult.length > 0
+      ? upcomingHallResult[0]
+      : null;
 
 
     // --- 6. GET RECENT ACTIVITY (For tables/history if needed) ---
-    const recentDonations = await donationModel.getUserDonations(userId, 1, 0);
+    const { donations: recentDonations } = await donationModel.getUserDonations(userId, 1, 0);
     const recentHallBookings = await hallBookingModel.getUserBookings(userId, 3, 0);
     const recentPoojaBookings = await poojaBookingModel.getUserBookings(userId, 1, 0);
 
@@ -94,13 +94,13 @@ const upcomingHall = upcomingHallResult.length > 0
     res.render('dashboard/user', {
       title: 'Dashboard',
       user: req.user,
-      
+
       // Dynamic Data for Dashboard Cards
-      upcomingPooja: upcomingPooja, 
+      upcomingPooja: upcomingPooja,
       upcomingHall: upcomingHall,
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,
       familyCount: familyCount,
-      
+
       // Other data for sidebar/footer/history
       donationsCount: donationsCount[0].count,
       hallBookingsCount: hallBookingsCount[0].count,
@@ -136,7 +136,7 @@ exports.adminDashboard = async (req, res) => {
        WHERE d.payment_id IS NOT NULL AND 
        d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`
     );
-    
+
     const [totalBookings] = await pool.execute(
       `SELECT 
         (SELECT COUNT(*) FROM hall_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) + 

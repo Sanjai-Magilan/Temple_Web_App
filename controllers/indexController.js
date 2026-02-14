@@ -7,11 +7,14 @@ const pool = require('../config/database');
 
 exports.home = async (req, res) => {
   try {
-    // Fetch latest news
+    // Delete expired news (where published_at < NOW())
+    await pool.execute('DELETE FROM news WHERE published_at < NOW()');
+
+    // Fetch latest news (Upcoming only)
     const [latestNews] = await pool.execute(
       `SELECT * FROM news 
-       WHERE is_published = 1 
-       ORDER BY published_at DESC LIMIT 5`
+       WHERE is_published = 1 AND published_at >= CURDATE()
+       ORDER BY published_at ASC LIMIT 5`
     );
 
     res.render('index', {

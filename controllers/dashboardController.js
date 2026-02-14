@@ -154,11 +154,14 @@ exports.adminDashboard = async (req, res) => {
          ORDER BY created_at DESC LIMIT 5`
     );
 
-    // Fetch News / Special Days
+    // Delete expired news (where published_at < NOW())
+    await pool.execute('DELETE FROM news WHERE published_at < NOW()');
+
+    // Fetch News / Special Days (Upcoming Only)
     const [latestNews] = await pool.execute(
       `SELECT * FROM news 
        WHERE is_published = 1 
-       ORDER BY published_at DESC LIMIT 5`
+       ORDER BY published_at ASC LIMIT 5`
     );
 
     res.render('dashboard/admin', {

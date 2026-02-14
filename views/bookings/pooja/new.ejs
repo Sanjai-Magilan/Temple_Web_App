@@ -3,6 +3,13 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap');
 
+    /* ===== Global Reset ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     /* ===== Allow FULL WINDOW SCROLL ===== */
 
     body {
@@ -118,6 +125,8 @@
       box-shadow: 0 0 0 4px rgba(191, 161, 95, .15);
     }
 
+
+
     /* ===== Two Column Layout ===== */
 
     .row-2 {
@@ -212,12 +221,19 @@
 
     @media (max-width:600px) {
 
+      .modal-overlay {
+        padding: 20px 10px;
+        align-items: flex-start;
+      }
+
       .row-2 {
         flex-direction: column;
       }
 
       .booking-modal {
-        padding: 22px 18px;
+        padding: 25px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
       }
     }
   </style>
@@ -347,7 +363,7 @@
             <div class="amount-box">
               <span class="amount-symbol">₹</span>
               <input type="number" id="amount" class="form-input amount-input"
-                placeholder="Auto filled from pooja selection" required>
+                placeholder="Auto filled from pooja selection" required readonly>
             </div>
 
           </div>

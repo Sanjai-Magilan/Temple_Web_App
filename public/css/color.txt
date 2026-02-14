@@ -1,0 +1,8 @@
+:root {
+    --bg-base: #F9F8F6;
+    --surface-primary: #F3EEE9;
+    --surface-secondary: #E3DBD2;
+    --accent: #C9B59C;
+    --text-main: #5E5A55;
+    --heading-dark: #4B463F;
+}

@@ -2,6 +2,11 @@
 
     <!-- LEFT -->
     <div class="nav-left">
+        <div class="mobile-menu-btn" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <div class="temple-logo">🕉️</div>
         <div class="temple-brand">
             <div class="temple-brand-name">Shri Temple</div>
@@ -31,7 +36,9 @@
                 <div class="nav-user-name">
                     <%= user && user.first_name ? user.first_name : 'User' %>
                 </div>
-                <div class="nav-user-role"><%= user? (user.role == 'admin'?'Admin':'Devotte'):'invalid user' %></div>
+                <div class="nav-user-role">
+                    <%= user? (user.role=='admin' ?'Admin':'Devotte'):'invalid user' %>
+                </div>
             </div>
 
             <div class="nav-user-dropdown">▼</div>
@@ -44,5 +51,4 @@
         </div>
     </div>
 </nav>
-
-
+<script src="/js/mobile-nav.js"></script>

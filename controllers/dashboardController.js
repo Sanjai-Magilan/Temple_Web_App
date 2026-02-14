@@ -48,10 +48,14 @@ exports.userDashboard = async (req, res) => {
       `SELECT COALESCE(SUM(amount), 0) as total FROM donations
        WHERE user_id = ?`,
       [userId]
+       WHERE user_id = ?`,
+      [userId]
     );
 
     // --- 3. GET FAMILY MEMBERS COUNT (Specific for "Family" Card) ---
     const [familyResult] = await pool.execute(
+      'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
+      [userId]
       'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
       [userId]
     );
@@ -84,7 +88,7 @@ exports.userDashboard = async (req, res) => {
 
 
     // --- 6. GET RECENT ACTIVITY (For tables/history if needed) ---
-    const recentDonations = await donationModel.getUserDonations(userId, 1, 0);
+    const { donations: recentDonations } = await donationModel.getUserDonations(userId, 1, 0);
     const recentHallBookings = await hallBookingModel.getUserBookings(userId, 3, 0);
     const recentPoojaBookings = await poojaBookingModel.getUserBookings(userId, 1, 0);
 
@@ -98,11 +102,14 @@ exports.userDashboard = async (req, res) => {
       title: 'Dashboard',
       user: req.user,
 
+
       // Dynamic Data for Dashboard Cards
+      upcomingPooja: upcomingPooja,
       upcomingPooja: upcomingPooja,
       upcomingHall: upcomingHall,
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,
       familyCount: familyCount,
+
 
       // Other data for sidebar/footer/history
       donationsCount: donationsCount[0].count,
@@ -141,6 +148,7 @@ exports.adminDashboard = async (req, res) => {
        WHERE d.payment_id IS NOT NULL AND 
        d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`
     );
+
 
     const [totalBookings] = await pool.execute(
       `SELECT 

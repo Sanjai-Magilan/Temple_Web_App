@@ -1,25 +1,28 @@
 <nav class="landing-navbar">
-    <div class="landing-logo">Temple</div>
+  <div class="mobile-menu-btn" id="mobile-menu-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="landing-logo">Temple</div>
 
-    <div class="landing-nav-links">
-        <a class="active" href="/">Home</a>
-        <a href="#"
-           data-bs-toggle="modal"
-           data-bs-target="#contactModal">
-           Contact Us
-        </a>
-    </div>
+  <div class="landing-nav-links">
+    <a class="active" href="/">Home</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#contactModal">
+      Contact Us
+    </a>
+  </div>
 
-    <div class="landing-auth-buttons">
-        <% if(!user){ %>
-            <a href="/register" class="btn landing-nav-secondary">Register</a>
-            <a href="/login" class="btn landing-nav-primary">Login</a>
-        <% } else { %>
-            <a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>" 
-              class="btn landing-hero-primary">Dashboard</a>
+  <div class="landing-auth-buttons">
+    <% if(!user){ %>
+      <a href="/register" class="btn landing-nav-secondary">Register</a>
+      <a href="/login" class="btn landing-nav-primary">Login</a>
+      <% } else { %>
+        <a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>" class="btn landing-hero-primary">Dashboard</a>
         <% } %>
-    </div>
+  </div>
 </nav>
+<script src="/js/mobile-nav.js"></script>
 
 <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-md">
@@ -28,11 +31,7 @@
       <div class="modal-header border-0 flex-column align-items-center">
         <h5 class="fw-bold fs-4 mb-2">Contact Us</h5>
         <hr class="w-100 my-1">
-        <button
-          type="button"
-          class="btn-close position-absolute end-0 me-3"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body px-4 pb-4">
@@ -42,11 +41,8 @@
             <i class="bi bi-envelope-fill text-primary"></i>
             <strong>Email</strong>
           </div>
-          <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=vdeepikaa24@gmail.com"
-            target="_blank"
-            class="text-primary text-decoration-none"
-          >
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vdeepikaa24@gmail.com" target="_blank"
+            class="text-primary text-decoration-none">
             vdeepikaa24@gmail.com
           </a>
         </div>

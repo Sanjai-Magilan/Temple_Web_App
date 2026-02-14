@@ -11,7 +11,7 @@ const logger = require('../../utils/logger')
  logger.info("hallBookingController:", hallBookingController);
  logger.info("poojaBookingController:", poojaBookingController);
  logger.info("authMiddleware:", authMiddleware);
-
+const receiptController = require("../../controllers/receiptController");
 // Hall booking routes
 router.get(
   "/bookings/hall",
@@ -35,6 +35,18 @@ router.get(
   "/bookings/pooja/new",
   authMiddleware.verifyToken,
   poojaBookingController.showNew,
+);
+
+router.get(
+  "/bookings/hall/:id/receipt",
+  authMiddleware.verifyToken,
+  receiptController.downloadHallReceipt
+);
+
+router.get(
+  "/bookings/pooja/:id/receipt",
+  authMiddleware.verifyToken,
+  receiptController.downloadPoojaReceipt
 );
 
 module.exports = router;

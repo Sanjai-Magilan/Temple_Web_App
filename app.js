@@ -94,6 +94,7 @@ app.use("/payment", paymentRoutes);
 app.use("/family", familyRoutes);
 app.use(profileRoutes);
 app.use(newsRoutes);
+app.use("/admin", require("./routes/admin/bookingRoutes"));
 
 // 404 handler
 app.use((req, res) => {

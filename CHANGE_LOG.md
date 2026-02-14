@@ -18,7 +18,10 @@ implemented
     - kabil  
 implemented  
     updated landing page UI  
-    - loki  
+    - loki 
+implemented
+    dashboard page UI
+    -karmugilan
 implemented
     update donation UI
     -kamalesh
@@ -38,8 +41,18 @@ Implemented
     Payment Controller Jest Test
     - Miruthul
 Implemented
-    Family Controller Jest Test
-    - Miruthul
-Implemented
-    Donation Controller Jest Test
-    - Miruthul
+    manage booking for admin
+    - kamalesh
+implemented  
+    profile controller test & auth controller test  
+    - miruthul & magilan  
+      
+implemented  
+    profile page(profile.ejs & profile.css)  
+    - Deepikaa  
+      
+implemented   
+    update hall booking UI  
+    - kamalesh  
+
+Clear the bug in the 

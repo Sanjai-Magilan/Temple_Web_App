@@ -131,6 +131,18 @@
             color: #b0a69a;
         }
 
+        /* Hide spinner for number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         /* Amount Input specifically */
         .amount-wrapper {
             position: relative;

@@ -141,6 +141,18 @@
             font-size: 1.2rem;
         }
 
+        /* Hide spinner for number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         .btn-submit-custom {
             display: block;
             width: 100%;

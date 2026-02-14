@@ -78,9 +78,9 @@ exports.paymentHistory = async (req, res) => {
     =============================== */
 
       // DATE FORMAT
-      p.formatted_date = new Date(p.created_at).toLocaleDateString('en-US', {
-          month: 'numeric',
+      p.formatted_date = new Date(p.created_at).toLocaleDateString('en-IN', {
           day: 'numeric',
+          month: 'numeric',
           year: 'numeric'
       });
 
@@ -97,19 +97,11 @@ exports.paymentHistory = async (req, res) => {
     =============================== */      
 
       // DATE FORMAT
-      p.formatted_booking_date = p.booking_date? new Date(p.booking_date).toLocaleDateString('en-US', {
-          month: 'numeric',
+      p.formatted_booking_date = p.booking_date? new Date(p.booking_date).toLocaleDateString('en-IN', {
           day: 'numeric',
+          month: 'numeric',
           year: 'numeric'
       }) : '' ;
-
-      // TIME FORMAT
-      p.formatted_booking_time =  p.booking_date? new Date(p.booking_date).toLocaleTimeString('en-GB', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false
-      }) : '';
     });
 
     /* ===============================

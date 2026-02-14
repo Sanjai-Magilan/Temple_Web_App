@@ -203,6 +203,9 @@ let query = `
     u.first_name AS first_name,
     u.last_name AS last_name,
     u.email AS user_email,
+    hb.start_time AS start_time,
+    hb.end_time AS end_time,
+    pb.booking_time AS booking_time,
 
     /* Unified booking date */
     COALESCE(hb.booking_date, pb.booking_date) AS booking_date
@@ -214,15 +217,13 @@ let query = `
 
   /* Hall Booking */
   LEFT JOIN hall_bookings hb
-    ON p.related_id = hb.id
+    ON p.id = hb.payment_id
     AND p.payment_type = 'hall_booking'
 
   /* Pooja Booking */
   LEFT JOIN pooja_bookings pb
-    ON p.related_id = pb.id
-    AND p.payment_type = 'pooja_booking'
-
-`;
+    ON p.id = pb.payment_id
+    AND p.payment_type = 'pooja_booking'`;
 
   let where = ` WHERE 1=1 `;
   let values = [];

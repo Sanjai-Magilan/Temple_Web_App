@@ -78,6 +78,27 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="/js/razorpay.js"></script>
 <script src="/js/navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.showAlert = function (type, title, message) {
+        const icons = {
+            success: 'success',
+            error: 'error',
+            warning: 'warning',
+            info: 'info'
+        };
+
+        Swal.fire({
+            icon: icons[type] || 'info',
+            title: title || 'Notice',
+            html: `<p style="font-size:15px;">${message}</p>`,
+            confirmButtonText: 'Okay',
+            confirmButtonColor: '#bfa15f'
+        });
+    };
+</script>
+
+</body>
 
 <style>
   .hover-bg:hover {

@@ -94,6 +94,7 @@ app.use("/", bookingRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/family", familyRoutes);
 app.use(profileRoutes);
+app.use("/admin", require("./routes/admin/bookingRoutes"));
 
 app.use("/",adminPayment)
 

@@ -1,8 +1,5 @@
 const paymentModel = require('../../models/paymentModel');
 
-/**
- * Payment History
- */
 exports.paymentHistory = async (req, res) => {
   try {
 
@@ -104,7 +101,7 @@ exports.paymentHistory = async (req, res) => {
           month: 'numeric',
           day: 'numeric',
           year: 'numeric'
-      }) : '-' ;
+      }) : '' ;
 
       // TIME FORMAT
       p.formatted_booking_time =  p.booking_date? new Date(p.booking_date).toLocaleTimeString('en-GB', {
@@ -112,17 +109,14 @@ exports.paymentHistory = async (req, res) => {
           minute: '2-digit',
           second: '2-digit',
           hour12: false
-      }) : '-';
+      }) : '';
     });
-
-    console.log(payments);
-
 
     /* ===============================
        RENDER VIEW
     =============================== */
 
-    res.render('admin/payment-history', {
+    res.render('admin/payment-history/payment-history', {
       title: 'Payment History',
       user: req.user,
       payments,

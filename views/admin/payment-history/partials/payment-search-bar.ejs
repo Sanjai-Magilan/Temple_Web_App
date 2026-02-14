@@ -1,0 +1,86 @@
+<!-- SEARCH BAR -->
+<div class="card shadow-sm border-0 mb-4" style="border-radius:15px;">
+    <div class="card-body p-4 bg-white">
+
+        <form method="GET" action="/admin/payments" class="row g-3 align-items-center">
+
+            <div class="col-md-10">
+
+                <div class="input-group input-group-lg">
+
+                    <!-- Search Icon -->
+                    <span class="input-group-text bg-transparent border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+
+                    <!-- Search Input -->
+                    <input type="text"
+                        name="search"
+                        class="form-control border-start-0 border-end-0 shadow-none"
+                        placeholder="Search by Payment ID, User Name, Email..."
+                        value="<%= search || '' %>">
+
+                    <a href="?"
+                    class="input-group-text bg-transparent border-start-0 text-decoration-none <%= search || filter || method || payment_type? '' : 'd-none' %>">
+
+                        <i class="bi bi-x-circle-fill text-danger"></i>
+
+                    </a>
+
+                    <!-- Filter Icon Dropdown -->
+                    <div class="input-group-text bg-transparent border-start-0 p-0">
+
+                        <div class="dropdown">
+
+                            <button class="btn btn-link text-decoration-none text-muted p-2"
+                                    type="button"
+                                    data-bs-toggle="dropdown">
+
+                                <i class="bi bi-funnel<%= filter ? '-fill text-primary' : '' %>"></i>
+
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                <li>
+                                    <a class="dropdown-item <%= filter==='recent'?'active':'' %>"
+                                    href="?search=<%= search || '' %>&filter=recent">
+                                    Recent Payments
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item <%= filter==='high'?'active':'' %>"
+                                    href="?search=<%= search || '' %>&filter=high">
+                                    Higher Amounts
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item <%= filter==='low'?'active':'' %>"
+                                    href="?search=<%= search || '' %>&filter=low">
+                                    Lower Amounts
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Search Button -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                    Search
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>

@@ -538,24 +538,27 @@
                     }
 
                     await initiatePayment('hall-booking', formData, {
-                        onSuccess: (result) => {
-                            // Redirect to the booking history list as requested
-                            showAlert(
-                                'success',
-                                'Booking Confirmed',
-                                'Your hall has been booked successfully!'
-                            );
+                        onSuccess: () => {
+  showAlert(
+    'success',
+    'Booking Confirmed',
+    'Your hall has been booked successfully!'
+  );
 
-                            setTimeout(() => {
-                                window.location.href = '/bookings/hall';
-                            }, 1500);
-
-                        },
-                        onFailure: (error) => {
-                            showAlert('error', 'Payment Failed', error.message);
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        }
+  setTimeout(() => {
+    window.location.reload();
+  }, 1500);
+},
+onCancel: () => {
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+},
+onFailure: (error) => {
+  showAlert('error', 'Payment Failed', error.message);
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = originalText;
+}
                     });
                 } catch (error) {
                     showAlert('error', 'Error', error.message);

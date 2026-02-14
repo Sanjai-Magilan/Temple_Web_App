@@ -250,7 +250,12 @@ body {
             <span class="amount-badge">
               ₹ <%= booking.amount.toLocaleString() %>
             </span>
-
+            <% if (booking.status === 'pending') { %>
+  <div class="mt-2 d-flex gap-2">
+    <button class="btn btn-sm btn-success" onclick="resumePoojaPayment('<%= booking.id %>', this)">Continue</button>
+    <button class="btn btn-sm btn-danger" onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
+  </div>
+<% } %>
           </div>
 
         </div>
@@ -303,3 +308,57 @@ body {
 </div>
 
 <%- include('../../partials/footer') %>
+
+<script>
+  function cancelPoojaBooking(id, btn) {
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+    fetch(`/bookings/pooja/cancel/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" } })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) btn.closest(".pooja-card").remove();
+        else alert(data.message || "Failed to cancel booking");
+      })
+      .catch(() => alert("Server error"));
+  }
+
+  function resumePoojaPayment(id, btn) {
+    const originalText = btn ? btn.innerHTML : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+    }
+
+    fetch(`/bookings/pooja/continue/${id}`, { method: "GET", headers: { "Content-Type": "application/json" }, credentials: "include" })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || "Failed to resume payment");
+        return data;
+      })
+      .then((data) => {
+        if (typeof RazorpayPayment !== "function") throw new Error("Payment function not loaded. Please contact support.");
+
+        const razorpayPayment = new RazorpayPayment({
+          key: data.key,
+          onSuccess: () => { window.location.href = "/bookings/pooja"; },
+          onFailure: (error) => {
+            alert("Payment failed: " + (error.message || "Unknown error"));
+            if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+          },
+          onCancel: () => {
+            if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+          }
+        });
+
+        return razorpayPayment.initCheckout({
+          order_id: data.order_id,
+          amount: data.amount,
+          description: data.description || "Pooja booking payment",
+          payment_type: "pooja-booking"
+        });
+      })
+      .catch((err) => {
+        alert("Error: " + err.message);
+        if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+      });
+  }
+</script>

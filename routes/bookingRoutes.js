@@ -51,4 +51,16 @@ router.get(
   poojaBookingController.showNew,
 );
 
+router.get(
+  "/bookings/pooja/continue/:id",
+  authMiddleware.verifyToken,
+  poojaBookingController.continuePayment,
+);
+
+router.delete(
+  "/bookings/pooja/cancel/:id",
+  authMiddleware.verifyToken,
+  poojaBookingController.cancelBooking,
+);
+
 module.exports = router;

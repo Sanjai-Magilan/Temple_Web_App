@@ -169,3 +169,19 @@ exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
     throw error;
   }
 };
+
+/**
+ * Cancel booking by ID
+ */
+exports.cancelBookingById = async (bookingId) => {
+  try {
+    const [result] = await pool.execute(
+      "DELETE FROM pooja_bookings WHERE id = ?",
+      [bookingId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    console.error("Error deleting pooja booking by ID:", error);
+    throw error;
+  }
+};

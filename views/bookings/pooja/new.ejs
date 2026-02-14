@@ -403,18 +403,28 @@
         try {
 
           await initiatePayment("pooja-booking", formData, {
-
-            onSuccess: (result) => {
+            onSuccess: () => {
               redirected = true;
-              //alert("Payment completed successfully.");
-              window.location.href = "/bookings/pooja";
+              showAlert(
+                'success',
+                'Booking Confirmed',
+                'Your pooja booking has been confirmed!'
+              );
+              setTimeout(() => {
+                window.location.href = "/bookings/pooja";
+              }, 1500);
             },
-
-            onFailure: () => {
+            onCancel: () => {
+              showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+              setTimeout(() => {
+                window.location.href = "/bookings/pooja";
+              }, 500);
+            },
+            onFailure: (error) => {
+              showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
               submitBtn.disabled = false;
               submitBtn.innerHTML = originalText;
             }
-
           });
 
         } catch (error) {

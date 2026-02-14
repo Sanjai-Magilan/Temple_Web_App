@@ -199,7 +199,7 @@ exports.getAllPayments = async ({
 
 let query = `
   SELECT 
-    p.*,
+    p.payment_id, p.user_id, p.created_at, p.payment_method, p.amount, p.currency, p.status, p.payment_type,
     u.first_name AS first_name,
     u.last_name AS last_name,
     u.email AS user_email,
@@ -235,14 +235,12 @@ let query = `
     where += `
       AND (
         p.payment_id LIKE ?
-        OR p.status LIKE ?
         OR u.first_name LIKE ?
         OR u.last_name LIKE ?
         OR u.email LIKE ?
       )
     `;
     values.push(
-      `%${search}%`,
       `%${search}%`,
       `%${search}%`,
       `%${search}%`,
@@ -296,20 +294,11 @@ let query = `
     order = "ASC";
   }
 
-  if (filter === "booking_date") {
-    sort = "booking_date";
-    order = "DESC";
-  } 
-
   /* ===============================
      SORTING
   =============================== */
 
-  if(sort === "booking_date"){
-      where += ` ORDER BY ${sort} ${order}`;
-  }else{
-      where += ` ORDER BY p.${sort} ${order}`;
-  }
+  where += ` ORDER BY p.${sort} ${order}`;
 
   /* ===============================
     LIMIT OFFSET FOR PAGINATION

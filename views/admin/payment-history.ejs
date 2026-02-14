@@ -27,7 +27,7 @@
                         <input type="text"
                             name="search"
                             class="form-control border-start-0 border-end-0 shadow-none"
-                            placeholder="Search by Payment ID, User Name, Email, Status..."
+                            placeholder="Search by Payment ID, User Name, Email..."
                             value="<%= search || '' %>">
 
                         <a href="?"
@@ -60,13 +60,6 @@
                                     </li>
 
                                     <li>
-                                        <a class="dropdown-item <%= filter==='completed'?'active':'' %>"
-                                        href="?search=<%= search || '' %>&filter=completed">
-                                        Payment Completed
-                                        </a>
-                                    </li>
-
-                                    <li>
                                         <a class="dropdown-item <%= filter==='high'?'active':'' %>"
                                         href="?search=<%= search || '' %>&filter=high">
                                         Higher Amounts
@@ -77,13 +70,6 @@
                                         <a class="dropdown-item <%= filter==='low'?'active':'' %>"
                                         href="?search=<%= search || '' %>&filter=low">
                                         Lower Amounts
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a class="dropdown-item <%= filter==='booking_date'?'active':'' %>"
-                                        href="?search=<%= search || '' %>&filter=booking_date">
-                                        Upcoming Bookings
                                         </a>
                                     </li>
 
@@ -263,7 +249,7 @@
 
                                     <!-- USER ID -->
                                     <div class="text-muted small">
-                                        ID: <%= payment.user_id %>
+                                        User ID: <%= payment.user_id %>
                                     </div>
 
                                     <!-- EMAIL -->
@@ -275,7 +261,18 @@
 
                                 <td>₹ <%= payment.amount %></td>
                                 <td><%= payment.payment_type %></td>
-                                <td><%= payment.formatted_booking_date %></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span><%= payment.formatted_booking_date %></span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <i class="bi bi-clock"></i>
+                                        <span><%= payment.formatted_booking_time %></span>
+                                    </div>
+                                </td>
+
                                 <!-- STATUS BADGE -->
                                 <td>
                                     <% if(payment.status === 'completed'){ %>
@@ -283,12 +280,23 @@
                                     <% } else if(payment.status === 'pending'){ %>
                                         <span class="badge bg-warning text-dark">Pending</span>
                                     <% } else { %>
-                                        <span class="badge bg-danger">Failed</span>
+                                        <span class="badge bg-danger"> - </span>
                                     <% } %>
                                 </td>
 
                                 <td><%= payment.payment_method %></td>
-                                <td><%= payment.formatted_date %></td>
+                                <td>
+                                    <% if(payment.formatted_date || payment.formatted_time) {}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span><%= payment.formatted_date %></span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <i class="bi bi-clock"></i>
+                                        <span><%= payment.formatted_time %></span>
+                                    </div>
+                                </td>
                                 <% if(payment.status !== 'pending'){ %>
                                     <td class="text-center">
 

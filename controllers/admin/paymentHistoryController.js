@@ -75,22 +75,44 @@ exports.paymentHistory = async (req, res) => {
     =============================== */
 
     payments.forEach(p => {
-      p.formatted_date = new Date(p.created_at).toLocaleString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+
+    /* ===============================
+       FORMAT CREATE DATE
+    =============================== */
+
+      // DATE FORMAT
+      p.formatted_date = new Date(p.created_at).toLocaleDateString('en-US', {
+          month: 'numeric',
+          day: 'numeric',
+          year: 'numeric'
       });
-      p.formatted_booking_date = p.booking_date
-        ? new Date(p.booking_date).toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })
-        : '-';
+
+      // TIME FORMAT
+      p.formatted_time = new Date(p.created_at).toLocaleTimeString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+      });
+
+    /* ===============================
+       FORMAT BOOKED DATE
+    =============================== */      
+
+      // DATE FORMAT
+      p.formatted_booking_date = p.booking_date? new Date(p.booking_date).toLocaleDateString('en-US', {
+          month: 'numeric',
+          day: 'numeric',
+          year: 'numeric'
+      }) : '-' ;
+
+      // TIME FORMAT
+      p.formatted_booking_time =  p.booking_date? new Date(p.booking_date).toLocaleTimeString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+      }) : '-';
     });
 
     console.log(payments);

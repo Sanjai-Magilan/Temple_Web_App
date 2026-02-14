@@ -187,7 +187,7 @@ body {
 
     <% bookings.forEach(booking => { %>
 
-    <div class="col-12 col-md-6 col-lg-4 mb-4">
+    <div class="col-12 col-md-6 col-lg-4 mb-4 booking-card" data-booking-number="<%= booking.booking_number %>">
 
       <div class="pooja-card h-100">
 
@@ -241,7 +241,7 @@ body {
 
           <!-- STATUS + AMOUNT -->
 
-          <div class="d-flex gap-2 mt-3">
+          <div class="d-flex gap-2 mt-3 align-items-center flex-wrap">
 
             <span class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>">
               <%= booking.status %>
@@ -250,6 +250,17 @@ body {
             <span class="amount-badge">
               ₹ <%= booking.amount.toLocaleString() %>
             </span>
+
+            <% if (booking.status === 'pending') { %>
+              <div class="d-flex gap-2 ms-auto">
+                <button type="button" class="btn btn-sm btn-warning" style="padding: 6px 14px; font-size: 13px; border-radius: 5px;">
+                  Continue
+                </button>
+                <button type="button" class="btn btn-sm btn-danger cancel-btn" style="padding: 6px 14px; font-size: 13px; border-radius: 5px;" data-booking-number="<%= booking.booking_number %>">
+                  Cancel
+                </button>
+              </div>
+            <% } %>
 
           </div>
 
@@ -301,5 +312,80 @@ body {
   <% } %>
 
 </div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-labelledby="cancelConfirmModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?</h5>
+                <p class="text-muted mb-4">Are you sure you want to cancel this payment?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal"
+                        style="border-radius: 5px;">No</button>
+                    <button type="button" class="btn btn-danger px-4" id="confirmCancelBtn"
+                        style="border-radius: 5px;">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  // Handle cancelled bookings - hide them on page load
+  (function() {
+    const cancelledBookings = JSON.parse(localStorage.getItem('cancelledPoojaBookings') || '[]');
+    cancelledBookings.forEach(bookingNumber => {
+      const card = document.querySelector(`.booking-card[data-booking-number="${bookingNumber}"]`);
+      if (card) {
+        card.style.display = 'none';
+      }
+    });
+  })();
+
+  // Variable to store the current cancel button and card element
+  let currentCancelBtn = null;
+  let currentCard = null;
+
+  // Cancel button click handler - show confirmation modal
+  document.querySelectorAll('.cancel-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      currentCancelBtn = this;
+      currentCard = this.closest('.booking-card');
+      // Show the confirmation modal
+      const modal = new bootstrap.Modal(document.getElementById('cancelConfirmModal'));
+      modal.show();
+    });
+  });
+
+  // Confirm cancel button click handler
+  document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+    if (currentCancelBtn && currentCard) {
+      const bookingNumber = currentCancelBtn.getAttribute('data-booking-number');
+      // Save to localStorage
+      const cancelledBookings = JSON.parse(localStorage.getItem('cancelledPoojaBookings') || '[]');
+      if (!cancelledBookings.includes(bookingNumber)) {
+        cancelledBookings.push(bookingNumber);
+        localStorage.setItem('cancelledPoojaBookings', JSON.stringify(cancelledBookings));
+      }
+      // Hide the card
+      currentCard.style.display = 'none';
+      
+      // Reset variables
+      currentCancelBtn = null;
+      currentCard = null;
+      
+      // Hide the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('cancelConfirmModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
+  });
+</script>
 
 <%- include('../../partials/footer') %>

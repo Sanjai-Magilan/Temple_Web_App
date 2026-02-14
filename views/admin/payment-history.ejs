@@ -9,81 +9,106 @@
     </div>
 
     <!-- SEARCH BAR -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    <div class="card shadow-sm border-0 mb-4" style="border-radius:15px;">
+        <div class="card-body p-4 bg-white">
 
-            <form method="GET" action="/admin/payments" class="row g-2 align-items-center">
+            <form method="GET" action="/admin/payments" class="row g-3 align-items-center">
 
-                <!-- SEARCH INPUT -->
-                <div class="col-md-8">
-                    <input 
-                        type="text" 
-                        name="search"
-                        value="<%= search || '' %>"
-                        placeholder="Search by Payment ID, User ID, Status..."
-                        class="form-control"
-                    >
-                </div>
+                <div class="col-md-10">
 
-                <!-- SEARCH BUTTON -->
-                <div class="col-md-2 d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        Search
-                    </button>
-                </div>
+                    <div class="input-group input-group-lg">
 
-                <!-- FILTER DROPDOWN -->
-                <div class="col-md-2 d-grid">
+                        <!-- Search Icon -->
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
 
-                    <div class="dropdown">
+                        <!-- Search Input -->
+                        <input type="text"
+                            name="search"
+                            class="form-control border-start-0 border-end-0 shadow-none"
+                            placeholder="Search by Payment ID, User Name, Email, Status..."
+                            value="<%= search || '' %>">
 
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100"
-                                type="button"
-                                data-bs-toggle="dropdown">
+                        <a href="?"
+                        class="input-group-text bg-transparent border-start-0 text-decoration-none <%= search || filter || method || payment_type? '' : 'd-none' %>">
 
-                            Filter
-                        </button>
+                            <i class="bi bi-x-circle-fill text-danger"></i>
 
-                        <ul class="dropdown-menu">
+                        </a>
 
-                            <li>
-                                <a class="dropdown-item"
-                                href="?search=<%= search || '' %>&filter=recent">
-                                Recent Payments
-                                </a>
-                            </li>
+                        <!-- Filter Icon Dropdown -->
+                        <div class="input-group-text bg-transparent border-start-0 p-0">
 
-                            <li>
-                                <a class="dropdown-item"
-                                href="?search=<%= search || '' %>&filter=completed">
-                                Payment Completed
-                                </a>
-                            </li>
+                            <div class="dropdown">
 
-                            <li>
-                                <a class="dropdown-item"
-                                href="?search=<%= search || '' %>&filter=high">
-                                Higher Amounts
-                                </a>
-                            </li>
+                                <button class="btn btn-link text-decoration-none text-muted p-2"
+                                        type="button"
+                                        data-bs-toggle="dropdown">
 
-                            <li>
-                                <a class="dropdown-item"
-                                href="?search=<%= search || '' %>&filter=low">
-                                Lower Amounts
-                                </a>
-                            </li>
+                                    <i class="bi bi-funnel<%= filter ? '-fill text-primary' : '' %>"></i>
 
-                        </ul>
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+
+                                    <li>
+                                        <a class="dropdown-item <%= filter==='recent'?'active':'' %>"
+                                        href="?search=<%= search || '' %>&filter=recent">
+                                        Recent Payments
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item <%= filter==='completed'?'active':'' %>"
+                                        href="?search=<%= search || '' %>&filter=completed">
+                                        Payment Completed
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item <%= filter==='high'?'active':'' %>"
+                                        href="?search=<%= search || '' %>&filter=high">
+                                        Higher Amounts
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item <%= filter==='low'?'active':'' %>"
+                                        href="?search=<%= search || '' %>&filter=low">
+                                        Lower Amounts
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item <%= filter==='booking_date'?'active':'' %>"
+                                        href="?search=<%= search || '' %>&filter=booking_date">
+                                        Upcoming Bookings
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
+                </div>
+
+                <!-- Search Button -->
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        Search
+                    </button>
                 </div>
 
             </form>
 
         </div>
     </div>
+
 
 
 
@@ -98,48 +123,128 @@
                     <thead class="table-light">
                         <tr>
 
-                            <th>
-                              <a class="text-decoration-none text-dark fw-semibold"
-                                 href="?search=<%= search || '' %>&sort=payment_id&order=<%= sort==='payment_id' && order==='ASC' ? 'DESC' : 'ASC' %>">
-                                 
+                            <th class="text-decoration-none text-dark fw-semibold" >
                                  Payment ID
-
-                    
-                              </a>
                             </th>
-
-                            <th>
-                              <a class="text-decoration-none text-dark fw-semibold"
-                                 href="?search=<%= search || '' %>&sort=user_id&order=<%= sort==='user_id' && order==='ASC' ? 'DESC' : 'ASC' %>">
-                                 
-                                 User ID
-
-                                 
-                              </a>
+                            <th class="text-decoration-none text-dark fw-semibold">
+                                 User
                             </th>
-
-                            <th>
-                              <a class="text-decoration-none text-dark fw-semibold"
-                                 href="?search=<%= search || '' %>&sort=amount&order=<%= sort==='amount' && order==='ASC' ? 'DESC' : 'ASC' %>">
-                                 
+                            <th class="text-decoration-none text-dark fw-semibold">
                                  Amount
+                            </th>
+                            <th class="fw-semibold">
 
-                                 
-                              </a>
+                                <div class="dropdown">
+
+                                    <button class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
+                                            type="button"
+                                            data-bs-toggle="dropdown">
+
+                                        Payment Type
+                                        <i class="bi bi-chevron-down small"></i>
+
+                                    </button>
+
+                                    <ul class="dropdown-menu">
+
+                                        <!-- ALL -->
+                                        <li>
+                                            <a class="dropdown-item <%= !method ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>">
+                                                All
+                                            </a>
+                                        </li>
+
+                                        <!-- Donations -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='upi' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=donation">
+                                                Donations
+                                            </a>
+                                        </li>
+
+                                        <!-- Hall Booking -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='card' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=hall_booking">
+                                                Hall Booking
+                                            </a>
+                                        </li>
+
+                                        <!-- Pooja Booking -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='netbanking' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=pooja_booking">
+                                                Pooja Booking
+                                            </a>
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                            </th>
+                            <th class="text-decoration-none text-dark fw-semibold">
+                                Booking Date
+                            </th>
+                            <th class="text-decoration-none text-dark fw-semibold">Status</th>
+                            <th class="fw-semibold">
+
+                                <div class="dropdown">
+
+                                    <button class="btn btn-link text-dark text-decoration-none p-0 fw-semibold"
+                                            type="button"
+                                            data-bs-toggle="dropdown">
+
+                                        Method
+                                        <i class="bi bi-chevron-down small"></i>
+
+                                    </button>
+
+                                    <ul class="dropdown-menu">
+
+                                        <!-- ALL -->
+                                        <li>
+                                            <a class="dropdown-item <%= !method ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>">
+                                                All Methods
+                                            </a>
+                                        </li>
+
+                                        <!-- UPI -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='upi' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&payment_type=<%= payment_type || '' %>&method=upi">
+                                                UPI
+                                            </a>
+                                        </li>
+
+                                        <!-- CARD -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='card' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&payment_type=<%= payment_type || '' %>&method=card">
+                                                Card
+                                            </a>
+                                        </li>
+
+                                        <!-- NETBANKING -->
+                                        <li>
+                                            <a class="dropdown-item <%= method==='netbanking' ? 'active' : '' %>"
+                                            href="?search=<%= search || '' %>&filter=<%= filter || '' %>&payment_type=<%= payment_type || '' %>&method=netbanking">
+                                                Netbanking
+                                            </a>
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
                             </th>
 
-                            <th>Status</th>
-                            <th>Method</th>
-
-                            <th>
-                              <a class="text-decoration-none text-dark fw-semibold"
-                                 href="?search=<%= search || '' %>&sort=created_at&order=<%= sort==='created_at' && order==='ASC' ? 'DESC' : 'ASC' %>">
-                                 
-                                 Date
-
-                                 
-                              </a>
+                            <th class="text-decoration-none text-dark fw-semibold">                   
+                                 Date & Time
                             </th>
+                            <th></th>
 
                         </tr>
                     </thead>
@@ -149,9 +254,28 @@
                         <% payments.forEach(payment => { %>
                             <tr>
                                 <td><%= payment.payment_id %></td>
-                                <td><%= payment.user_id %></td>
-                                <td>₹ <%= payment.amount %></td>
+                                <td>
 
+                                    <!-- USER NAME -->
+                                    <div class="fw-bold">
+                                        <%= payment.first_name + " " + payment.last_name %>
+                                    </div>
+
+                                    <!-- USER ID -->
+                                    <div class="text-muted small">
+                                        ID: <%= payment.user_id %>
+                                    </div>
+
+                                    <!-- EMAIL -->
+                                    <div class="text-muted small">
+                                        <%= payment.user_email || '-' %>
+                                    </div>
+
+                                </td>
+
+                                <td>₹ <%= payment.amount %></td>
+                                <td><%= payment.payment_type %></td>
+                                <td><%= payment.formatted_booking_date %></td>
                                 <!-- STATUS BADGE -->
                                 <td>
                                     <% if(payment.status === 'completed'){ %>
@@ -165,6 +289,19 @@
 
                                 <td><%= payment.payment_method %></td>
                                 <td><%= payment.formatted_date %></td>
+                                <% if(payment.status !== 'pending'){ %>
+                                    <td class="text-center">
+
+                                        <a href="/admin/payments/<%= payment.payment_id %>/receipt"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="Download Receipt">
+
+                                            <i class="bi bi-download"></i>
+
+                                        </a>
+                                        
+                                    </td>
+                                <% } %>
                             </tr>
                         <% }) %>
 
@@ -174,6 +311,44 @@
 
             </div>
         </div>
+
+        <% if(totalPages > 1){ %>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                <!-- Previous -->
+                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link"
+                    href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=<%= payment_type || '' %>&page=<%= currentPage-1 %>">
+                    Previous
+                    </a>
+                </li>
+
+                <% for(let i = 1; i <= totalPages; i++){ %>
+
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                        href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=<%= payment_type || '' %>&page=<%= i %>">
+                        <%= i %>
+                        </a>
+                    </li>
+
+                <% } %>
+
+                <!-- Next -->
+                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                    <a class="page-link"
+                    href="?search=<%= search || '' %>&filter=<%= filter || '' %>&method=<%= method || '' %>&payment_type=<%= payment_type || '' %>&page=<%= currentPage+1 %>">
+                    Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <% } %>
+
 
     <% } else { %>
 

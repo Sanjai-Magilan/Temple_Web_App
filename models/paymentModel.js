@@ -190,10 +190,41 @@ exports.getAllPayments = async ({
   search,
   filter,
   sort,
-  order
+  order,
+  method,
+  payment_type,
+  limit,
+  offset
 }) => {
 
-  let query = `SELECT * FROM payments WHERE 1=1`;
+let query = `
+  SELECT 
+    p.*,
+    u.first_name AS first_name,
+    u.last_name AS last_name,
+    u.email AS user_email,
+
+    /* Unified booking date */
+    COALESCE(hb.booking_date, pb.booking_date) AS booking_date
+
+  FROM payments p
+
+  LEFT JOIN users u
+    ON p.user_id = u.id
+
+  /* Hall Booking */
+  LEFT JOIN hall_bookings hb
+    ON p.related_id = hb.id
+    AND p.payment_type = 'hall_booking'
+
+  /* Pooja Booking */
+  LEFT JOIN pooja_bookings pb
+    ON p.related_id = pb.id
+    AND p.payment_type = 'pooja_booking'
+
+`;
+
+  let where = ` WHERE 1=1 `;
   let values = [];
 
   /* ===============================
@@ -201,14 +232,18 @@ exports.getAllPayments = async ({
   =============================== */
 
   if (search) {
-    query += `
+    where += `
       AND (
-        payment_id LIKE ?
-        OR user_id LIKE ?
-        OR status LIKE ?
+        p.payment_id LIKE ?
+        OR p.status LIKE ?
+        OR u.first_name LIKE ?
+        OR u.last_name LIKE ?
+        OR u.email LIKE ?
       )
     `;
     values.push(
+      `%${search}%`,
+      `%${search}%`,
       `%${search}%`,
       `%${search}%`,
       `%${search}%`
@@ -216,11 +251,29 @@ exports.getAllPayments = async ({
   }
 
   /* ===============================
-     FILTER DROPDOWN
+      METHOD
+  =============================== */  
+
+  if(method){
+   where += ` AND p.payment_method = ?`;
+   values.push(method);
+  }
+
+  /* ===============================
+      PAYMENT TYPE
+  =============================== */  
+
+  if(payment_type){
+   where += ` AND p.payment_type = ?`;
+   values.push(payment_type);
+  }
+
+  /* ===============================
+     FILTER
   =============================== */
 
   if (filter === "completed") {
-    query += ` AND status = 'completed'`;
+    where += ` AND p.status = 'completed'`;
   }
 
   if (filter === "recent") {
@@ -238,20 +291,53 @@ exports.getAllPayments = async ({
     order = "ASC";
   }
 
+  if (filter === "low") {
+    sort = "amount";
+    order = "ASC";
+  }
+
+  if (filter === "booking_date") {
+    sort = "booking_date";
+    order = "DESC";
+  } 
+
   /* ===============================
      SORTING
   =============================== */
 
-  query += ` ORDER BY ${sort} ${order}`;
-
+  if(sort === "booking_date"){
+      where += ` ORDER BY ${sort} ${order}`;
+  }else{
+      where += ` ORDER BY p.${sort} ${order}`;
+  }
 
   /* ===============================
-     EXECUTE QUERY
+    LIMIT OFFSET FOR PAGINATION
   =============================== */
+
+  limit_offset = ` LIMIT ${limit} OFFSET ${offset}`;
+
+  query += where;
+
+  const countQuery = `
+        SELECT COUNT(*) AS total
+        FROM payments p
+        LEFT JOIN users u ON p.user_id = u.id
+        LEFT JOIN hall_bookings hb ON p.related_id = hb.id AND p.payment_type = 'hall_booking'
+        LEFT JOIN pooja_bookings pb ON p.related_id = pb.id AND p.payment_type = 'pooja_booking'
+        ${where}`;
+
+  query += limit_offset;
+
+   const [countResult] = await pool.query(countQuery, values);  
 
   const [rows] = await pool.query(query, values);
 
-  return rows;
+  return {
+    payments: rows,
+    totalCount: countResult[0].total
+  };
 };
+
 
 

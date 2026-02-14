@@ -25,8 +25,15 @@ exports.paymentHistory = async (req, res) => {
       search = "",
       filter = "",
       sort = "created_at",
-      order = "DESC"
+      order = "DESC",
+      method = "",
+      payment_type = "",
+      page = 1
     } = req.query;
+
+    const limit = 12;
+    const currentPage = parseInt(page) || 1;
+    const offset = (currentPage - 1) * limit;  
 
     /* ===============================
        SECURITY (SORT WHITELIST)
@@ -34,10 +41,9 @@ exports.paymentHistory = async (req, res) => {
     =============================== */
 
     const allowedSort = [
-      "payment_id",
-      "user_id",
       "amount",
-      "created_at"
+      "created_at",
+      "booking_date"
     ];
 
     if (!allowedSort.includes(sort)) {
@@ -51,13 +57,18 @@ exports.paymentHistory = async (req, res) => {
        GET DATA FROM MODEL
     =============================== */
 
-    const payments = await paymentModel.getAllPayments({
+    const {payments, totalCount} = await paymentModel.getAllPayments({
       search,
       filter,
       sort,
-      order
+      order,
+      method,
+      payment_type,
+      limit,
+      offset
     });
 
+    const totalPages = Math.ceil(totalCount / limit);
 
     /* ===============================
        FORMAT DATE
@@ -71,7 +82,18 @@ exports.paymentHistory = async (req, res) => {
         hour: '2-digit',
         minute: '2-digit'
       });
+      p.formatted_booking_date = p.booking_date
+        ? new Date(p.booking_date).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : '-';
     });
+
+    console.log(payments);
 
 
     /* ===============================
@@ -85,8 +107,12 @@ exports.paymentHistory = async (req, res) => {
       search,
       filter,
       sort,
-      order
-    });
+      order,
+      method,
+      payment_type,
+      currentPage,
+      totalPages
+    });  
 
   } catch (error) {
 

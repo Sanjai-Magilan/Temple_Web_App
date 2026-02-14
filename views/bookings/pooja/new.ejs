@@ -150,18 +150,6 @@
       color: #bfa15f;
     }
 
-    /* Hide spinner specifically for amount input */
-    .amount-input::-webkit-inner-spin-button,
-    .amount-input::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    .amount-input {
-      -moz-appearance: textfield;
-      appearance: textfield;
-    }
-
     /* ===== Buttons ===== */
 
     .btn-book {
@@ -220,9 +208,6 @@
         padding: 22px 18px;
       }
     }
-    .swal2-container {
-  z-index: 20000 !important;
-}
   </style>
 
   <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
@@ -350,7 +335,7 @@
             <div class="amount-box">
               <span class="amount-symbol">₹</span>
               <input type="number" id="amount" class="form-input amount-input"
-                placeholder="Auto filled from pooja selection" required>
+                placeholder="Auto filled from pooja selection" readonly required>
             </div>
 
           </div>
@@ -369,28 +354,7 @@
     </div>
 
     <script>
-            if (typeof window.showAlert !== 'function') {
-        window.showAlert = function (type, title, message) {
-          if (window.Swal) {
-            const icons = {
-              success: 'success',
-              error: 'error',
-              warning: 'warning',
-              info: 'info'
-            };
 
-            Swal.fire({
-              icon: icons[type] || 'info',
-              title: title || 'Notice',
-              html: `<p style="font-size:15px;">${message || ''}</p>`,
-              confirmButtonText: 'Okay',
-              confirmButtonColor: '#bfa15f'
-            });
-          } else {
-            alert(message || title || 'Notice');
-          }
-        };
-      }
       function closeModal() {
         window.location.href = "/bookings/pooja";
       }
@@ -427,36 +391,24 @@
         try {
 
           await initiatePayment("pooja-booking", formData, {
-            onSuccess: () => {
+
+            onSuccess: (result) => {
               redirected = true;
-              showAlert(
-                'success',
-                'Booking Confirmed',
-                'Your pooja booking has been confirmed!'
-              );
-              setTimeout(() => {
-                window.location.href = "/bookings/pooja";
-              }, 1500);
+              window.location.href = "/payment/success?payment_id=" + result.payment_id;
             },
-            onCancel: () => {
-              showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
-              setTimeout(() => {
-                window.location.href = "/bookings/pooja";
-              }, 500);
-            },
-            onFailure: (error) => {
-              showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+
+            onFailure: () => {
               submitBtn.disabled = false;
               submitBtn.innerHTML = originalText;
             }
+
           });
 
+        } catch (error) {
 
-          } catch (error) {
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = originalText;
-  showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
-
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          alert("Payment cancelled");
 
         } finally {
 

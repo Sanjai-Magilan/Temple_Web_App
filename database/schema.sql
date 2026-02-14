@@ -159,6 +159,8 @@ CREATE TABLE hall_bookings (
     event_type VARCHAR(100) COMMENT 'wedding, function, ceremony, etc.',
     event_description TEXT,
     expected_guests INT UNSIGNED,
+    food_required TINYINT(1) DEFAULT 0,
+    food_meals VARCHAR(255),
     amount DECIMAL(10, 2) NOT NULL,
     payment_id INT UNSIGNED NULL,
     status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',

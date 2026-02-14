@@ -75,11 +75,13 @@ exports.listAdmin = async (req, res) => {
     const limit = 12;
     const offset = (page - 1) * limit;
     const search = req.query.search || "";
+    const type = req.query.type || "";
 
     const { donations, total } = await donationModel.getAllDonations(
       limit,
       offset,
       search,
+      type
     );
 
     const totalPages = Math.ceil(total / limit);
@@ -90,6 +92,7 @@ exports.listAdmin = async (req, res) => {
       currentPage: page,
       totalPages: totalPages,
       search: search,
+      donationType: type, // Pass the type to the view
       user: req.user,
     });
   } catch (error) {

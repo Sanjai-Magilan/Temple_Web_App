@@ -165,7 +165,7 @@ exports.updateReceiptJson = async (donationId, receiptJson) => {
 /**
  * Get all donations (for admin)
  */
-exports.getAllDonations = async (limit = 20, offset = 0, search = "") => {
+exports.getAllDonations = async (limit = 20, offset = 0, search = "", type = "") => {
   try {
     let query = `
        SELECT d.*, p.status as payment_status, p.payment_method,
@@ -176,19 +176,25 @@ exports.getAllDonations = async (limit = 20, offset = 0, search = "") => {
     `;
 
     const params = [];
+    const whereConditions = [];
 
     if (search) {
-      query += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?`;
+      whereConditions.push(`(d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?)`);
       const searchParam = `%${search}%`;
       params.push(searchParam, searchParam, searchParam);
     }
 
+    if (type) {
+      whereConditions.push(`d.donation_type = ?`);
+      params.push(type);
+    }
+
+    if (whereConditions.length > 0) {
+      query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
     query += ` ORDER BY d.created_at DESC LIMIT ? OFFSET ?`;
-    // Ensure params are numbers but passed as strings if library demands, 
-    // but mysql2 usually handles numbers fine. The error 'Incorrect arguments to mysqld_stmt_execute'
-    // often means one of the params is NaN or undefined or an object. 
-    // Let's force them to be strings just in case, or verify they are numbers.
-    // Actually, LIMIT requires integers.
+
     params.push(String(limit), String(offset));
 
     const [rows] = await pool.execute(query, params);
@@ -200,11 +206,21 @@ exports.getAllDonations = async (limit = 20, offset = 0, search = "") => {
        LEFT JOIN users u ON d.user_id = u.id
     `;
     const countParams = [];
+    const countWhereConditions = [];
 
     if (search) {
-      countQuery += ` WHERE d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?`;
+      countWhereConditions.push(`(d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?)`);
       const searchParam = `%${search}%`;
       countParams.push(searchParam, searchParam, searchParam);
+    }
+
+    if (type) {
+      countWhereConditions.push(`d.donation_type = ?`);
+      countParams.push(type);
+    }
+
+    if (countWhereConditions.length > 0) {
+      countQuery += ` WHERE ` + countWhereConditions.join(' AND ');
     }
 
     const [countRows] = await pool.execute(countQuery, countParams);

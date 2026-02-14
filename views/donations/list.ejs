@@ -271,7 +271,7 @@
                                         <%= i %>
                                     </a>
                                 </li>
-                                <% } %>
+                            <% } %>
 
                                     <!-- Next -->
                                     <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
@@ -396,21 +396,22 @@
                     }
 
                     await initiatePayment('donation', formData, {
-                        onSuccess: (result) => {
-                            // Redirect to the donations history list (which is this same page)
-                            // Ideally, we could just reload, but a redirect ensures clean state
-                            window.location.href = '/donations';
-                        },
-                        onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        }
-                    });
+  onSuccess: () => {
+    showAlert('success', 'Donation Successful', 'Thank you for your donation!');
+    setTimeout(() => {
+      window.location.href = '/donations';
+    }, 1500);
+  },
+  onFailure: (error) => {
+    showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+});
                 } catch (error) {
-                    alert('Error: ' + error.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+                    showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+submitBtn.disabled = false;
+submitBtn.innerHTML = originalText;
                 }
             });
         </script>

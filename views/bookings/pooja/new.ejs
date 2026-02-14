@@ -220,6 +220,9 @@
         padding: 22px 18px;
       }
     }
+    .swal2-container {
+  z-index: 20000 !important;
+}
   </style>
 
   <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
@@ -366,7 +369,28 @@
     </div>
 
     <script>
+            if (typeof window.showAlert !== 'function') {
+        window.showAlert = function (type, title, message) {
+          if (window.Swal) {
+            const icons = {
+              success: 'success',
+              error: 'error',
+              warning: 'warning',
+              info: 'info'
+            };
 
+            Swal.fire({
+              icon: icons[type] || 'info',
+              title: title || 'Notice',
+              html: `<p style="font-size:15px;">${message || ''}</p>`,
+              confirmButtonText: 'Okay',
+              confirmButtonColor: '#bfa15f'
+            });
+          } else {
+            alert(message || title || 'Notice');
+          }
+        };
+      }
       function closeModal() {
         window.location.href = "/bookings/pooja";
       }
@@ -427,11 +451,12 @@
             }
           });
 
-        } catch (error) {
 
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-          alert("Payment cancelled");
+          } catch (error) {
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = originalText;
+  showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+
 
         } finally {
 

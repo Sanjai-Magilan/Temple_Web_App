@@ -48,21 +48,16 @@ exports.userDashboard = async (req, res) => {
       `SELECT COALESCE(SUM(amount), 0) as total FROM donations
        WHERE user_id = ?`,
       [userId]
-       WHERE user_id = ?`,
-      [userId]
     );
 
     // --- 3. GET FAMILY MEMBERS COUNT (Specific for "Family" Card) ---
     const [familyResult] = await pool.execute(
       'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
       [userId]
-      'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
-      [userId]
     );
     const familyCount = familyResult[0].count;
 
     // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
-    // --- 4. GET UPCOMING POOJAN (Specific for "Upcoming Pooja" Card & Details) ---
     const [upcomingPoojasResult] = await pool.execute(
       `SELECT * FROM pooja_bookings 
          WHERE user_id = ? AND booking_date >= CURDATE() 
@@ -102,9 +97,7 @@ exports.userDashboard = async (req, res) => {
       title: 'Dashboard',
       user: req.user,
 
-
       // Dynamic Data for Dashboard Cards
-      upcomingPooja: upcomingPooja,
       upcomingPooja: upcomingPooja,
       upcomingHall: upcomingHall,
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,

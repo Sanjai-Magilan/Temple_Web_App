@@ -1,106 +1,70 @@
 <%- include('partials/header') %>
-<%- include('partials/landing-nav', { user: typeof user !=='undefined' ? user : null }) %>
+    <%- include('partials/landing-nav', { user: typeof user !=='undefined' ? user : null }) %>
 
-<!-- HERO -->
-<section class="landing-hero">
-    <div class="landing-hero-layout">
+        <!-- HERO -->
+        <section class="landing-hero">
+            <div class="landing-hero-layout">
 
-        <!-- LEFT : HERO CONTENT -->
-        <div class="landing-hero-content">
-            <h1>Shri Temple</h1>
+                <!-- LEFT : HERO CONTENT -->
+                <div class="landing-hero-content">
+                    <h1>Shri Temple</h1>
 
-            <p class="landing-hero-tagline">
-                A place of devotion, tradition, and community.
-            </p>
+                    <p class="landing-hero-tagline">
+                        A place of devotion, tradition, and community.
+                    </p>
 
-            <p class="landing-hero-description">
-                Shri Temple stands as a center of spiritual heritage and cultural
-                continuity. The temple hosts daily poojas, special rituals, and
-                community gatherings, offering devotees a peaceful space to
-                connect, reflect, and participate in sacred practices.
-            </p>
+                    <p class="landing-hero-description">
+                        Shri Temple stands as a center of spiritual heritage and cultural
+                        continuity. The temple hosts daily poojas, special rituals, and
+                        community gatherings, offering devotees a peaceful space to
+                        connect, reflect, and participate in sacred practices.
+                    </p>
 
-            <div class="landing-hero-actions">
-                <% if(!user){ %>
-                    <a href="/register" class="btn landing-hero-secondary">Register</a>
-                    <a href="/login" class="btn landing-hero-primary">Login</a>
-                <% }else { %>
-                    <a href= "<%= user.role == 'admin' ? '/admin' : '/dashboard' %>" 
-                        class="btn landing-hero-primary">Dashboard</a>
-                <% } %>
+                    <div class="landing-hero-actions">
+                        <% if(!user){ %>
+                            <a href="/register" class="btn landing-hero-secondary">Register</a>
+                            <a href="/login" class="btn landing-hero-primary">Login</a>
+                            <% }else { %>
+                                <a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>"
+                                    class="btn landing-hero-primary">Dashboard</a>
+                                <% } %>
+                    </div>
+                </div>
+
+                <!-- RIGHT : LATEST UPDATES -->
+                <aside class="landing-updates-panel">
+                    <h3>Latest Updates</h3>
+
+                    <ul class="landing-updates-list">
+                        <% if (typeof latestNews !=='undefined' && latestNews.length> 0) { %>
+                            <% latestNews.forEach(news=> { %>
+                                <li>
+                                    <span class="badge">NEW</span>
+                                    <strong>
+                                        <%= news.title %>
+                                    </strong><br>
+                                    <%= news.content %>
+                                        <% if (news.published_at) { %>
+                                            <br><small style="color: #666; font-size: 0.8em;">
+                                                <%= new Date(news.published_at).toLocaleDateString('en-IN', {
+                                                    day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                                            </small>
+                                            <% } %>
+                                </li>
+                                <% }); %>
+                                    <% } else { %>
+                                        <li>
+                                            <span class="badge">INFO</span>
+                                            Welcome to Shri Temple. No recent updates at this time.
+                                        </li>
+                                        <% } %>
+                    </ul>
+                </aside>
+
             </div>
-        </div>
-
-        <!-- RIGHT : LATEST UPDATES -->
-        <aside class="landing-updates-panel">
-            <h3>Latest Updates</h3>
-
-            <ul class="landing-updates-list">
-                <li>
-                    <span class="badge">NEW</span>
-                    Senior Citizens / Physically challenged quota for
-                    April-2026 has been completed.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    Darshan & Accommodation quota to the SRIVANI Trust
-                    (Rs. 10,000/-) donors for April 2026 will be available
-                    w.e.f 23.01.2026, 11:00 AM onwards.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    SRIVANI Trust Break Darshan tickets (800/day) will be
-                    available online from 09:00 AM to 02:00 PM for same-day
-                    darshan.
-                </li>
-
-                <li>
-                    To generate Digital passbook for donations made before
-                    September 2016, please <a href="#">click here</a>.
-                </li>
-
-                <li>
-                    To enable self service for existing donors,
-                    please <a href="#">click here</a>.
-                </li>
-                <li>
-                    <span class="badge">NEW</span>
-                    Senior Citizens / Physically challenged quota for
-                    April-2026 has been completed.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    Darshan & Accommodation quota to the SRIVANI Trust
-                    (Rs. 10,000/-) donors for April 2026 will be available
-                    w.e.f 23.01.2026, 11:00 AM onwards.
-                </li>
-
-                <li>
-                    <span class="badge">NEW</span>
-                    SRIVANI Trust Break Darshan tickets (800/day) will be
-                    available online from 09:00 AM to 02:00 PM for same-day
-                    darshan.
-                </li>
-
-                <li>
-                    To generate Digital passbook for donations made before
-                    September 2016, please <a href="#">click here</a>.
-                </li>
-
-                <li>
-                    To enable self service for existing donors,
-                    please <a href="#">click here</a>.
-                </li>
-            </ul>
-        </aside>
-
-    </div>
-</section>
+        </section>
 
 
-<script src="/js/landing.js"></script>
+        <script src="/js/landing.js"></script>
 
-<%- include('partials/footer') %>
+        <%- include('partials/footer') %>

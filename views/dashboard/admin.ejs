@@ -1,161 +1,181 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">
-                <i class="bi bi-shield-check"></i> Admin Dashboard
-            </h2>
-        </div>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Temple Management</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
 
-    <!-- Admin Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-primary">
-                <div class="card-body">
-                    <i class="bi bi-people-fill text-primary fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof totalUsers !== 'undefined' ? totalUsers : 0 %></h5>
-                    <p class="card-text text-muted small">Total Users</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-success">
-                <div class="card-body">
-                    <i class="bi bi-heart-fill text-danger fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof totalDonations !== 'undefined' ? totalDonations : 0 %></h5>
-                    <p class="card-text text-muted small">Total Donations</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-info">
-                <div class="card-body">
-                    <i class="bi bi-calendar-check-fill text-info fs-1"></i>
-                    <h5 class="card-title mt-2"><%= typeof totalBookings !== 'undefined' ? totalBookings : 0 %></h5>
-                    <p class="card-text text-muted small">Total Bookings</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center border-warning">
-                <div class="card-body">
-                    <i class="bi bi-wallet2-fill text-warning fs-1"></i>
-                    <h5 class="card-title mt-2">₹<%= typeof totalRevenue !== 'undefined' ? totalRevenue.toLocaleString() : '0' %></h5>
-                    <p class="card-text text-muted small">Total Revenue</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<body>
 
-    <!-- Admin Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-gear"></i> Admin Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <a href="/admin/users" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-people"></i><br>
-                                <small>Manage Users</small>
-                            </a>
+    <%- include('../partials/header') %>
+        <%- include('../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
+
+            <main class="container">
+                <h1 class="welcome-text">Welcome <%= user && user.first_name ? user.first_name : '' %>
+                </h1>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-value">
+                            <%= typeof totalUsers !=='undefined' ? totalUsers : 0 %>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/admin/donations" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-heart"></i><br>
-                                <small>View Donations</small>
-                            </a>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Donations</div>
+                        <div class="stat-value">
+                            <%= typeof totalDonations !=='undefined' ? totalDonations : 0 %>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/admin/bookings" class="btn btn-outline-success w-100">
-                                <i class="bi bi-calendar"></i><br>
-                                <small>Manage Bookings</small>
-                            </a>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value">
+                            <%= typeof totalBookings !=='undefined' ? totalBookings : 0 %>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/admin/payments" class="btn btn-outline-info w-100">
-                                <i class="bi bi-credit-card"></i><br>
-                                <small>Payment History</small>
-                            </a>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">
+                            ₹<%= typeof totalRevenue !=='undefined' ? totalRevenue.toLocaleString('en-IN') : '0' %>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="row">
-        <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Payments</h5>
-                </div>
-                <div class="card-body">
-                    <% if (typeof recentPayments !== 'undefined' && recentPayments.length > 0) { %>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% recentPayments.forEach(payment => { %>
-                                        <tr>
-                                            <td><%= payment.payment_type %></td>
-                                            <td>₹<%= payment.amount.toLocaleString() %></td>
-                                            <td><span class="badge bg-<%= payment.status === 'completed' ? 'success' : 'warning' %>"><%= payment.status %></span></td>
-                                            <td><small><%= new Date(payment.created_at).toLocaleDateString() %></small></td>
-                                        </tr>
-                                    <% }); %>
-                                </tbody>
-                            </table>
+                <!-- Details Grid -->
+                <div class="details-grid">
+
+                    <!-- Card 1: Quick Actions -->
+                    <div class="detail-card" style="grid-column: 1 / -1; min-height: auto;">
+                        <h3>Quick Actions</h3>
+                        <div class="detail-content">
+                            <div class="quick-actions-grid">
+                                <a href="/admin/users" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-users"></i>
+                                        <div class="quick-action-label">Manage Users</div>
+                                    </div>
+                                </a>
+                                <a href="/admin/bookings"
+                                    style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <div class="quick-action-label">Manage Bookings</div>
+                                    </div>
+                                </a>
+                                <a href="/admin/donations"
+                                    style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-hand-holding-heart"></i>
+                                        <div class="quick-action-label">View Donations</div>
+                                    </div>
+                                </a>
+                                <a href="/admin/payments"
+                                    style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="quick-action-card">
+                                        <i class="fas fa-history"></i>
+                                        <div class="quick-action-label">Payment History</div>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
-                    <% } else { %>
-                        <p class="text-muted text-center mb-0">No recent payments</p>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Pending Approvals</h5>
-                </div>
-                <div class="card-body">
-                                        <% if (typeof pendingBookings !== 'undefined' && pendingBookings.length > 0) { %>
-                        <div class="list-group list-group-flush">
-                            <% pendingBookings.forEach(booking => { %>
-                                <div class="list-group-item px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1"><%= booking.booking_number || booking.pooja_name || booking.hall_name %></h6>
-                                            <small class="text-muted"><%= new Date(booking.booking_date || booking.created_at).toLocaleDateString() %></small>
-                                        </div>
-                                        <div class="ms-2 text-end">
-                                            <span class="badge bg-<%= booking.payment_status === 'completed' ? 'success' : booking.payment_status === 'pending' ? 'warning' : 'secondary' %>">
-                                                Payment: <%= booking.payment_status || 'pending' %>
-                                            </span>
-                                        </div>
+                    </div>
+
+                    <!-- Card 3: Post Temple Updates -->
+                    <div class="detail-card">
+                        <h3>Post Updates / Special Days</h3>
+                        <div class="detail-content">
+                            <form action="/admin/news/new" method="POST" id="newsForm">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label text-muted small"
+                                        style="display:block; margin-bottom:5px;">Title</label>
+                                    <input type="text" class="form-control form-control-sm" id="title" name="title"
+                                        required placeholder="e.g. Special Deeparadhana"
+                                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                </div>
+                                <div class="row g-2 mb-3" style="display:flex; gap:10px; margin-top:10px;">
+                                    <div class="col-6" style="flex:1;">
+                                        <label for="published_date" class="form-label text-muted small"
+                                            style="display:block; margin-bottom:5px;">Date</label>
+                                        <input type="date" class="form-control form-control-sm" id="published_date"
+                                            name="published_date"
+                                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                    </div>
+                                    <div class="col-6" style="flex:1;">
+                                        <label for="published_time" class="form-label text-muted small"
+                                            style="display:block; margin-bottom:5px;">Time</label>
+                                        <input type="time" class="form-control form-control-sm" id="published_time"
+                                            name="published_time"
+                                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
                                     </div>
                                 </div>
-                            <% }); %>
-                        <% } else { %>
-                        <p class="text-muted text-center mb-0">No pending approvals</p>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                <div class="mb-3" style="margin-top:10px;">
+                                    <label for="content" class="form-label text-muted small"
+                                        style="display:block; margin-bottom:5px;">Details</label>
+                                    <textarea class="form-control form-control-sm" id="content" name="content" rows="3"
+                                        required placeholder="Enter details here..."
+                                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm w-100"
+                                    style="margin-top:15px; width:100%; padding:10px; background:#bfa15f; color:white; border:none; border-radius:4px; cursor:pointer;">Post
+                                    Update</button>
+                            </form>
+                        </div>
+                    </div>
 
-<%- include('../partials/footer') %>
+                    <!-- Card 4: Upcoming Temple Events (Admin View) -->
+                    <div class="detail-card">
+                        <h3>Upcoming Temple Events</h3>
+                        <div class="detail-content">
+                            <% if (typeof latestNews !=='undefined' && latestNews.length> 0) { %>
+                                <div class="booking-list">
+                                    <% latestNews.forEach(news=> { %>
+                                        <div class="booking-item">
+                                            <div class="booking-info">
+                                                <span class="booking-id" style="font-weight:bold; color:#bfa15f;">
+                                                    <%= news.title %>
+                                                </span>
+                                                <span class="booking-date">
+                                                    <%= new Date(news.published_at ||
+                                                        news.created_at).toLocaleDateString('en-IN', { day: 'numeric' ,
+                                                        month: 'short' }) %>
+                                                        <% if (news.content) { %> | <%= news.content.substring(0, 30) %>
+                                                                ... <% } %>
+                                                </span>
+                                            </div>
+                                            <div class="booking-status" style="display:flex; gap:5px;">
+                                                <form action="/admin/news/delete/<%= news.id %>" method="POST"
+                                                    onsubmit="return confirm('Are you sure?');">
+                                                    <button type="submit"
+                                                        style="background:none; border:none; color:red; cursor:pointer;">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                                <% } else { %>
+                                    <div class="detail-content"
+                                        style="display: flex; align-items: center; justify-content: center;">
+                                        <p style="color: #777;">No events posted yet.</p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                        <div class="detail-footer">
+                            <span class="footer-text">These appear on User Dashboard</span>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+            <%- include('../partials/footer') %>
+
+</body>
+
+</html>

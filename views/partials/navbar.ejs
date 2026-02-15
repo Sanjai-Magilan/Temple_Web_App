@@ -17,7 +17,7 @@
     <!-- CENTER -->
     <div class="nav-center">
         <ul class="nav-links">
-            <li><a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>">Dashboard</a></li>
+            <li><a href="<%= user && user.role === 'admin' ? '/admin' : '/dashboard' %>">Dashboard</a></li>
             <li><a href="/bookings/pooja">Pooja Booking</a></li>
             <li><a href="/bookings/hall">Hall Booking</a></li>
             <li><a href="/donations">Donate</a></li>

@@ -236,27 +236,37 @@
                                             <%= booking.event_description %>
                                         </p>
                                         <% } %>
-                                            <div class="mt-3 d-flex align-items-center gap-2 flex-wrap">
-                                                <span
-                                                    class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %>"
-                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">
-                                                    <%= booking.status %>
-                                                </span>
-                                                <span class="badge bg-light text-dark border"
-                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">₹<%=
-                                                        booking.amount.toLocaleString() %></span>
-                                                <% if(booking.status==='pending' ) { %>
-                                                    <button class="btn btn-success"
-                                                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
-                                                        onclick="resumeHallPayment('<%= booking.id %>', this)">
-                                                        Continue
-                                                    </button>
+                                            <div class="mt-3">
+                                                <!-- Row 1: Status & Amount -->
+                                                <div class="d-flex justify-content-between gap-2 mb-3">
+                                                    <span
+                                                        class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> flex-grow-1"
+                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">
+                                                        <%= booking.status.charAt(0).toUpperCase() +
+                                                            booking.status.slice(1) %>
+                                                    </span>
 
-                                                    <button class="btn btn-danger"
-                                                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
-                                                        onclick="cancelBooking('<%= booking.id %>', this)">
-                                                        Cancel
-                                                    </button>
+                                                    <span class="badge bg-light text-dark border flex-grow-1"
+                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">₹
+                                                        <%= booking.amount.toLocaleString() %>
+                                                    </span>
+                                                </div>
+
+                                                <!-- Row 2: Buttons -->
+                                                <% if (booking.status==='pending' ) { %>
+                                                    <div class="d-flex justify-content-between gap-2">
+                                                        <button class="btn btn-success flex-grow-1"
+                                                            style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
+                                                            onclick="resumeHallPayment('<%= booking.id %>', this)">
+                                                            Continue
+                                                        </button>
+
+                                                        <button class="btn btn-danger flex-grow-1"
+                                                            style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
+                                                            onclick="cancelBooking('<%= booking.id %>', this)">
+                                                            Cancel
+                                                        </button>
+                                                    </div>
                                                     <% } %>
                                             </div>
                                 </div>
@@ -554,26 +564,26 @@
 
                     await initiatePayment('hall-booking', formData, {
                         onSuccess: () => {
-  showAlert(
-    'success',
-    'Booking Confirmed',
-    'Your hall has been booked successfully!'
-  );
+                            showAlert(
+                                'success',
+                                'Booking Confirmed',
+                                'Your hall has been booked successfully!'
+                            );
 
-  setTimeout(() => {
-    window.location.reload();
-  }, 1500);
-},
-onCancel: () => {
-  setTimeout(() => {
-    window.location.reload();
-  }, 500);
-},
-onFailure: (error) => {
-  showAlert('error', 'Payment Failed', error.message);
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = originalText;
-}
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        },
+                        onCancel: () => {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        },
+                        onFailure: (error) => {
+                            showAlert('error', 'Payment Failed', error.message);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                        }
                     });
                 } catch (error) {
                     showAlert('error', 'Error', error.message);

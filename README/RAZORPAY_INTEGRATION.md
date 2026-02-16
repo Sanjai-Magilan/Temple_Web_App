@@ -50,6 +50,7 @@ Body: {
   "purpose": "Temple construction",
   "is_anonymous": false
 }
+
 Response: {
   "success": true,
   "order_id": "order_xxx",
@@ -58,6 +59,10 @@ Response: {
   "donation_id": 1,
   "receipt_number": "DON-2024-1234"
 }
+
+⚠ Validation Rules:
+  - Minimum amount: ₹1
+  - Maximum amount: ₹5,00,000
 ```
 
 ### Create Hall Booking Order
@@ -74,6 +79,7 @@ Body: {
   "expected_guests": 200,
   "amount": 5000
 }
+
 Response: {
   "success": true,
   "order_id": "order_xxx",
@@ -82,6 +88,10 @@ Response: {
   "booking_id": 1,
   "booking_number": "HALL-202412-1234"
 }
+
+⚠ Validation Rules:
+  - Minimum amount: ₹1
+  - Maximum amount: ₹50,000
 ```
 
 ### Create Pooja Booking Order
@@ -154,7 +164,7 @@ initiatePayment('donation', {
   },
   onFailure: (error) => {
     console.error('Payment failed:', error);
-    alert('Payment failed: ' + error.message);
+    showAlert('error','Payment Failed',error.message);
   }
 });
 

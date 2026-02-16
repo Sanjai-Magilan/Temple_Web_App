@@ -18,7 +18,10 @@ implemented
     - kabil  
 implemented  
     updated landing page UI  
-    - loki  
+    - loki 
+implemented
+    dashboard page UI
+    -karmugilan
 implemented
     update donation UI
     -kamalesh
@@ -31,3 +34,25 @@ Implemented
 Implemented
     Clickable email and phone in contact-modal(footer.ejs & landing-nav.ejs)
     - Deepikaa
+Implemented
+    Pooja booking controller jest test
+    - Miruthul
+Implemented
+    Payment Controller Jest Test
+    - Miruthul
+Implemented
+    manage booking for admin
+    - kamalesh
+implemented  
+    profile controller test & auth controller test  
+    - miruthul & magilan  
+      
+implemented  
+    profile page(profile.ejs & profile.css)  
+    - Deepikaa  
+      
+implemented   
+    update hall booking UI  
+    - kamalesh  
+
+Clear the bug in the 

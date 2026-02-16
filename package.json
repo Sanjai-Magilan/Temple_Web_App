@@ -26,17 +26,20 @@
     "express": "^4.22.1",
     "express-session": "^1.19.0",
     "express-validator": "^7.0.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.6.5",
     "nodemailer": "^7.0.13",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "puppeteer": "^24.37.3",
     "razorpay": "^2.9.2",
     "winston": "^3.19.0"
   },
   "devDependencies": {
     "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "nodemon": "^3.0.2"
   },
   "engines": {

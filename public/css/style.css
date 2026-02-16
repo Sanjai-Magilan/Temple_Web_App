@@ -16,7 +16,9 @@
 * {
     box-sizing: border-box;
 }
-html,body{
+
+html,
+body {
     margin: 0;
     min-height: 100vh;
 }
@@ -26,13 +28,22 @@ html {
 }
 
 
+
 body {
     display: grid;
     grid-template-rows: auto 1fr auto;
     font-family: 'Segoe UI', sans-serif;
     background: var(--bg-base);
     color: var(--text-main);
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    width: 100%;
 }
+
+/* ... existing code ... */
+
+
+
 
 /* ===========================
    NAVIGATION BAR
@@ -47,7 +58,7 @@ body {
     align-items: center;
     height: 70px;
     width: 100%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* LEFT */
@@ -203,7 +214,7 @@ body {
     border: 1px solid #e0d8c8;
     border-radius: 8px;
     width: 160px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     display: none;
     flex-direction: column;
     overflow: hidden;
@@ -346,12 +357,12 @@ body {
 .landing-nav-primary {
     background: var(--accent);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .landing-nav-primary:hover {
     background: #bfa889;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* =========================
@@ -406,11 +417,11 @@ body {
 .landing-hero-primary {
     background: var(--accent);
     color: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .landing-hero-secondary {
-    background: rgba(255,255,255,0.85);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid var(--accent);
 }
 
@@ -436,8 +447,9 @@ body {
     border-radius: 26px;
     padding: 26px 28px;
     max-height: 520px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
-    height: 480px;   /* fixed height = more scroll */
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    height: 480px;
+    /* fixed height = more scroll */
     overflow-y: auto;
 }
 
@@ -455,7 +467,7 @@ body {
 }
 
 .landing-updates-panel::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.15);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 6px;
 }
 
@@ -543,6 +555,7 @@ body {
 .footer-bottom-links a:hover {
     color: #2c2c2c;
 }
+
 /* POoja Booking UI */
 
 
@@ -762,4 +775,316 @@ body {
 
 .auth-footer a:hover {
     text-decoration: underline;
+}
+
+
+/*contact icon css*/
+.contact-icon {
+    color: #d1b570;
+    font-size: 1.2rem;
+    transition: 0.2s ease;
+}
+
+.contact-icon:hover {
+    color: #b89c55;
+    /* slightly darker gold */
+    transform: scale(1.15);
+}
+
+/* =========================
+   MOBILE NAVIGATION
+========================= */
+
+/* Mobile Menu Button - Hidden by default */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.mobile-menu-btn span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: #333;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Landing specific override */
+.landing-navbar .mobile-menu-btn {
+    order: -1;
+    /* Move to left */
+}
+
+/* Hamburger Animation */
+.mobile-menu-btn.open span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-btn.open span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* =========================
+   MEDIA QUERIES
+========================= */
+
+/* TABLET & MOBILE (Max Width: 992px) */
+@media (max-width: 992px) {
+
+    .nav-bar,
+    .landing-navbar {
+        padding: 0 15px;
+    }
+
+    .temple-brand {
+        display: none;
+    }
+
+    .temple-logo {
+        font-size: 24px;
+    }
+
+    /* Mobile Menu Button Visible */
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    /* Navigation Links - Mobile View */
+    .nav-links,
+    .landing-nav-links {
+        position: fixed;
+        top: 70px;
+        left: -50%;
+        width: 50%;
+        height: calc(100vh - 70px);
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-top: 40px;
+        transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: none;
+        z-index: 1000;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-links.active,
+    .landing-nav-links.active {
+        left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links li,
+    .landing-nav-links a {
+        width: 100%;
+        text-align: left;
+        margin: 10px 0;
+        opacity: 0;
+        /* Animate flush in */
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-links.active li,
+    .landing-nav-links.active a {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Stagger delay for menu items */
+    .nav-links.active li:nth-child(1) {
+        transition-delay: 0.1s;
+    }
+
+    .nav-links.active li:nth-child(2) {
+        transition-delay: 0.15s;
+    }
+
+    .nav-links.active li:nth-child(3) {
+        transition-delay: 0.2s;
+    }
+
+    .nav-links.active li:nth-child(4) {
+        transition-delay: 0.25s;
+    }
+
+    .nav-links.active li:nth-child(5) {
+        transition-delay: 0.3s;
+    }
+
+    .nav-links li:not(:last-child)::after {
+        content: none;
+    }
+
+    .nav-links a,
+    .landing-nav-links a {
+        display: block;
+        padding: 15px;
+        font-size: 18px;
+        width: 100%;
+        color: var(--heading-dark);
+        font-weight: 600;
+    }
+
+    .nav-links a:hover,
+    .landing-nav-links a:hover {
+        background-color: var(--surface-primary);
+        color: var(--accent);
+    }
+
+    /* Remove underline on mobile */
+    .nav-links a::after,
+    .landing-nav-links a::after {
+        content: none;
+        display: none;
+    }
+
+    .landing-auth-buttons {
+        display: flex;
+    }
+
+    .landing-hero-layout {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+        gap: 30px;
+    }
+
+    .landing-hero-content {
+        padding: 0;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .landing-hero-actions {
+        justify-content: center;
+    }
+
+    .landing-hero h1 {
+        font-size: 42px;
+        /* Responsive Heading */
+        line-height: 1.2;
+    }
+
+    .landing-updates-panel {
+        height: auto;
+        max-height: 400px;
+    }
+}
+
+/* MOBILE ONLY (Max Width: 576px) */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .landing-auth-buttons .btn {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+
+    /* Remove heavy glassmorphism on mobile auth card */
+    .auth-card {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-user-name,
+    .nav-user-role {
+        display: none;
+    }
+
+    .nav-user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .temple-brand-name {
+        font-size: 16px;
+    }
+
+    /* Typography Scaling */
+    h1,
+    .h1 {
+        font-size: 2rem !important;
+    }
+
+    h2,
+    .h2 {
+        font-size: 1.75rem !important;
+    }
+
+    h3,
+    .h3 {
+        font-size: 1.5rem !important;
+    }
+
+    .landing-hero-content h1 {
+        font-size: 32px;
+    }
+
+    .landing-hero-tagline {
+        font-size: 16px;
+    }
+
+    /* Card Padding reduction */
+    .card-body,
+    .card {
+        padding: 1rem !important;
+        /* Override standard p-4 */
+    }
+
+    /* Full width buttons on mobile */
+    .btn {
+        width: 100%;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .landing-hero-actions .btn {
+        width: auto;
+        /* Keep hero buttons auto width side-by-side */
+        display: inline-block;
+        margin-bottom: 0;
+    }
+
+    .landing-hero-actions {
+        flex-direction: row;
+        /* Ensure they stay side by side */
+        gap: 10px;
+    }
+
+    /* Table Responsive Scroll Hint */
+    .table-responsive {
+        position: relative;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .table-responsive::after {
+        content: 'Scroll →';
+        position: absolute;
+        bottom: -20px;
+        right: 0;
+        font-size: 10px;
+        color: #999;
+        display: none;
+        /* Enable if needed */
+    }
 }

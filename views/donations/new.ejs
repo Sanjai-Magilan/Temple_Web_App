@@ -131,6 +131,18 @@
             color: #b0a69a;
         }
 
+        /* Hide spinner for number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         /* Amount Input specifically */
         .amount-wrapper {
             position: relative;
@@ -316,18 +328,21 @@
                 try {
                     await initiatePayment('donation', formData, {
                         onSuccess: (result) => {
-                            window.location.href = '/payment/success?payment_id=' + result.payment_id;
+                            showAlert('success', 'Donation Successful', 'Thank you for your donation!');
+                            setTimeout(() => {
+                                window.location.href = '/payment/success?payment_id=' + result.payment_id;
+                            }, 1500);
                         },
                         onFailure: (error) => {
-                            alert('Payment failed: ' + error.message);
+                            showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalText;
                         }
                     });
                 } catch (error) {
-                    alert('Error: ' + error.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+                    showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+submitBtn.disabled = false;
+submitBtn.innerHTML = originalText;
                 }
             });
         </script>

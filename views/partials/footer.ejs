@@ -1,7 +1,7 @@
 <% const year = new Date().getFullYear(); %>
 
 <footer class="page-footer bg-light">
-  <div class="container py-2">
+  <div class="container py-0">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
 
       <div class="text-muted small">
@@ -47,7 +47,7 @@
 
         <div class="d-flex justify-content-between align-items-center py-3 hover-bg">
           <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-envelope-fill text-primary"></i>
+            <i class="bi bi-envelope-fill contact-icon"></i>
             <strong>Email</strong>
           </div>
           <a
@@ -61,7 +61,7 @@
 
         <div class="d-flex justify-content-between align-items-center py-3 hover-bg mt-2">
           <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-telephone-fill text-primary"></i>
+            <i class="bi bi-telephone-fill contact-icon"></i>
             <strong>Phone</strong>
           </div>
           <a href="tel:+919876543210" class="text-primary text-decoration-none">
@@ -78,6 +78,27 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="/js/razorpay.js"></script>
 <script src="/js/navbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.showAlert = function (type, title, message) {
+        const icons = {
+            success: 'success',
+            error: 'error',
+            warning: 'warning',
+            info: 'info'
+        };
+
+        Swal.fire({
+            icon: icons[type] || 'info',
+            title: title || 'Notice',
+            html: `<p style="font-size:15px;">${message}</p>`,
+            confirmButtonText: 'Okay',
+            confirmButtonColor: '#bfa15f'
+        });
+    };
+</script>
+
+</body>
 
 <style>
   .hover-bg:hover {

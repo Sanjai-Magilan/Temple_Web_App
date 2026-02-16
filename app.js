@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const passport = require("passport");
 const logger = require("./utils/logger");
+const helmet = require("helmet");
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// app.use(helmet());
 
 // Session configuration
 app.use(
@@ -73,13 +75,14 @@ app.use((req, res, next) => {
 
 // Routes
 const indexRoutes = require("./routes/index");
-const authRoutes = require("./routes/authRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes");
-const donationRoutes = require("./routes/donationRoutes");
-const bookingRoutes = require("./routes/bookingRoutes");
-const familyRoutes = require("./routes/familyRoutes");
-const profileRoutes = require("./routes/profileRoutes");
+const authRoutes = require("./routes/user/authRoutes");
+const paymentRoutes = require("./routes/user/paymentRoutes");
+const dashboardRoutes = require("./routes/user/dashboardRoutes");
+const donationRoutes = require("./routes/user/donationRoutes");
+const bookingRoutes = require("./routes/user/bookingRoutes");
+const familyRoutes = require("./routes/user/familyRoutes");
+const profileRoutes = require("./routes/user/profileRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 
 // Public routes
 app.use("/", indexRoutes);
@@ -90,6 +93,8 @@ app.use("/", bookingRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/family", familyRoutes);
 app.use(profileRoutes);
+app.use(newsRoutes);
+app.use("/admin", require("./routes/admin/bookingRoutes"));
 
 // 404 handler
 app.use((req, res) => {

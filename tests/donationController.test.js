@@ -3,7 +3,6 @@ jest.mock('../models/donationModel');
 const donationController = require('../controllers/donationController');
 const donationModel = require('../models/donationModel');
 
-// Helper function to mock Express response
 const mockResponse = () => {
   const res = {};
   res.render = jest.fn().mockReturnValue(res);
@@ -17,6 +16,7 @@ describe('Donation Controller Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
 
   // ===============================
   // LIST FUNCTION TESTS
@@ -35,15 +35,20 @@ describe('Donation Controller Tests', () => {
     });
 
     test('should fetch donations and render list page', async () => {
+
       const mockDonations = [
         { id: 1, amount: 500 },
         { id: 2, amount: 1000 }
       ];
 
-      donationModel.getUserDonations.mockResolvedValue(mockDonations);
+      donationModel.getUserDonations.mockResolvedValue({
+        donations: mockDonations,
+        total: 2
+      });
 
       const req = {
-        user: { id: 1, name: 'Test User' }
+        user: { id: 1, name: 'Test User' },
+        query: {}
       };
 
       const res = mockResponse();
@@ -51,25 +56,28 @@ describe('Donation Controller Tests', () => {
       await donationController.list(req, res);
 
       expect(donationModel.getUserDonations)
-        .toHaveBeenCalledWith(1, 50, 0);
+        .toHaveBeenCalledWith(1, 12, 0);
 
       expect(res.render).toHaveBeenCalledWith('donations/list', {
         title: 'My Donations',
         user: req.user,
-        donations: mockDonations
+        donations: mockDonations,
+        currentPage: 1,
+        totalPages: 1
       });
     });
 
     test('should render 500 page if error occurs in list()', async () => {
+
       donationModel.getUserDonations.mockRejectedValue(new Error('DB Error'));
 
       const req = {
-        user: { id: 1 }
+        user: { id: 1 },
+        query: {}
       };
 
       const res = mockResponse();
 
-      // Silence console.error for cleaner test output
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       await donationController.list(req, res);
@@ -84,7 +92,6 @@ describe('Donation Controller Tests', () => {
     });
 
   });
-
 
   // ===============================
   // showNew FUNCTION TESTS

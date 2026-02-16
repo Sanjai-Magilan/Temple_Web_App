@@ -56,3 +56,7 @@ implemented
     - kamalesh  
 
 Clear the bug in the 
+
+Fixed
+    Bugs in previously written test files
+    - Miruthul

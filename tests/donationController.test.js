@@ -3,7 +3,6 @@ jest.mock('../models/donationModel');
 const donationController = require('../controllers/donationController');
 const donationModel = require('../models/donationModel');
 
-// Helper function to mock Express response
 const mockResponse = () => {
   const res = {};
   res.render = jest.fn().mockReturnValue(res);
@@ -17,6 +16,7 @@ describe('Donation Controller Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
 
   // ===============================
   // LIST FUNCTION TESTS

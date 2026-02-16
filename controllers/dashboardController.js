@@ -58,30 +58,32 @@ exports.userDashboard = async (req, res) => {
     const familyCount = familyResult[0].count;
 
     // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
-    const [upcomingPoojaResult] = await pool.execute(
+    const [upcomingPoojasResult] = await pool.execute(
       `SELECT * FROM pooja_bookings 
          WHERE user_id = ? AND booking_date >= CURDATE() 
-         ORDER BY booking_date ASC LIMIT 1`,
+         ORDER BY booking_date ASC LIMIT 5`,
       [userId]
     );
-    const upcomingPooja = upcomingPoojaResult.length > 0 ? upcomingPoojaResult[0] : null;
+    const upcomingPooja = upcomingPoojasResult.length > 0 ? upcomingPoojasResult[0] : null;
+    const upcomingPoojas = upcomingPoojasResult;
 
-    // --- 5. GET UPCOMING HALL BOOKING (FUTURE EVENT) ---
+    // --- 5. GET UPCOMING HALL BOOKINGS (FUTURE EVENT) ---
     const [upcomingHallResult] = await pool.execute(
       `SELECT * FROM hall_bookings 
-   WHERE user_id = ? AND booking_date >= CURDATE()
-   ORDER BY booking_date ASC 
-   LIMIT 1`,
+       WHERE user_id = ? AND booking_date >= CURDATE()
+       ORDER BY booking_date ASC 
+       LIMIT 5`,
       [userId]
     );
 
     const upcomingHall = upcomingHallResult.length > 0
       ? upcomingHallResult[0]
       : null;
+    const upcomingHallBookings = upcomingHallResult;
 
 
     // --- 6. GET RECENT ACTIVITY (For tables/history if needed) ---
-    const recentDonations = await donationModel.getUserDonations(userId, 1, 0);
+    const { donations: recentDonations } = await donationModel.getUserDonations(userId, 1, 0);
     const recentHallBookings = await hallBookingModel.getUserBookings(userId, 3, 0);
     const recentPoojaBookings = await poojaBookingModel.getUserBookings(userId, 1, 0);
 
@@ -106,7 +108,9 @@ exports.userDashboard = async (req, res) => {
       hallBookingsCount: hallBookingsCount[0].count,
       poojaBookingsCount: poojaBookingsCount[0].count,
       recentDonations: recentDonations,
-      recentBookings: recentBookings
+      recentBookings: recentBookings,
+      upcomingPoojas: upcomingPoojas,
+      upcomingHallBookings: upcomingHallBookings
     });
 
   } catch (error) {

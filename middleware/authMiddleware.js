@@ -62,6 +62,7 @@ exports.verifyToken = async (req, res, next) => {
  */
 exports.requireRole = (...roles) => {
   return (req, res, next) => {
+    console.log(`Checking role... Required: ${roles}, User role: ${req.user ? req.user.role : 'none'}`);
     if (!req.user) {
       return res.status(401).render("errors/401", {
         title: "Unauthorized",

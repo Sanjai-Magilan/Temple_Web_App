@@ -223,6 +223,57 @@
     .swal2-container {
   z-index: 20000 !important;
 }
+
+    /* ===== 48hr Warning Popup ===== */
+    .booking-warning-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 21000;
+      padding: 16px;
+    }
+
+    .booking-warning-overlay.show {
+      display: flex;
+    }
+
+    .booking-warning-card {
+      width: 100%;
+      max-width: 360px;
+      background: #fffaf3;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: popup .2s ease;
+    }
+
+    .booking-warning-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #5d5145;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .booking-warning-text {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: #6d6256;
+    }
+
+    .booking-warning-btn {
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #bfa15f, #a88b4d);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      cursor: pointer;
+    }
   </style>
 
   <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
@@ -269,7 +320,7 @@
 
             <div class="col-2 form-group">
               <label class="form-label">Booking Date</label>
-              <input type="date" name="booking_date" class="form-input" required>
+              <input type="date" name="booking_date" id="booking_date" class="form-input" required>
             </div>
 
             <div class="col-2 form-group">
@@ -368,6 +419,14 @@
       </div>
     </div>
 
+    <div id="bookingWarningPopup" class="booking-warning-overlay" aria-hidden="true">
+      <div class="booking-warning-card" role="dialog" aria-modal="true" aria-labelledby="bookingWarningTitle">
+        <h3 id="bookingWarningTitle" class="booking-warning-title">Booking Restriction</h3>
+        <p id="bookingWarningText" class="booking-warning-text">You should book before 48hrs</p>
+        <button type="button" class="booking-warning-btn" onclick="hideBookingWarningPopup()">Okay</button>
+      </div>
+    </div>
+
     <script>
             if (typeof window.showAlert !== 'function') {
         window.showAlert = function (type, title, message) {
@@ -395,11 +454,53 @@
         window.location.href = "/bookings/pooja";
       }
 
+      function showBookingWarningPopup(message) {
+        const popup = document.getElementById("bookingWarningPopup");
+        const text = document.getElementById("bookingWarningText");
+        text.textContent = message || "You should book before 48hrs";
+        popup.classList.add("show");
+        popup.setAttribute("aria-hidden", "false");
+      }
+
+      function hideBookingWarningPopup() {
+        const popup = document.getElementById("bookingWarningPopup");
+        popup.classList.remove("show");
+        popup.setAttribute("aria-hidden", "true");
+      }
+
+      // Set minimum date to 48 hours from now
+      function setMinDate() {
+        const dateInput = document.getElementById("booking_date");
+        const now = new Date();
+        // Add 48 hours
+        now.setHours(now.getHours() + 48);
+        
+        // Format date as YYYY-MM-DD
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const minDate = `${year}-${month}-${day}`;
+        
+        dateInput.setAttribute("min", minDate);
+      }
+
+      // Call setMinDate when the page loads
+      setMinDate();
+
       function setAmount() {
         const select = document.getElementById("pooja_name");
         const option = select.options[select.selectedIndex];
         const price = option.getAttribute("data-price");
         document.getElementById("amount").value = price || "";
+      }
+
+      // Validate booking date is at least 48 hours from now
+      function validateBookingDate(bookingDate) {
+        const selectedDate = new Date(bookingDate);
+        const now = new Date();
+        const minDate = new Date(now.getTime() + (48 * 60 * 60 * 1000)); // 48 hours in milliseconds
+        
+        return selectedDate >= minDate;
       }
 
       document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
@@ -415,7 +516,7 @@
 
         const formData = {
           pooja_name: document.getElementById("pooja_name").value,
-          booking_date: document.querySelector('[name="booking_date"]').value,
+          booking_date: document.getElementById("booking_date").value,
           booking_time: document.querySelector('[name="booking_time"]').value,
           devotee_name: document.querySelector('[name="devotee_name"]').value,
           gotra: document.querySelector('[name="gotra"]').value,
@@ -423,6 +524,15 @@
           special_instructions: document.querySelector('[name="special_instructions"]').value,
           amount: document.getElementById("amount").value
         };
+
+        // Validate 48 hours booking rule
+        if (!validateBookingDate(formData.booking_date)) {
+          e.preventDefault();
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          showBookingWarningPopup('You should book before 48hrs');
+          return;
+        }
 
         try {
 

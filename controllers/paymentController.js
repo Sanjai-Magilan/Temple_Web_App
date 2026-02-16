@@ -4,7 +4,7 @@
  */
 const PAYMENT_LIMITS = {
   donation: 500000,
-  hall_booking: 50000
+  hall_booking: 50000,
 };
 
 const razorpay = require("../config/razorpay");
@@ -31,11 +31,11 @@ exports.createDonationOrder = async (req, res) => {
     // Validate amount
     const donationAmount = parseFloat(amount);
     if (donationAmount > PAYMENT_LIMITS.donation) {
-    return res.status(400).json({
-    success: false,
-    message: "Donation amount cannot exceed ₹5,00,000"
-  });
-}
+      return res.status(400).json({
+        success: false,
+        message: "Donation amount cannot exceed ₹5,00,000",
+      });
+    }
 
     // Create Razorpay order
     const options = {
@@ -84,24 +84,24 @@ exports.createDonationOrder = async (req, res) => {
       receipt_number: donation.receipt_number,
     });
   } catch (error) {
-  console.error("Error creating donation order:", error);
+    console.error("Error creating donation order:", error);
 
-      // Razorpay amount limit error
-      if (
-        error?.error?.code === 'BAD_REQUEST_ERROR' &&
-        error?.error?.description?.includes('Amount exceeds')
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "Check the amount please"
-        });
-      }
-
-      res.status(500).json({
+    // Razorpay amount limit error
+    if (
+      error?.error?.code === "BAD_REQUEST_ERROR" &&
+      error?.error?.description?.includes("Amount exceeds")
+    ) {
+      return res.status(400).json({
         success: false,
-        message: "Failed to create payment order"
+        message: "Check the amount please",
       });
     }
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to create payment order",
+    });
+  }
 };
 
 /**
@@ -154,15 +154,27 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
+    const bookingDateTime = new Date(`${booking_date}T${start_time}:00`);
+    const minBookingDateTime = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+    if (
+      Number.isNaN(bookingDateTime.getTime()) ||
+      bookingDateTime < minBookingDateTime
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "You should book before 48hrs",
+      });
+    }
+
     const bookingAmount = parseFloat(amount);
     // Max limit validation for hall booking
     if (bookingAmount > PAYMENT_LIMITS.hall_booking) {
-    return res.status(400).json({
-    success: false,
-    message: "Hall booking amount cannot exceed ₹50,000"
-  });
-}
-
+      return res.status(400).json({
+        success: false,
+        message: "Hall booking amount cannot exceed ₹50,000",
+      });
+    }
 
     //Block booking if there is a confirmed booking with overlapping time slot
     const hasConflict = await hallBookingModel.hasConfirmedOverlap({
@@ -272,6 +284,18 @@ exports.createPoojaBookingOrder = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });
+    }
+
+    // Validate 48 hours booking rule
+    const selectedDate = new Date(booking_date);
+    const now = new Date();
+    const minBookingDate = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours in milliseconds
+
+    if (selectedDate < minBookingDate) {
+      return res.status(400).json({
+        success: false,
+        message: "You should book before 48hrs",
+      });
     }
 
     const bookingAmount = parseFloat(amount);

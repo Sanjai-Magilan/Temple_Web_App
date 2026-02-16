@@ -33,7 +33,7 @@
     "nodemailer": "^7.0.13",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "puppeteer": "^24.37.2",
+    "puppeteer": "^24.37.3",
     "razorpay": "^2.9.2",
     "winston": "^3.19.0"
   },

@@ -84,6 +84,8 @@ const familyRoutes = require("./routes/user/familyRoutes");
 const profileRoutes = require("./routes/user/profileRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 
+const adminPayment = require("./routes/admin/paymentRoutes")
+
 // Public routes
 app.use("/", indexRoutes);
 app.use("/", authRoutes);
@@ -95,6 +97,8 @@ app.use("/family", familyRoutes);
 app.use(profileRoutes);
 app.use(newsRoutes);
 app.use("/admin", require("./routes/admin/bookingRoutes"));
+
+app.use("/",adminPayment)
 
 // 404 handler
 app.use((req, res) => {

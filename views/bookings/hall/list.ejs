@@ -254,26 +254,28 @@
                                             <%= booking.event_description %>
                                         </p>
                                         <% } %>
-                                            <div class="mt-3">
+                                            <div class="mt-3 d-flex align-items-center gap-2 flex-wrap">
                                                 <span
-                                                    class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %>">
+                                                    class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %>"
+                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">
                                                     <%= booking.status %>
                                                 </span>
-                                                <span class="badge bg-light text-dark border ms-2">₹<%=
+                                                <span class="badge bg-light text-dark border"
+                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">₹<%=
                                                         booking.amount.toLocaleString() %></span>
-                                                <% if(booking.status === 'pending') { %>
-                                                <span class="badge bg-light text-dark border ms-2">
-                                                    <button class="btn btn-sm btn-success" 
-                                                    onclick="resumeHallPayment('<%= booking.id %>', this)">
-                                                    Continue
+                                                <% if(booking.status==='pending' ) { %>
+                                                    <button class="btn btn-success"
+                                                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
+                                                        onclick="resumeHallPayment('<%= booking.id %>', this)">
+                                                        Continue
                                                     </button>
 
-                                                    <button class="btn btn-sm btn-danger" 
-                                                    onclick="cancelBooking('<%= booking.id %>', this)">
-                                                    Cancel
+                                                    <button class="btn btn-danger"
+                                                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
+                                                        onclick="cancelBooking('<%= booking.id %>', this)">
+                                                        Cancel
                                                     </button>
-                                                </span> 
-                                                <% } %>
+                                                    <% } %>
                                             </div>
                                 </div>
                                 <div class="card-footer bg-transparent border-top-0">
@@ -566,23 +568,23 @@
                         "Content-Type": "application/json"
                     }
                 })
-                .then(res => res.json())
-                .then(data => {
+                    .then(res => res.json())
+                    .then(data => {
 
-                    if (data.success) {
+                        if (data.success) {
 
-                        // Remove card from UI
-                        btn.closest(".card").remove();
+                            // Remove card from UI
+                            btn.closest(".card").remove();
 
-                    } else {
-                        alert("Failed to cancel booking");
-                    }
+                        } else {
+                            alert("Failed to cancel booking");
+                        }
 
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Server error");
-                });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Server error");
+                    });
             }
         </script>
 

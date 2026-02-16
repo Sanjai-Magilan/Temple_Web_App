@@ -1,364 +1,370 @@
-<%
-if (!Array.isArray(bookings)) {
-  bookings = bookings ? [bookings] : [];
-}
-%>
-<%- include('../../partials/header') %>
+<% if (!Array.isArray(bookings)) { bookings=bookings ? [bookings] : []; } %>
+  <%- include('../../partials/header') %>
 
-<style>
-/* ===== NAVBAR COLOR SAME AS HALL BOOKING ===== */
-.navbar {
-  background: linear-gradient(90deg, #2c241b, #8c7b65) !important;
-  border-bottom: 1px solid rgba(191, 161, 95, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-.navbar-brand,
-.navbar .nav-link {
-  color: #f5f5f5 !important;
-  font-weight: 500;
-}
-.navbar .nav-link:hover {
-  color: #bfa15f !important;
-}
-.navbar .dropdown-toggle {
-  color: #ffffff !important;
-}
-.navbar-toggler {
-  border-color: rgba(191, 161, 95, 0.6);
-}
-.navbar-toggler-icon {
-  filter: invert(1) sepia(1) saturate(4) hue-rotate(10deg);
-}
+    <style>
+      /* ===== NAVBAR COLOR SAME AS HALL BOOKING ===== */
+      .navbar {
+        background: linear-gradient(90deg, #2c241b, #8c7b65) !important;
+        border-bottom: 1px solid rgba(191, 161, 95, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
 
-/* ===== PAGE BACKGROUND ===== */
+      .navbar-brand,
+      .navbar .nav-link {
+        color: #f5f5f5 !important;
+        font-weight: 500;
+      }
 
-body {
-  background: linear-gradient(180deg, #7a7a7a, #5f5f5f);
-}
+      .navbar .nav-link:hover {
+        color: #bfa15f !important;
+      }
 
-/* ===== PAGE TITLE ===== */
+      .navbar .dropdown-toggle {
+        color: #ffffff !important;
+      }
 
-.page-title {
-  font-family: 'Playfair Display', serif;
-  color: #ffffff;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0,0,0,.4);
-}
+      .navbar-toggler {
+        border-color: rgba(191, 161, 95, 0.6);
+      }
 
-/* ===== CARD ===== */
+      .navbar-toggler-icon {
+        filter: invert(1) sepia(1) saturate(4) hue-rotate(10deg);
+      }
 
-.pooja-card {
-  background: #fffaf2;
-  border-radius: 15px;
-  overflow: hidden;
-  border: none;
-  box-shadow: 0 12px 22px rgba(0,0,0,.30);
-  transition: .3s ease;
-}
+      /* ===== PAGE BACKGROUND ===== */
 
-.pooja-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 35px rgba(0,0,0,.45);
-}
+      body {
+        background: linear-gradient(180deg, #7a7a7a, #5f5f5f);
+      }
 
-/* ===== CARD HEADER ===== */
+      /* ===== PAGE TITLE ===== */
 
-.pooja-header {
-  background: linear-gradient(90deg, #c6a75d, #b1934e);
-  padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #2c241b;
-}
+      .page-title {
+        font-family: 'Playfair Display', serif;
+        color: #ffffff;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+      }
 
-/* ===== CARD BODY ===== */
+      /* ===== CARD ===== */
 
-.card-body {
-  padding: 16px 18px;
-}
+      .pooja-card {
+        background: #fffaf2;
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 12px 22px rgba(0, 0, 0, .30);
+        transition: .3s ease;
+      }
 
-.card-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #2c241b;
-}
+      .pooja-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 35px rgba(0, 0, 0, .45);
+      }
 
-/* ===== INFO LINES ===== */
+      /* ===== CARD HEADER ===== */
 
-.info-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  margin-bottom: 7px;
-  color: #444;
-}
+      .pooja-header {
+        background: linear-gradient(90deg, #c6a75d, #b1934e);
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #2c241b;
+      }
 
-/* ===== STATUS BADGES ===== */
+      /* ===== CARD BODY ===== */
 
-.badge-pending {
-  background: #ffc107;
-  color: #000;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
+      .card-body {
+        padding: 16px 18px;
+      }
 
-.badge-confirmed {
-  background: #28a745;
-  color: #fff;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
+      .card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #2c241b;
+      }
 
-.badge-cancelled {
-  background: #dc3545;
-  color: #fff;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
+      /* ===== INFO LINES ===== */
 
-/* ===== AMOUNT ===== */
+      .info-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        margin-bottom: 7px;
+        color: #444;
+      }
 
-.amount-badge {
-  background: #f1f1f1;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-}
+      /* ===== STATUS BADGES ===== */
 
-/* ===== FOOTER ===== */
+      .badge-pending {
+        background: #ffc107;
+        color: #000;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-.card-footer {
-  padding: 10px 16px 14px;
-  font-size: 12px;
-  color: #666;
-}
+      .badge-confirmed {
+        background: #28a745;
+        color: #fff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-/* ===== BUTTON ===== */
+      .badge-cancelled {
+        background: #dc3545;
+        color: #fff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-.btn-gold {
-  background: linear-gradient(90deg, #c6a75d, #b1934e);
-  color: white;
-  border-radius: 20px;
-  padding: 8px 18px;
-  border: none;
-}
+      /* ===== AMOUNT ===== */
 
-.btn-gold:hover {
-  background: linear-gradient(90deg, #b1934e, #9f823e);
-}
-</style>
+      .amount-badge {
+        background: #f1f1f1;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+      /* ===== FOOTER ===== */
 
-<div class="container mt-4 mb-5">
+      .card-footer {
+        padding: 10px 16px 14px;
+        font-size: 12px;
+        color: #666;
+      }
 
-  <!-- ===== HEADER ===== -->
+      /* ===== BUTTON ===== */
 
-  <div class="row mb-3">
-    <div class="col-12 d-flex justify-content-between align-items-center">
+      .btn-gold {
+        background: linear-gradient(90deg, #c6a75d, #b1934e);
+        color: white;
+        border-radius: 20px;
+        padding: 8px 18px;
+        border: none;
+      }
 
-      <h2 class="page-title">
-        <i class="bi bi-stars me-2"></i> Pooja Bookings
-      </h2>
+      .btn-gold:hover {
+        background: linear-gradient(90deg, #b1934e, #9f823e);
+      }
+    </style>
 
-      <a href="/bookings/pooja/new" class="btn btn-gold">
-        <i class="bi bi-plus-circle"></i> New Booking
-      </a>
+    <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
-    </div>
-  </div>
+      <div class="container mt-4 mb-5">
 
-  <% if (bookings.length > 0) { %>
+        <!-- ===== HEADER ===== -->
 
-  <!-- ===== CARD GRID ===== -->
+        <div class="row mb-3">
+          <div class="col-12 d-flex justify-content-between align-items-center">
 
-  <div class="row">
+            <h2 class="page-title">
+              <i class="bi bi-stars me-2"></i> Pooja Bookings
+            </h2>
 
-    <% bookings.forEach(booking => { %>
+            <a href="/bookings/pooja/new" class="btn btn-gold">
+              <i class="bi bi-plus-circle"></i> New Booking
+            </a>
 
-    <div class="col-12 col-md-6 col-lg-4 mb-4">
-
-      <div class="pooja-card h-100">
-
-        <!-- HEADER -->
-
-        <div class="pooja-header">
-          <%= booking.booking_number %>
+          </div>
         </div>
 
-        <!-- BODY -->
+        <% if (bookings.length> 0) { %>
 
-        <div class="card-body">
+          <!-- ===== CARD GRID ===== -->
 
-          <h5 class="card-title">
-            <%= booking.pooja_name %>
-          </h5>
+          <div class="row">
 
-          <div class="info-line">
-            <i class="bi bi-calendar"></i>
-            <%= new Date(booking.booking_date).toLocaleDateString() %>
+            <% bookings.forEach(booking=> { %>
+
+              <div class="col-12 col-md-6 col-lg-4 mb-4">
+
+                <div class="pooja-card h-100">
+
+                  <!-- HEADER -->
+
+                  <div class="pooja-header">
+                    <%= booking.booking_number %>
+                  </div>
+
+                  <!-- BODY -->
+
+                  <div class="card-body">
+
+                    <h5 class="card-title">
+                      <%= booking.pooja_name %>
+                    </h5>
+
+                    <div class="info-line">
+                      <i class="bi bi-calendar"></i>
+                      <%= new Date(booking.booking_date).toLocaleDateString() %>
+                    </div>
+
+                    <div class="info-line">
+                      <i class="bi bi-clock"></i>
+                      <%= booking.booking_time %>
+                    </div>
+
+                    <div class="info-line">
+                      <i class="bi bi-person"></i>
+                      <%= booking.devotee_name %>
+                    </div>
+
+                    <% if (booking.gotra) { %>
+                      <div class="info-line">
+                        <strong>Gotra:</strong>
+                        <%= booking.gotra %>
+                      </div>
+                      <% } %>
+
+                        <% if (booking.nakshatra) { %>
+                          <div class="info-line">
+                            <strong>Nakshatra:</strong>
+                            <%= booking.nakshatra %>
+                          </div>
+                          <% } %>
+
+                            <% if (booking.special_instructions) { %>
+                              <div class="info-line text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                <%= booking.special_instructions %>
+                              </div>
+                              <% } %>
+
+                                <!-- STATUS + AMOUNT -->
+
+                                <div class="d-flex align-items-center gap-2 flex-wrap mt-3">
+
+                                  <span
+                                    class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>"
+                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">
+                                    <%= booking.status %>
+                                  </span>
+
+                                  <span class="amount-badge" style="font-size: 0.7rem; padding: 0.35em 0.6em;">
+                                    ₹ <%= booking.amount.toLocaleString() %>
+                                  </span>
+                                  <% if (booking.status==='pending' ) { %>
+                                    <button class="btn btn-success"
+                                      style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
+                                      onclick="resumePoojaPayment('<%= booking.id %>', this)">Continue</button>
+                                    <button class="btn btn-danger"
+                                      style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
+                                      onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
+                                    <% } %>
+                                </div>
+
+                  </div>
+
+                  <!-- FOOTER -->
+
+                  <div class="card-footer">
+                    Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <% }) %>
+
           </div>
 
-          <div class="info-line">
-            <i class="bi bi-clock"></i>
-            <%= booking.booking_time %>
-          </div>
+          <% } else { %>
 
-          <div class="info-line">
-            <i class="bi bi-person"></i>
-            <%= booking.devotee_name %>
-          </div>
+            <!-- EMPTY STATE -->
 
-          <% if (booking.gotra) { %>
-          <div class="info-line">
-            <strong>Gotra:</strong> <%= booking.gotra %>
-          </div>
-          <% } %>
+            <div class="row justify-content-center">
 
-          <% if (booking.nakshatra) { %>
-          <div class="info-line">
-            <strong>Nakshatra:</strong> <%= booking.nakshatra %>
-          </div>
-          <% } %>
+              <div class="col-md-7">
 
-          <% if (booking.special_instructions) { %>
-          <div class="info-line text-muted">
-            <i class="bi bi-info-circle"></i>
-            <%= booking.special_instructions %>
-          </div>
-          <% } %>
+                <div class="card text-center p-4 shadow-lg border-0" style="border-radius:15px;background:#fff;">
 
-          <!-- STATUS + AMOUNT -->
+                  <i class="bi bi-stars text-warning" style="font-size:50px"></i>
 
-          <div class="d-flex gap-2 mt-3">
+                  <h4 class="mt-3">No Pooja Bookings Yet</h4>
 
-            <span class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>">
-              <%= booking.status %>
-            </span>
+                  <p class="text-muted">
+                    Book a pooja and receive divine blessings 🙏
+                  </p>
 
-            <span class="amount-badge">
-              ₹ <%= booking.amount.toLocaleString() %>
-            </span>
-            <% if (booking.status === 'pending') { %>
-  <div class="mt-2 d-flex gap-2">
-    <button class="btn btn-sm btn-success" onclick="resumePoojaPayment('<%= booking.id %>', this)">Continue</button>
-    <button class="btn btn-sm btn-danger" onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
-  </div>
-<% } %>
-          </div>
+                  <a href="/bookings/pooja/new" class="btn btn-gold mt-2">
+                    Book Pooja
+                  </a>
 
-        </div>
+                </div>
 
-        <!-- FOOTER -->
+              </div>
 
-        <div class="card-footer">
-          Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
-        </div>
+            </div>
+
+            <% } %>
 
       </div>
 
-    </div>
+      <%- include('../../partials/footer') %>
 
-    <% }) %>
-
-  </div>
-
-  <% } else { %>
-
-  <!-- EMPTY STATE -->
-
-  <div class="row justify-content-center">
-
-    <div class="col-md-7">
-
-      <div class="card text-center p-4 shadow-lg border-0"
-           style="border-radius:15px;background:#fff;">
-
-        <i class="bi bi-stars text-warning" style="font-size:50px"></i>
-
-        <h4 class="mt-3">No Pooja Bookings Yet</h4>
-
-        <p class="text-muted">
-          Book a pooja and receive divine blessings 🙏
-        </p>
-
-        <a href="/bookings/pooja/new" class="btn btn-gold mt-2">
-          Book Pooja
-        </a>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <% } %>
-
-</div>
-
-<%- include('../../partials/footer') %>
-
-<script>
-  function cancelPoojaBooking(id, btn) {
-    if (!confirm("Are you sure you want to cancel this booking?")) return;
-    fetch(`/bookings/pooja/cancel/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" } })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) btn.closest(".pooja-card").remove();
-        else alert(data.message || "Failed to cancel booking");
-      })
-      .catch(() => alert("Server error"));
-  }
-
-  function resumePoojaPayment(id, btn) {
-    const originalText = btn ? btn.innerHTML : "";
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-    }
-
-    fetch(`/bookings/pooja/continue/${id}`, { method: "GET", headers: { "Content-Type": "application/json" }, credentials: "include" })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message || "Failed to resume payment");
-        return data;
-      })
-      .then((data) => {
-        if (typeof RazorpayPayment !== "function") throw new Error("Payment function not loaded. Please contact support.");
-
-        const razorpayPayment = new RazorpayPayment({
-          key: data.key,
-          onSuccess: () => { window.location.href = "/bookings/pooja"; },
-          onFailure: (error) => {
-            alert("Payment failed: " + (error.message || "Unknown error"));
-            if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
-          },
-          onCancel: () => {
-            if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+        <script>
+          function cancelPoojaBooking(id, btn) {
+            if (!confirm("Are you sure you want to cancel this booking?")) return;
+            fetch(`/bookings/pooja/cancel/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" } })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) btn.closest(".pooja-card").remove();
+                else alert(data.message || "Failed to cancel booking");
+              })
+              .catch(() => alert("Server error"));
           }
-        });
 
-        return razorpayPayment.initCheckout({
-          order_id: data.order_id,
-          amount: data.amount,
-          description: data.description || "Pooja booking payment",
-          payment_type: "pooja-booking"
-        });
-      })
-      .catch((err) => {
-        alert("Error: " + err.message);
-        if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
-      });
-  }
-</script>
+          function resumePoojaPayment(id, btn) {
+            const originalText = btn ? btn.innerHTML : "";
+            if (btn) {
+              btn.disabled = true;
+              btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            }
+
+            fetch(`/bookings/pooja/continue/${id}`, { method: "GET", headers: { "Content-Type": "application/json" }, credentials: "include" })
+              .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.message || "Failed to resume payment");
+                return data;
+              })
+              .then((data) => {
+                if (typeof RazorpayPayment !== "function") throw new Error("Payment function not loaded. Please contact support.");
+
+                const razorpayPayment = new RazorpayPayment({
+                  key: data.key,
+                  onSuccess: () => { window.location.href = "/bookings/pooja"; },
+                  onFailure: (error) => {
+                    alert("Payment failed: " + (error.message || "Unknown error"));
+                    if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+                  },
+                  onCancel: () => {
+                    if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+                  }
+                });
+
+                return razorpayPayment.initCheckout({
+                  order_id: data.order_id,
+                  amount: data.amount,
+                  description: data.description || "Pooja booking payment",
+                  payment_type: "pooja-booking"
+                });
+              })
+              .catch((err) => {
+                alert("Error: " + err.message);
+                if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+              });
+          }
+        </script>

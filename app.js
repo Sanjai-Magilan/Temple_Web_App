@@ -8,13 +8,13 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const passport = require("passport");
 const logger = require("./utils/logger");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3000;
 
 // View engine setup
 app.set("view engine", "ejs");
@@ -121,7 +121,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT,"0.0.0.0", () => {
   logger.info(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });

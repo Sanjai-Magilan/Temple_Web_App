@@ -1,8 +1,7 @@
 <%- include('../../partials/header') %>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
+        
         /* Page Background Overrides */
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
@@ -270,36 +269,60 @@
 
         .booking-warning-card {
             width: 100%;
-            max-width: 360px;
-            background: #fffaf3;
+            max-width: 400px;
+            background: #fff;
             border-radius: 16px;
-            padding: 20px;
+            padding: 30px;
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
             text-align: center;
+            animation: popup .2s ease;
+            position: relative;
+        }
+
+        .booking-warning-icon {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #f8bb86;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #f8bb86;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
         }
 
         .booking-warning-title {
-            margin: 0 0 8px;
-            font-size: 20px;
-            color: #5d5145;
-            font-family: 'Playfair Display', serif;
+            margin: 0 0 10px;
+            font-size: 24px;
+            color: #595959;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
         }
 
         .booking-warning-text {
-            margin: 0 0 16px;
-            font-size: 14px;
-            color: #6d6256;
+            margin: 0 0 25px;
+            font-size: 16px;
+            color: #545454;
+            font-family: 'Poppins', sans-serif;
         }
 
         .booking-warning-btn {
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #bfa15f, #a88b4d);
+            border-radius: 6px;
+            background-color: #bfa15f;
             color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 10px 18px;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 12px 30px;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .booking-warning-btn:hover {
+            background-color: #a88b4d;
         }
     </style>
 
@@ -469,8 +492,10 @@
 
         <div id="bookingWarningPopup" class="booking-warning-overlay" aria-hidden="true">
             <div class="booking-warning-card" role="dialog" aria-modal="true" aria-labelledby="bookingWarningTitle">
-                <h3 id="bookingWarningTitle" class="booking-warning-title">Booking Restriction</h3>
-                <p id="bookingWarningText" class="booking-warning-text">You should book before 48hrs</p>
+                <div class="booking-warning-icon">!</div>
+                <h3 id="bookingWarningTitle" class="booking-warning-title">Advance Booking Required</h3>
+                <p id="bookingWarningText" class="booking-warning-text">Hall booking must be made at least 48 hours in
+                    advance.</p>
                 <button type="button" class="booking-warning-btn" onclick="hideBookingWarningPopup()">Okay</button>
             </div>
         </div>
@@ -505,7 +530,7 @@
             function showBookingWarningPopup(message) {
                 const popup = document.getElementById('bookingWarningPopup');
                 const text = document.getElementById('bookingWarningText');
-                text.textContent = message || 'You should book before 48hrs';
+                text.textContent = message || 'Hall booking must be made at least 48 hours in advance.';
                 popup.classList.add('show');
                 popup.setAttribute('aria-hidden', 'false');
             }
@@ -553,7 +578,7 @@
                 const bookingAmount = Number(document.getElementById('amount').value);
 
                 if (!isBookingAtLeast48HoursAhead()) {
-                    showBookingWarningPopup('You should book before 48hrs');
+                    showBookingWarningPopup('Hall booking must be made at least 48 hours in advance.');
                     return;
                 }
 

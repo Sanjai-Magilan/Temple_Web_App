@@ -1,9 +1,7 @@
 <%- include('../../partials/header') %>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap');
-
-    /* ===== Global Reset ===== */
+        /* ===== Global Reset ===== */
     * {
       margin: 0;
       padding: 0;
@@ -236,9 +234,10 @@
         margin-bottom: 20px;
       }
     }
+
     .swal2-container {
-  z-index: 20000 !important;
-}
+      z-index: 20000 !important;
+    }
 
     /* ===== 48hr Warning Popup ===== */
     .booking-warning-overlay {
@@ -258,37 +257,60 @@
 
     .booking-warning-card {
       width: 100%;
-      max-width: 360px;
-      background: #fffaf3;
+      max-width: 400px;
+      background: #fff;
       border-radius: 16px;
-      padding: 20px;
+      padding: 30px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
       text-align: center;
       animation: popup .2s ease;
+      position: relative;
+    }
+
+    .booking-warning-icon {
+      width: 80px;
+      height: 80px;
+      border: 4px solid #f8bb86;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      color: #f8bb86;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
     }
 
     .booking-warning-title {
-      margin: 0 0 8px;
-      font-size: 20px;
-      color: #5d5145;
-      font-family: 'Playfair Display', serif;
+      margin: 0 0 10px;
+      font-size: 24px;
+      color: #595959;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
     }
 
     .booking-warning-text {
-      margin: 0 0 16px;
-      font-size: 14px;
-      color: #6d6256;
+      margin: 0 0 25px;
+      font-size: 16px;
+      color: #545454;
+      font-family: 'Poppins', sans-serif;
     }
 
     .booking-warning-btn {
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #bfa15f, #a88b4d);
+      border-radius: 6px;
+      background-color: #bfa15f;
       color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 18px;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 12px 30px;
       cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .booking-warning-btn:hover {
+      background-color: #a88b4d;
     }
   </style>
 
@@ -437,14 +459,16 @@
 
     <div id="bookingWarningPopup" class="booking-warning-overlay" aria-hidden="true">
       <div class="booking-warning-card" role="dialog" aria-modal="true" aria-labelledby="bookingWarningTitle">
-        <h3 id="bookingWarningTitle" class="booking-warning-title">Booking Restriction</h3>
-        <p id="bookingWarningText" class="booking-warning-text">You should book before 48hrs</p>
+        <div class="booking-warning-icon">!</div>
+        <h3 id="bookingWarningTitle" class="booking-warning-title">Advance Booking Required</h3>
+        <p id="bookingWarningText" class="booking-warning-text">Pooja booking must be made at least 48 hours in advance.
+          Please select a later date.</p>
         <button type="button" class="booking-warning-btn" onclick="hideBookingWarningPopup()">Okay</button>
       </div>
     </div>
 
     <script>
-            if (typeof window.showAlert !== 'function') {
+      if (typeof window.showAlert !== 'function') {
         window.showAlert = function (type, title, message) {
           if (window.Swal) {
             const icons = {
@@ -473,7 +497,7 @@
       function showBookingWarningPopup(message) {
         const popup = document.getElementById("bookingWarningPopup");
         const text = document.getElementById("bookingWarningText");
-        text.textContent = message || "You should book before 48hrs";
+        text.textContent = message || "Pooja booking must be made at least 48 hours in advance. Please select a later date.";
         popup.classList.add("show");
         popup.setAttribute("aria-hidden", "false");
       }
@@ -490,13 +514,13 @@
         const now = new Date();
         // Add 48 hours
         now.setHours(now.getHours() + 48);
-        
+
         // Format date as YYYY-MM-DD
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const minDate = `${year}-${month}-${day}`;
-        
+
         dateInput.setAttribute("min", minDate);
       }
 
@@ -510,13 +534,18 @@
         document.getElementById("amount").value = price || "";
       }
 
-      // Validate booking date is at least 48 hours from now
-      function validateBookingDate(bookingDate) {
-        const selectedDate = new Date(bookingDate);
+      // Validate booking date and time is at least 48 hours from now
+      function validateBookingDate(bookingDate, bookingTime) {
+        if (!bookingDate) return false;
+
+        // If time is not provided, use a default (but it should be required)
+        const timeStr = bookingTime || '00:00';
+
+        const selectedDateTime = new Date(`${bookingDate}T${timeStr}`);
         const now = new Date();
         const minDate = new Date(now.getTime() + (48 * 60 * 60 * 1000)); // 48 hours in milliseconds
-        
-        return selectedDate >= minDate;
+
+        return selectedDateTime >= minDate;
       }
 
       document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
@@ -542,11 +571,12 @@
         };
 
         // Validate 48 hours booking rule
-        if (!validateBookingDate(formData.booking_date)) {
+        if (!validateBookingDate(formData.booking_date, formData.booking_time)) {
           e.preventDefault();
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalText;
-          showBookingWarningPopup('You should book before 48hrs');
+          submitBtn.innerHTML = originalText;
+          showBookingWarningPopup('Pooja booking must be made at least 48 hours in advance.');
           return;
         }
 
@@ -578,10 +608,10 @@
           });
 
 
-          } catch (error) {
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = originalText;
-  showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+        } catch (error) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
 
 
         } finally {

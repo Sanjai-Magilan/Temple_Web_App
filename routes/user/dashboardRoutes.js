@@ -11,9 +11,9 @@ const authMiddleware = require('../../middleware/authMiddleware');
 router.get('/dashboard', authMiddleware.verifyToken, dashboardController.userDashboard);
 
 // Admin dashboard
-router.get('/admin', authMiddleware.verifyToken, authMiddleware.requireRole('admin'), dashboardController.adminDashboard);
+router.get('/admin', authMiddleware.verifyToken, authMiddleware.requireRole('admin'),
+    dashboardController.adminDashboard);
 
 module.exports = router;
-
 
 

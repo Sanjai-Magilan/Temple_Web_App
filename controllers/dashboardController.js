@@ -103,7 +103,6 @@ exports.userDashboard = async (req, res) => {
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,
       familyCount: familyCount,
 
-
       // Other data for sidebar/footer/history
       donationsCount: donationsCount[0].count,
       hallBookingsCount: hallBookingsCount[0].count,
@@ -142,7 +141,6 @@ exports.adminDashboard = async (req, res) => {
        d.payment_id IN (SELECT id FROM payments WHERE status = 'completed')`
     );
 
-
     const [totalBookings] = await pool.execute(
       `SELECT 
         (SELECT COUNT(*) FROM hall_bookings WHERE payment_id IS NOT NULL AND payment_id IN (SELECT id FROM payments WHERE status = 'completed')) + 
@@ -153,19 +151,22 @@ exports.adminDashboard = async (req, res) => {
       `SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'completed'`
     );
 
-    const recentPayments = await paymentModel.getUserPayments(null, 10, 0);
-    const [pendingHallBookings] = await pool.execute(
-      'SELECT * FROM hall_bookings WHERE status = "pending" ORDER BY created_at DESC LIMIT 5'
+    // Fetch Recent Confirmed Payments
+    const [recentConfirmedPayments] = await pool.execute(
+      `SELECT * FROM payments 
+         WHERE status = 'completed' 
+         ORDER BY created_at DESC LIMIT 5`
     );
-    const [pendingPoojaBookings] = await pool.execute(
-      `SELECT pb.*, p.status as payment_status 
-       FROM pooja_bookings pb
-       LEFT JOIN payments p ON pb.payment_id = p.id
-       WHERE pb.status = "pending" 
-       ORDER BY pb.created_at DESC LIMIT 5`
+
+    // Delete expired news (where published_at < NOW())
+    await pool.execute('DELETE FROM news WHERE published_at < NOW()');
+
+    // Fetch News / Special Days (Upcoming Only)
+    const [latestNews] = await pool.execute(
+      `SELECT * FROM news 
+       WHERE is_published = 1 
+       ORDER BY published_at ASC LIMIT 5`
     );
-    const pendingBookings = [...pendingHallBookings, ...pendingPoojaBookings]
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     res.render('dashboard/admin', {
       title: 'Admin Dashboard',
@@ -174,8 +175,8 @@ exports.adminDashboard = async (req, res) => {
       totalDonations: totalDonations[0].count,
       totalBookings: totalBookings[0].count,
       totalRevenue: parseFloat(totalRevenue[0].total) || 0,
-      recentPayments: recentPayments,
-      pendingBookings: pendingBookings
+      recentConfirmedPayments: recentConfirmedPayments,
+      latestNews: latestNews
     });
   } catch (error) {
     console.error('Error loading admin dashboard:', error);

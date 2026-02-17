@@ -15,7 +15,6 @@ const dashboardController = require('../controllers/dashboardController');
 const donationModel = require('../models/donationModel');
 const hallBookingModel = require('../models/hallBookingModel');
 const poojaBookingModel = require('../models/poojaBookingModel');
-const paymentModel = require('../models/paymentModel');
 const pool = require('../config/database');
 
 const mockResponse = () => {
@@ -51,7 +50,6 @@ describe('Dashboard Controller', () => {
       const req = { user: { id: 1, name: 'Test User' } };
       const res = mockResponse();
 
-      // Mock DB responses in order
       pool.execute
         .mockResolvedValueOnce([[{ count: 2 }]]) // donationsCount
         .mockResolvedValueOnce([[{ count: 1 }]]) // hallBookingsCount
@@ -61,21 +59,32 @@ describe('Dashboard Controller', () => {
         .mockResolvedValueOnce([[{ id: 10, booking_date: '2026-12-01' }]]) // upcomingPooja
         .mockResolvedValueOnce([[{ id: 20, booking_date: '2026-11-01' }]]); // upcomingHall
 
-      donationModel.getUserDonations.mockResolvedValue([{ id: 1 }]);
-      hallBookingModel.getUserBookings.mockResolvedValue([{ id: 2, created_at: new Date() }]);
-      poojaBookingModel.getUserBookings.mockResolvedValue([{ id: 3, created_at: new Date() }]);
+      donationModel.getUserDonations.mockResolvedValue({
+        donations: [{ id: 1 }]
+      });
+
+      hallBookingModel.getUserBookings.mockResolvedValue([
+        { id: 2, created_at: new Date() }
+      ]);
+
+      poojaBookingModel.getUserBookings.mockResolvedValue([
+        { id: 3, created_at: new Date() }
+      ]);
 
       await dashboardController.userDashboard(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('dashboard/user', expect.objectContaining({
-        title: 'Dashboard',
-        user: req.user,
-        totalDonation: 5000,
-        familyCount: 4,
-        donationsCount: 2,
-        hallBookingsCount: 1,
-        poojaBookingsCount: 3
-      }));
+      expect(res.render).toHaveBeenCalledWith(
+        'dashboard/user',
+        expect.objectContaining({
+          title: 'Dashboard',
+          user: req.user,
+          totalDonation: 5000,
+          familyCount: 4,
+          donationsCount: 2,
+          hallBookingsCount: 1,
+          poojaBookingsCount: 3
+        })
+      );
     });
 
     test('should handle errors and return 500', async () => {
@@ -87,11 +96,15 @@ describe('Dashboard Controller', () => {
       await dashboardController.userDashboard(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenCalledWith('errors/500', expect.any(Object));
+      expect(res.render).toHaveBeenCalledWith(
+        'errors/500',
+        expect.any(Object)
+      );
     });
 
   });
- // ================================
+
+  // ================================
   // ADMIN DASHBOARD TESTS
   // ================================
 
@@ -104,7 +117,10 @@ describe('Dashboard Controller', () => {
       await dashboardController.adminDashboard(req, res);
 
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.render).toHaveBeenCalledWith('errors/403', expect.any(Object));
+      expect(res.render).toHaveBeenCalledWith(
+        'errors/403',
+        expect.any(Object)
+      );
     });
 
     test('should render admin dashboard for admin user', async () => {
@@ -116,20 +132,22 @@ describe('Dashboard Controller', () => {
         .mockResolvedValueOnce([[{ count: 5 }]])  // totalDonations
         .mockResolvedValueOnce([[{ count: 8 }]])  // totalBookings
         .mockResolvedValueOnce([[{ total: 25000 }]]) // totalRevenue
-        .mockResolvedValueOnce([[{ id: 1, status: 'pending', created_at: new Date() }]]) // pendingHall
-        .mockResolvedValueOnce([[{ id: 2, status: 'pending', created_at: new Date() }]]); // pendingPooja
-
-      paymentModel.getUserPayments.mockResolvedValue([{ id: 100 }]);
+        .mockResolvedValueOnce([[{ id: 1, status: 'completed', created_at: new Date() }]]) // recentConfirmedPayments
+        .mockResolvedValueOnce([[]]) // DELETE news
+        .mockResolvedValueOnce([[{ id: 99, title: 'News' }]]); // latestNews
 
       await dashboardController.adminDashboard(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('dashboard/admin', expect.objectContaining({
-        title: 'Admin Dashboard',
-        totalUsers: 10,
-        totalDonations: 5,
-        totalBookings: 8,
-        totalRevenue: 25000
-      }));
+      expect(res.render).toHaveBeenCalledWith(
+        'dashboard/admin',
+        expect.objectContaining({
+          title: 'Admin Dashboard',
+          totalUsers: 10,
+          totalDonations: 5,
+          totalBookings: 8,
+          totalRevenue: 25000
+        })
+      );
     });
 
     test('should handle admin dashboard errors', async () => {
@@ -141,10 +159,12 @@ describe('Dashboard Controller', () => {
       await dashboardController.adminDashboard(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenCalledWith('errors/500', expect.any(Object));
+      expect(res.render).toHaveBeenCalledWith(
+        'errors/500',
+        expect.any(Object)
+      );
     });
 
   });
 
- 
 });

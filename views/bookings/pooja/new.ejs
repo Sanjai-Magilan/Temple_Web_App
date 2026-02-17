@@ -1,9 +1,7 @@
 <%- include('../../partials/header') %>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap');
-
-    /* ===== Global Reset ===== */
+        /* ===== Global Reset ===== */
     * {
       margin: 0;
       padding: 0;
@@ -236,9 +234,10 @@
         margin-bottom: 20px;
       }
     }
+
     .swal2-container {
-  z-index: 20000 !important;
-}
+      z-index: 20000 !important;
+    }
   </style>
 
   <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
@@ -285,7 +284,7 @@
 
             <div class="col-2 form-group">
               <label class="form-label">Booking Date</label>
-              <input type="date" name="booking_date" class="form-input" required>
+              <input type="date" name="booking_date" class="form-input" required onclick="this.showPicker()">
             </div>
 
             <div class="col-2 form-group">
@@ -385,7 +384,7 @@
     </div>
 
     <script>
-            if (typeof window.showAlert !== 'function') {
+      if (typeof window.showAlert !== 'function') {
         window.showAlert = function (type, title, message) {
           if (window.Swal) {
             const icons = {
@@ -417,6 +416,24 @@
         const price = option.getAttribute("data-price");
         document.getElementById("amount").value = price || "";
       }
+
+      function setMinDate() {
+        const dateInput = document.querySelector('[name="booking_date"]');
+        if (!dateInput) return;
+
+        const now = new Date();
+        now.setDate(now.getDate() + 3); // Lock today + 2 days -> start from 3rd day
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const minDate = `${year}-${month}-${day}`;
+
+        dateInput.setAttribute("min", minDate);
+      }
+
+      // Initialize min date
+      setMinDate();
 
       document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
 
@@ -468,10 +485,10 @@
           });
 
 
-          } catch (error) {
-  submitBtn.disabled = false;
-  submitBtn.innerHTML = originalText;
-  showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+        } catch (error) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
 
 
         } finally {

@@ -48,6 +48,7 @@ exports.showNew = (req, res) => {
       title: "Book a Pooja",
       user: req.user,
       error: null,
+      booking: null
     });
   } catch (error) {
     console.error("Error loading pooja booking form:", error);
@@ -57,6 +58,48 @@ exports.showNew = (req, res) => {
     });
   }
 };
+
+exports.showContinue = async (req, res) => {
+  try {
+      if (!req.user) {
+        return res.redirect("/login");
+      }
+  
+      const bookingId = req.params.id;
+      const booking = await poojaBookingModel.findById(bookingId);
+  
+      if (!booking) {
+        return res.status(404).render("errors/404", {
+          title: "Not Found",
+          message: "Booking not found"
+        });
+      }
+  
+      if (Number(booking.user_id) !== Number(req.user.id)) {
+        return res.status(403).render("errors/403", {
+          title: "Unauthorized",
+          message: "You are not authorized to view this booking"
+        });
+      }
+
+      if (booking.status !== 'pending') {
+         return res.redirect('/bookings/pooja');
+      }
+  
+      res.render("bookings/pooja/new", {
+        title: "Complete Pooja Booking",
+        user: req.user,
+        error: null,
+        booking: booking
+      });
+    } catch (error) {
+      console.error("Error loading pooja booking continue form:", error);
+      res.status(500).render("errors/500", {
+        title: "Server Error",
+        message: "Failed to load booking details",
+      });
+    }
+  };
 
 exports.continuePayment = async (req, res) => {
   const bookingId = req.params.id;

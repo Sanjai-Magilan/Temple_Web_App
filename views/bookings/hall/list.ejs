@@ -246,11 +246,11 @@
                                                     style="font-size: 0.7rem; padding: 0.35em 0.6em;">₹<%=
                                                         booking.amount.toLocaleString() %></span>
                                                 <% if(booking.status==='pending' ) { %>
-                                                    <button class="btn btn-success"
-                                                        style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
-                                                        onclick="resumeHallPayment('<%= booking.id %>', this)">
-                                                        Continue
-                                                    </button>
+<a href="/bookings/hall/continue-form/<%= booking.id %>" 
+                                                    class="btn btn-success"
+                                                    style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;">
+                                                    Continue
+                                                </a>
 
                                                     <button class="btn btn-danger"
                                                         style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
@@ -459,21 +459,15 @@
         </div>
 
         <!-- Cancel Confirmation Modal -->
-        <div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-labelledby="cancelConfirmModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal fade" id="cancelHallModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-body text-center p-4">
-                        <div class="mb-3">
-                            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
-                        </div>
                         <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?</h5>
-                        <p class="text-muted mb-4">Are you sure you want to cancel this payment?</p>
+                        <p class="text-muted mb-4">Are you sure you want to cancel this booking?</p>
                         <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal"
-                                style="border-radius: 5px;">No</button>
-                            <button type="button" class="btn btn-danger px-4" id="confirmCancelBtn"
-                                style="border-radius: 5px;">OK</button>
+                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger px-4" id="confirmCancelHallBtn">OK</button>
                         </div>
                     </div>
                 </div>
@@ -481,56 +475,7 @@
         </div>
 
         <script>
-            // Handle cancelled bookings - hide them on page load
-            (function() {
-                const cancelledBookings = JSON.parse(localStorage.getItem('cancelledHallBookings') || '[]');
-                cancelledBookings.forEach(bookingNumber => {
-                    const card = document.querySelector(`.booking-card[data-booking-number="${bookingNumber}"]`);
-                    if (card) {
-                        card.style.display = 'none';
-                    }
-                });
-            })();
 
-            // Variable to store the current cancel button and card element
-            let currentCancelBtn = null;
-            let currentCard = null;
-
-            // Cancel button click handler - show confirmation modal
-            document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentCancelBtn = this;
-                    currentCard = this.closest('.booking-card');
-                    // Show the confirmation modal
-                    const modal = new bootstrap.Modal(document.getElementById('cancelConfirmModal'));
-                    modal.show();
-                });
-            });
-
-            // Confirm cancel button click handler
-            document.getElementById('confirmCancelBtn').addEventListener('click', function() {
-                if (currentCancelBtn && currentCard) {
-                    const bookingNumber = currentCancelBtn.getAttribute('data-booking-number');
-                    // Save to localStorage
-                    const cancelledBookings = JSON.parse(localStorage.getItem('cancelledHallBookings') || '[]');
-                    if (!cancelledBookings.includes(bookingNumber)) {
-                        cancelledBookings.push(bookingNumber);
-                        localStorage.setItem('cancelledHallBookings', JSON.stringify(cancelledBookings));
-                    }
-                    // Hide the card
-                    currentCard.style.display = 'none';
-                    
-                    // Reset variables
-                    currentCancelBtn = null;
-                    currentCard = null;
-                    
-                    // Hide the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelConfirmModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                }
-            });
 
             // Toggle Meal Options
             const foodRadios = document.getElementsByName('food_required');
@@ -654,97 +599,53 @@ onFailure: (error) => {
                     submitBtn.innerHTML = originalText;
                 }
             });
+            let hallBookingIdToCancel = null;
+            let hallBookingElementToRemove = null;
+
             function cancelBooking(id, btn) {
+                hallBookingIdToCancel = id;
+                hallBookingElementToRemove = btn.closest(".booking-card"); // Select the col div
+                const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('cancelHallModal'));
+                modal.show();
+            }
 
-                if (!confirm("Are you sure you want to cancel this booking?")) return;
+            document.getElementById('confirmCancelHallBtn').addEventListener('click', function() {
+                if (!hallBookingIdToCancel) return;
 
-                fetch(`/bookings/hall/cancel/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                const btn = document.getElementById('confirmCancelHallBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Cancelling...';
+                btn.disabled = true;
+
+                fetch(`/bookings/hall/cancel/${hallBookingIdToCancel}`, { 
+                    method: "DELETE", 
+                    headers: { "Content-Type": "application/json" } 
                 })
                     .then(res => res.json())
                     .then(data => {
+                        const modalEl = document.getElementById('cancelHallModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
 
                         if (data.success) {
-
-                            // Remove card from UI
-                            btn.closest(".card").remove();
-
+                            if (hallBookingElementToRemove) hallBookingElementToRemove.remove();
+                            modal.hide();
                         } else {
-                            alert("Failed to cancel booking");
+                            alert(data.message || "Failed to cancel booking");
                         }
-
                     })
                     .catch(err => {
                         console.error(err);
                         alert("Server error");
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        hallBookingIdToCancel = null;
+                        hallBookingElementToRemove = null;
                     });
-            }
+            });
         </script>
 
-        <script>
-            function resumeHallPayment(id, btn) {
-                const originalText = btn ? btn.innerHTML : "";
 
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-                }
-
-                fetch(`/bookings/hall/continue/${id}`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include"
-                })
-                    .then(async (res) => {
-                        const data = await res.json();
-                        if (!res.ok || !data.success) {
-                            throw new Error(data.message || "Failed to resume payment");
-                        }
-                        return data;
-                    })
-                    .then((data) => {
-                        if (typeof RazorpayPayment !== "function") {
-                            throw new Error("Payment function not loaded. Please contact support.");
-                        }
-
-                        const razorpayPayment = new RazorpayPayment({
-                            key: data.key,
-                            onSuccess: () => {
-                                window.location.href = "/bookings/hall";
-                            },
-                            onFailure: (error) => {
-                                alert("Payment failed: " + (error.message || "Unknown error"));
-                                if (btn) {
-                                    btn.disabled = false;
-                                    btn.innerHTML = originalText;
-                                }
-                            },
-                            onCancel: () => {
-                                if (btn) {
-                                    btn.disabled = false;
-                                    btn.innerHTML = originalText;
-                                }
-                            }
-                        });
-
-                        return razorpayPayment.initCheckout({
-                            order_id: data.order_id,
-                            amount: data.amount,
-                            description: data.description || "Hall booking payment",
-                            payment_type: "hall-booking"
-                        });
-                    })
-                    .catch((err) => {
-                        alert("Error: " + err.message);
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = originalText;
-                        }
-                    });
-            }
-        </script>
 
         <%- include('../../partials/footer') %>

@@ -43,12 +43,64 @@ exports.showNew = (req, res) => {
       title: "Book a Hall",
       user: req.user,
       error: null,
+      booking: null // Explicitly pass null for new bookings
     });
   } catch (error) {
     console.error("Error loading hall booking form:", error);
     res.status(500).render("errors/500", {
       title: "Server Error",
       message: "Failed to load hall booking form",
+    });
+  }
+};
+
+exports.showContinue = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect("/login");
+    }
+
+    const bookingId = req.params.id;
+    const booking = await hallBookingModel.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).render("errors/404", {
+        title: "Not Found",
+        message: "Booking not found"
+      });
+    }
+
+    // Verify ownership
+    if (Number(booking.user_id) !== Number(req.user.id)) {
+      return res.status(403).render("errors/403", {
+        title: "Unauthorized",
+        message: "You are not authorized to view this booking"
+      });
+    }
+
+    // Verify status (optional, but usually we only continue pending bookings)
+    if (booking.status !== 'pending') {
+       return res.redirect('/bookings/hall');
+    }
+    
+    // Parse food_meals if it's a string, ensuring it's an array for the view
+    if (booking.food_meals && typeof booking.food_meals === 'string') {
+        booking.food_meals = booking.food_meals.split(',').map(s => s.trim());
+    } else if (!booking.food_meals) {
+        booking.food_meals = [];
+    }
+
+    res.render("bookings/hall/new", {
+      title: "Complete Hall Booking",
+      user: req.user,
+      error: null,
+      booking: booking
+    });
+  } catch (error) {
+    console.error("Error loading hall booking continue form:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "Failed to load booking details",
     });
   }
 };

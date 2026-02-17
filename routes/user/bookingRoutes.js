@@ -31,6 +31,12 @@ router.get(
   hallBookingController.continuePayment,
 );
 
+router.get(
+  "/bookings/hall/continue-form/:id",
+  authMiddleware.verifyToken,
+  hallBookingController.showContinue,
+);
+
 router.delete(
   "/bookings/hall/cancel/:id",
   authMiddleware.verifyToken,
@@ -67,6 +73,12 @@ router.get(
   "/bookings/pooja/continue/:id",
   authMiddleware.verifyToken,
   poojaBookingController.continuePayment,
+);
+
+router.get(
+  "/bookings/pooja/continue-form/:id",
+  authMiddleware.verifyToken,
+  poojaBookingController.showContinue,
 );
 
 router.delete(

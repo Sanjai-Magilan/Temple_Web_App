@@ -261,7 +261,6 @@
 
                                   <!-- Row 2: Buttons -->
                                   <% if (booking.status==='pending' ) { %>
-<<<<<<< HEAD
                                     <a href="/bookings/pooja/continue-form/<%= booking.id %>"
                                       class="btn btn-success"
                                       style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;">
@@ -270,17 +269,6 @@
                                     <button class="btn btn-danger"
                                       style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
                                       onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
-=======
-                                    <div class="d-flex justify-content-between gap-2">
-                                      <button class="btn btn-success flex-grow-1"
-                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
-                                        onclick="resumePoojaPayment('<%= booking.id %>', this)">Continue</button>
-
-                                      <button class="btn btn-danger flex-grow-1"
-                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
-                                        onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
-                                    </div>
->>>>>>> 631b7f5312a7445c1ac288f79496df58b66b622a
                                     <% } %>
                                 </div>
 

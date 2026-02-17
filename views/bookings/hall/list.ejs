@@ -236,23 +236,6 @@
                                             <%= booking.event_description %>
                                         </p>
                                         <% } %>
-<<<<<<< HEAD
-                                            <div class="mt-3 d-flex align-items-center gap-2 flex-wrap">
-                                                <span
-                                                    class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %>"
-                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">
-                                                    <%= booking.status %>
-                                                </span>
-                                                <span class="badge bg-light text-dark border"
-                                                    style="font-size: 0.7rem; padding: 0.35em 0.6em;">₹<%=
-                                                        booking.amount.toLocaleString() %></span>
-                                                <% if(booking.status==='pending' ) { %>
-<a href="/bookings/hall/continue-form/<%= booking.id %>" 
-                                                    class="btn btn-success"
-                                                    style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;">
-                                                    Continue
-                                                </a>
-=======
                                             <div class="mt-3">
                                                 <!-- Row 1: Status & Amount -->
                                                 <div class="d-flex justify-content-between gap-2 mb-3">
@@ -262,7 +245,6 @@
                                                         <%= booking.status.charAt(0).toUpperCase() +
                                                             booking.status.slice(1) %>
                                                     </span>
->>>>>>> 631b7f5312a7445c1ac288f79496df58b66b622a
 
                                                     <span class="badge bg-light text-dark border flex-grow-1"
                                                         style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">₹

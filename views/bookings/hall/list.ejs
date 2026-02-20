@@ -255,11 +255,11 @@
                                                 <!-- Row 2: Buttons -->
                                                 <% if (booking.status==='pending' ) { %>
                                                     <div class="d-flex justify-content-between gap-2">
-                                                        <button class="btn btn-success flex-grow-1"
-                                                            style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
-                                                            onclick="resumeHallPayment('<%= booking.id %>', this)">
-                                                            Continue
-                                                        </button>
+                                                        <a href="/bookings/hall/continue-form/<%= booking.id %>"
+    class="btn btn-success flex-grow-1"
+    style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">
+    Continue
+</a>
 
                                                         <button class="btn btn-danger flex-grow-1"
                                                             style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"

@@ -1,36 +1,69 @@
 <%- include('partials/header') %>
-<%- include('partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+    <%- include('partials/landing-nav', { user: typeof user !=='undefined' ? user : null }) %>
 
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h1 class="card-title mb-4"><%= title %></h1>
-                    <p class="lead"><%= message %></p>
-                    <% if (typeof user !== 'undefined' && user) { %>
-                        <div class="alert alert-success mt-4">
-                            <h5>Welcome, <%= user.first_name %>!</h5>
-                            <p class="mb-0">You are logged in as <strong><%= user.role %></strong></p>
-                            <div class="mt-3">
-                                <a href="/dashboard" class="btn btn-primary me-2">Go to Dashboard</a>
-                                <% if (user.role === 'admin') { %>
-                                    <a href="/admin" class="btn btn-outline-primary">Admin Panel</a>
+        <!-- HERO -->
+        <section class="landing-hero">
+            <div class="landing-hero-layout">
+
+                <!-- LEFT : HERO CONTENT -->
+                <div class="landing-hero-content">
+                    <h1>Shri Temple</h1>
+
+                    <p class="landing-hero-tagline">
+                        A place of devotion, tradition, and community.
+                    </p>
+
+                    <p class="landing-hero-description">
+                        Shri Temple stands as a center of spiritual heritage and cultural
+                        continuity. The temple hosts daily poojas, special rituals, and
+                        community gatherings, offering devotees a peaceful space to
+                        connect, reflect, and participate in sacred practices.
+                    </p>
+
+                    <div class="landing-hero-actions">
+                        <% if(!user){ %>
+                            <a href="/register" class="btn landing-hero-secondary">Register</a>
+                            <a href="/login" class="btn landing-hero-primary">Login</a>
+                            <% }else { %>
+                                <a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>"
+                                    class="btn landing-hero-primary">Dashboard</a>
                                 <% } %>
-                            </div>
-                        </div>
-                    <% } else { %>
-                        <p class="text-muted mt-4">Please <a href="/login">login</a> or <a href="/register">register</a> to continue.</p>
-                        <div class="mt-4">
-                            <a href="/login" class="btn btn-primary me-2">Login</a>
-                            <a href="/register" class="btn btn-outline-primary">Register</a>
-                        </div>
-                    <% } %>
+                    </div>
                 </div>
+
+                <!-- RIGHT : LATEST UPDATES -->
+                <aside class="landing-updates-panel">
+                    <h3>Latest Updates</h3>
+
+                    <ul class="landing-updates-list">
+                        <% if (typeof latestNews !=='undefined' && latestNews.length> 0) { %>
+                            <% latestNews.forEach(news=> { %>
+                                <li>
+                                    <span class="badge">NEW</span>
+                                    <strong>
+                                        <%= news.title %>
+                                    </strong><br>
+                                    <%= news.content %>
+                                        <% if (news.published_at) { %>
+                                            <br><small style="color: #666; font-size: 0.8em;">
+                                                <%= new Date(news.published_at).toLocaleDateString('en-IN', {
+                                                    day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                                            </small>
+                                            <% } %>
+                                </li>
+                                <% }); %>
+                                    <% } else { %>
+                                        <li>
+                                            <span class="badge">INFO</span>
+                                            Welcome to Shri Temple. No recent updates at this time.
+                                        </li>
+                                        <% } %>
+                    </ul>
+                </aside>
+
             </div>
-        </div>
-    </div>
-</div>
+        </section>
 
-<%- include('partials/footer') %>
+<script src="/js/common-alert.js"></script>
 
+        <%- include('partials/footer') %>

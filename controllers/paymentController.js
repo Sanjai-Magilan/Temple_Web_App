@@ -2,6 +2,10 @@
  * Payment Controller
  * Handles Razorpay payment initiation and verification
  */
+const PAYMENT_LIMITS = {
+  donation: 500000,
+  hall_booking: 50000
+};
 
 const razorpay = require("../config/razorpay");
 const paymentModel = require("../models/paymentModel");
@@ -9,6 +13,7 @@ const donationModel = require("../models/donationModel");
 const hallBookingModel = require("../models/hallBookingModel");
 const poojaBookingModel = require("../models/poojaBookingModel");
 const { verifyPaymentSignature } = require("../config/razorpay");
+const receiptService = require("../utils/receiptService");
 
 /**
  * Create Razorpay order for donation
@@ -25,11 +30,12 @@ exports.createDonationOrder = async (req, res) => {
 
     // Validate amount
     const donationAmount = parseFloat(amount);
-    if (!donationAmount || donationAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid donation amount" });
-    }
+    if (donationAmount > PAYMENT_LIMITS.donation) {
+    return res.status(400).json({
+    success: false,
+    message: "Donation amount cannot exceed ₹5,00,000"
+  });
+}
 
     // Create Razorpay order
     const options = {
@@ -78,11 +84,24 @@ exports.createDonationOrder = async (req, res) => {
       receipt_number: donation.receipt_number,
     });
   } catch (error) {
-    console.error("Error creating donation order:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to create payment order" });
-  }
+  console.error("Error creating donation order:", error);
+
+      // Razorpay amount limit error
+      if (
+        error?.error?.code === 'BAD_REQUEST_ERROR' &&
+        error?.error?.description?.includes('Amount exceeds')
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Check the amount please"
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to create payment order"
+      });
+    }
 };
 
 /**
@@ -105,7 +124,28 @@ exports.createHallBookingOrder = async (req, res) => {
       event_description,
       expected_guests,
       amount,
+      food_required,
+      food_meals,
     } = req.body;
+
+    const foodRequired =
+      food_required === true ||
+      food_required === 1 ||
+      food_required === "1" ||
+      food_required === "yes";
+
+    const mealsArray = Array.isArray(food_meals)
+      ? food_meals
+      : typeof food_meals === "string"
+        ? food_meals.split(",")
+        : [];
+
+    const foodMealsCsv = foodRequired
+      ? mealsArray
+          .map((m) => String(m).trim())
+          .filter(Boolean)
+          .join(", ")
+      : null;
 
     // Validate required fields
     if (!hall_name || !booking_date || !start_time || !end_time || !amount) {
@@ -115,10 +155,28 @@ exports.createHallBookingOrder = async (req, res) => {
     }
 
     const bookingAmount = parseFloat(amount);
-    if (!bookingAmount || bookingAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid booking amount" });
+    // Max limit validation for hall booking
+    if (bookingAmount > PAYMENT_LIMITS.hall_booking) {
+    return res.status(400).json({
+    success: false,
+    message: "Hall booking amount cannot exceed ₹50,000"
+  });
+}
+
+
+    //Block booking if there is a confirmed booking with overlapping time slot
+    const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+      hall_name,
+      booking_date,
+      start_time,
+      end_time,
+    });
+
+    if (hasConflict) {
+      return res.status(409).json({
+        success: false,
+        message: "Selected time slot is already booked.",
+      });
     }
 
     // Create Razorpay order
@@ -157,6 +215,8 @@ exports.createHallBookingOrder = async (req, res) => {
       event_type: event_type || null,
       event_description: event_description || null,
       expected_guests: expected_guests || null,
+      food_required: foodRequired ? 1 : 0,
+      food_meals: foodMealsCsv,
       amount: bookingAmount,
       payment_id: paymentId,
       status: "pending",
@@ -215,12 +275,6 @@ exports.createPoojaBookingOrder = async (req, res) => {
     }
 
     const bookingAmount = parseFloat(amount);
-    if (!bookingAmount || bookingAmount < 1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid booking amount" });
-    }
-
     // Create Razorpay order
     const options = {
       amount: bookingAmount * 100, // Convert to paise
@@ -321,6 +375,13 @@ exports.verifyPayment = async (req, res) => {
     // Fetch payment details from Razorpay
     const razorpayPayment = await razorpay.payments.fetch(payment_id);
 
+    if (!razorpayPayment || !razorpayPayment.status) {
+      return res.status(502).json({
+        success: false,
+        message: "Unable to fetch payment status from Razorpay",
+      });
+    }
+
     // Find payment record by order_id
     const payment = await paymentModel.findByOrderId(order_id);
     if (!payment) {
@@ -342,9 +403,43 @@ exports.verifyPayment = async (req, res) => {
         // Donation receipt is already generated during creation
         // No additional update needed
       } else if (payment.payment_type === "hall_booking") {
+        const booking = await hallBookingModel.findById(payment.related_id);
+
+        if (booking) {
+          const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+            hall_name: booking.hall_name,
+            booking_date: booking.booking_date,
+            start_time: booking.start_time,
+            end_time: booking.end_time,
+            excludeBookingId: booking.id,
+          });
+
+          if (hasConflict) {
+            await hallBookingModel.updateStatus(
+              booking.id,
+              "cancelled",
+              "Time slot already booked",
+            );
+            return res.status(409).json({
+              success: false,
+              message:
+                "Time slot already booked. Payment received; admin will contact you.",
+            });
+          }
+        }
         await hallBookingModel.updateStatus(payment.related_id, "confirmed");
       } else if (payment.payment_type === "pooja_booking") {
         await poojaBookingModel.updateStatus(payment.related_id, "confirmed");
+      }
+    }
+
+    if (razorpayPayment.status === "captured" && payment.related_id) {
+      if (payment.payment_type === "donation") {
+        await receiptService.ensureDonationReceiptJsonById(payment.related_id);
+      } else if (payment.payment_type === "hall_booking") {
+        await receiptService.ensureHallReceiptJsonById(payment.related_id);
+      } else if (payment.payment_type === "pooja_booking") {
+        await receiptService.ensurePoojaReceiptJsonById(payment.related_id);
       }
     }
 
@@ -416,6 +511,29 @@ exports.handleWebhook = async (req, res) => {
       // Update related records
       if (existingPayment.related_id) {
         if (existingPayment.payment_type === "hall_booking") {
+          const booking = await hallBookingModel.findById(
+            existingPayment.related_id,
+          );
+
+          if (booking) {
+            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+              hall_name: booking.hall_name,
+              booking_date: booking.booking_date,
+              start_time: booking.start_time,
+              end_time: booking.end_time,
+              excludeBookingId: booking.id,
+            });
+
+            if (hasConflict) {
+              await hallBookingModel.updateStatus(
+                booking.id,
+                "cancelled",
+                "Time slot already booked",
+              );
+              return res.json({ success: true });
+            }
+          }
+
           await hallBookingModel.updateStatus(
             existingPayment.related_id,
             "confirmed",
@@ -427,6 +545,22 @@ exports.handleWebhook = async (req, res) => {
           );
         }
       }
+
+      if (existingPayment.related_id) {
+        if (existingPayment.payment_type === "donation") {
+          await receiptService.ensureDonationReceiptJsonById(
+            existingPayment.related_id,
+          );
+        } else if (existingPayment.payment_type === "hall_booking") {
+          await receiptService.ensureHallReceiptJsonById(
+            existingPayment.related_id,
+          );
+        } else if (existingPayment.payment_type === "pooja_booking") {
+          await receiptService.ensurePoojaReceiptJsonById(
+            existingPayment.related_id,
+          );
+        }
+      }
     }
 
     res.json({ success: true });
@@ -435,5 +569,64 @@ exports.handleWebhook = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Webhook processing failed" });
+  }
+};
+
+/**
+ * Display payment success page
+ */
+exports.paymentSuccess = async (req, res) => {
+  try {
+    const { payment_id, order_id } = req.query;
+
+    if (!payment_id && !order_id) {
+      return res.status(400).render("errors/400", {
+        title: "Bad Request",
+        message: "Payment ID or Order ID is required.",
+      });
+    }
+
+    // Fetch payment details from database
+    let paymentDetails = null;
+    if (payment_id) {
+      paymentDetails = await paymentModel.findByPaymentId(payment_id);
+    } else if (order_id) {
+      paymentDetails = await paymentModel.findByOrderId(order_id);
+    }
+
+    res.render("payment/success", {
+      title: "Payment Success",
+      payment_id: payment_id || null,
+      order_id: order_id || null,
+      paymentDetails: paymentDetails,
+    });
+  } catch (error) {
+    console.error("Error rendering payment success page:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "An error occurred while processing your request.",
+    });
+  }
+};
+
+/**
+ * Display payment failure page
+ */
+exports.paymentFailure = async (req, res) => {
+  try {
+    const { payment_id, order_id, error } = req.query;
+
+    res.render("payment/failure", {
+      title: "Payment Failed",
+      payment_id: payment_id || null,
+      order_id: order_id || null,
+      error: error || "Payment could not be processed.",
+    });
+  } catch (error) {
+    console.error("Error rendering payment failure page:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "An error occurred while processing your request.",
+    });
   }
 };

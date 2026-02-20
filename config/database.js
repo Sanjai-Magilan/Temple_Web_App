@@ -8,9 +8,9 @@ require('dotenv').config();
 
 // Create connection pool for better performance
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
+  host: process.env.DB_HOST || "127.0.0.1",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "3014",
+  password: process.env.DB_PASSWORD || "deepi__24",
   database: process.env.DB_NAME || "temple_db",
   waitForConnections: true,
   connectionLimit: 10,
@@ -18,6 +18,8 @@ const pool = mysql.createPool({
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
 });
+
+logger.info(`Database config: Host=${process.env.DB_HOST || "localhost"}, User=${process.env.DB_USER || "root"}, DB=${process.env.DB_NAME || "temple_db"}`);
 
 // Test connection
 pool.getConnection()
@@ -27,9 +29,9 @@ pool.getConnection()
   })
   .catch(err => {
     logger.error('Database connection failed', {
-    message: err.message,
-    stack: err.stack,
-  });
+      message: err.message,
+      stack: err.stack,
+    });
   });
 
 module.exports = pool;

@@ -157,15 +157,47 @@ exports.updateStatus = async (bookingId, status, cancellationReason = null) => {
 exports.getUserBookings = async (userId, limit = 20, offset = 0) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM pooja_bookings
-       WHERE user_id = ?
-       ORDER BY created_at DESC
+      `SELECT pb.*, p.status AS payment_status, p.payment_method
+       FROM pooja_bookings pb
+       LEFT JOIN payments p ON pb.payment_id = p.id
+       WHERE pb.user_id = ?
+       ORDER BY pb.created_at DESC
        LIMIT ${limit} OFFSET ${offset}`,
-      [(userId, limit, offset)],
+      [userId],
     );
     return rows;
   } catch (error) {
     console.error("Error getting user pooja bookings:", error);
     throw error;
   }
+};
+
+exports.getReceiptData = async (bookingId) => {
+  const [rows] = await pool.execute(
+    `SELECT pb.*,
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.payment_method,
+            p.status AS payment_status,
+            p.currency,
+            p.amount AS payment_amount,
+            p.created_at AS payment_created_at,
+            p.updated_at AS payment_updated_at,
+            u.first_name, u.last_name, u.email, u.phone
+     FROM pooja_bookings pb
+     LEFT JOIN payments p ON pb.payment_id = p.id
+     LEFT JOIN users u ON pb.user_id = u.id
+     WHERE pb.id = ?`,
+    [bookingId],
+  );
+  return rows[0] || null;
+};
+
+exports.updateReceiptJson = async (bookingId, receiptJson) => {
+  await pool.execute(
+    `UPDATE pooja_bookings
+     SET receipt_json = ?, updated_at = NOW()
+     WHERE id = ?`,
+    [JSON.stringify(receiptJson), bookingId],
+  );
 };

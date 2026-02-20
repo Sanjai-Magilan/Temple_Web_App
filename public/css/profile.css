@@ -1,0 +1,43 @@
+/* Profile Card Enhancements */
+.profile-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Header */
+.profile-card .card-header {
+  background: linear-gradient(135deg, #d1b570, #d1b570);
+}
+
+/* Inputs */
+.profile-card .form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.profile-card .form-control:focus {
+  border-color: #d1b570;
+  box-shadow: 0 0 0 0.15rem rgba(209, 181, 112, 0.25);
+}
+
+/* Edit button */
+#editBtn {
+  transition: all 0.2s ease-in-out;
+}
+
+#editBtn:hover {
+  background-color: #ffffff;
+  color: #d1b570;
+}
+
+/* Save button */
+#saveSection .btn {
+  padding: 0.5rem 1.5rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 576px) {
+  .profile-card {
+    margin: 0 10px;
+  }
+}

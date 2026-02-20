@@ -114,12 +114,123 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
        LEFT JOIN payments p ON d.payment_id = p.id
        WHERE d.user_id = ?
        ORDER BY d.created_at DESC
-       LIMIT ${limit} OFFSET ${offset}`,
+       LIMIT ? OFFSET ?`,
+      [userId, String(limit), String(offset)],
+    );
+
+    const [countRows] = await pool.execute(
+      "SELECT COUNT(*) as count FROM donations WHERE user_id = ?",
       [userId],
     );
-    return rows;
+
+    return {
+      donations: rows,
+      total: countRows[0].count,
+    };
   } catch (error) {
     console.error("Error getting user donations:", error);
+    throw error;
+  }
+};
+exports.getReceiptData = async (donationId) => {
+  const [rows] = await pool.execute(
+    `SELECT d.*, 
+            p.payment_id AS razorpay_payment_id,
+            p.order_id,
+            p.payment_method,
+            p.status AS payment_status,
+            p.currency,
+            p.amount AS payment_amount,
+            p.created_at AS payment_created_at,
+            p.updated_at AS payment_updated_at,
+            u.first_name, u.last_name, u.email, u.phone
+     FROM donations d
+     LEFT JOIN payments p ON d.payment_id = p.id
+     LEFT JOIN users u ON d.user_id = u.id
+     WHERE d.id = ?`,
+    [donationId],
+  );
+  return rows[0] || null;
+};
+
+exports.updateReceiptJson = async (donationId, receiptJson) => {
+  await pool.execute(
+    `UPDATE donations 
+     SET receipt_json = ?, receipt_generated = 1, updated_at = NOW()
+     WHERE id = ?`,
+    [JSON.stringify(receiptJson), donationId],
+  );
+};
+
+/**
+ * Get all donations (for admin)
+ */
+exports.getAllDonations = async (limit = 20, offset = 0, search = "", type = "") => {
+  try {
+    let query = `
+       SELECT d.*, p.status as payment_status, p.payment_method,
+              u.first_name, u.last_name, u.email
+       FROM donations d
+       LEFT JOIN payments p ON d.payment_id = p.id
+       LEFT JOIN users u ON d.user_id = u.id
+    `;
+
+    const params = [];
+    const whereConditions = [];
+
+    if (search) {
+      whereConditions.push(`(d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?)`);
+      const searchParam = `%${search}%`;
+      params.push(searchParam, searchParam, searchParam);
+    }
+
+    if (type) {
+      whereConditions.push(`d.donation_type = ?`);
+      params.push(type);
+    }
+
+    if (whereConditions.length > 0) {
+      query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    query += ` ORDER BY d.created_at DESC LIMIT ? OFFSET ?`;
+
+    params.push(String(limit), String(offset));
+
+    const [rows] = await pool.execute(query, params);
+
+    // Get total count for pagination
+    let countQuery = `
+       SELECT COUNT(*) as count 
+       FROM donations d
+       LEFT JOIN users u ON d.user_id = u.id
+    `;
+    const countParams = [];
+    const countWhereConditions = [];
+
+    if (search) {
+      countWhereConditions.push(`(d.receipt_number LIKE ? OR u.first_name LIKE ? OR u.email LIKE ?)`);
+      const searchParam = `%${search}%`;
+      countParams.push(searchParam, searchParam, searchParam);
+    }
+
+    if (type) {
+      countWhereConditions.push(`d.donation_type = ?`);
+      countParams.push(type);
+    }
+
+    if (countWhereConditions.length > 0) {
+      countQuery += ` WHERE ` + countWhereConditions.join(' AND ');
+    }
+
+    const [countRows] = await pool.execute(countQuery, countParams);
+
+    return {
+      donations: rows,
+      total: countRows[0].count,
+    };
+  } catch (error) {
+    console.error("Error getting all donations:", error);
     throw error;
   }
 };

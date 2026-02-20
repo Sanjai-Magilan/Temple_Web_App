@@ -43,7 +43,7 @@ exports.verifyToken = async (req, res, next) => {
       last_name: user.last_name,
       role: user.role,
     };
-
+    console.log("COOKIE TOKEN:", req.cookies.token);
     next();
   } catch (error) {
     res.clearCookie("token");
@@ -62,6 +62,7 @@ exports.verifyToken = async (req, res, next) => {
  */
 exports.requireRole = (...roles) => {
   return (req, res, next) => {
+    console.log(`Checking role... Required: ${roles}, User role: ${req.user ? req.user.role : 'none'}`);
     if (!req.user) {
       return res.status(401).render("errors/401", {
         title: "Unauthorized",

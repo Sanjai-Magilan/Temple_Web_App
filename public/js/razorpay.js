@@ -14,40 +14,44 @@ class RazorpayPayment {
    */
   async initCheckout(orderData) {
     const self = this;
-    
+
     const options = {
       key: this.razorpayKey,
       amount: orderData.amount * 100, // Convert to paise
-      currency: 'INR',
-      name: 'Temple Management',
-      description: orderData.description || 'Payment',
+      currency: "INR",
+      name: "Temple Management",
+      description: orderData.description || "Payment",
       order_id: orderData.order_id,
-      handler: async function(response) {
+      handler: async function (response) {
         await self.verifyPayment(response, orderData);
       },
       prefill: {
-        name: orderData.name || '',
-        email: orderData.email || '',
-        contact: orderData.phone || ''
+        name: orderData.name || "",
+        email: orderData.email || "",
+        contact: orderData.phone || "",
       },
       theme: {
-        color: '#3399cc'
+        color: "#3399cc",
       },
       modal: {
-        ondismiss: function() {
+        ondismiss: function () {
           if (self.options.onCancel) {
             self.options.onCancel();
+          } else {
+            window.location.reload();
           }
-        }
-      }
+        },
+      },
     };
 
     const razorpay = new Razorpay(options);
-    razorpay.on('payment.failed', function(response) {
+    razorpay.on("payment.failed", function (response) {
       if (self.options.onFailure) {
         self.options.onFailure(response);
       } else {
-        window.location.href = '/payment/failure?error=' + encodeURIComponent(response.error.description);
+        window.location.href =
+          "/payment/failure?error=" +
+          encodeURIComponent(response.error.description);
       }
     });
 
@@ -59,18 +63,18 @@ class RazorpayPayment {
    */
   async verifyPayment(response, orderData) {
     try {
-      const verifyResponse = await fetch('/payment/verify', {
-        method: 'POST',
+      const verifyResponse = await fetch("/payment/verify", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           order_id: response.razorpay_order_id,
           payment_id: response.razorpay_payment_id,
           signature: response.razorpay_signature,
-          payment_type: orderData.payment_type
-        })
+          payment_type: orderData.payment_type,
+        }),
       });
 
       const result = await verifyResponse.json();
@@ -78,28 +82,31 @@ class RazorpayPayment {
       if (result.success) {
         if (this.options.onSuccess) {
           this.options.onSuccess(result);
-        } else {
-          // Redirect to success page
-          const redirectUrl = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
-          if (orderData.successUrl) {
-            window.location.href = orderData.successUrl + redirectUrl.split('?')[1];
-          } else {
-            window.location.href = redirectUrl;
-          }
+        }
+
+        // Redirect to success page or provided successUrl
+        const redirectUrl = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
+        if (orderData.successUrl) {
+          const query = redirectUrl.split("?")[1];
+          const separator = orderData.successUrl.includes("?") ? "&" : "?";
+          window.location.href = orderData.successUrl + separator + query;
+        } else if (!this.options.onSuccess) {
+          window.location.href = redirectUrl;
         }
       } else {
         if (this.options.onFailure) {
           this.options.onFailure(result);
         } else {
-          window.location.href = '/payment/failure?error=' + encodeURIComponent(result.message);
+          window.location.href =
+            "/payment/failure?error=" + encodeURIComponent(result.message);
         }
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
+      console.error("Payment verification error:", error);
       if (this.options.onFailure) {
-        this.options.onFailure({ message: 'Payment verification failed' });
+        this.options.onFailure({ message: "Payment verification failed" });
       } else {
-        window.location.href = '/payment/failure?error=Verification failed';
+        window.location.href = "/payment/failure?error=Verification failed";
       }
     }
   }
@@ -112,24 +119,39 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
   try {
     // Create order on server
     const orderResponse = await fetch(`/payment/${paymentType}/order`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
-      body: JSON.stringify(paymentData)
+      credentials: "include",
+      body: JSON.stringify(paymentData),
     });
 
     const orderResult = await orderResponse.json();
 
-    if (!orderResult.success) {
-      throw new Error(orderResult.message || 'Failed to create payment order');
+    // Handle backend validation errors properly
+    if (!orderResponse.ok) {
+      let message = orderResult.message || "Unable to proceed with payment.";
+
+      if (paymentType === "donation") {
+        message =
+          orderResult.message || "Donation amount cannot exceed ₹5,00,000.";
+        showAlert("warning", "Donation Limit Exceeded", message);
+      } else if (paymentType === "hall-booking") {
+        message =
+          orderResult.message ||
+          "Hall booking amount cannot exceed the allowed limit.";
+        showAlert("warning", "Hall Booking Limit Exceeded", message);
+      }
+
+      if (options.onFailure) options.onFailure({ message }); // re-enables submit button in existing forms
+      return;
     }
 
     // Initialize Razorpay checkout
     const razorpayPayment = new RazorpayPayment({
       key: orderResult.key,
-      ...options
+      ...options,
     });
 
     await razorpayPayment.initCheckout({
@@ -138,22 +160,19 @@ async function initiatePayment(paymentType, paymentData, options = {}) {
       description: paymentData.description || `${paymentType} payment`,
       payment_type: paymentType,
       ...orderResult,
-      ...options
+      ...options,
     });
   } catch (error) {
-    console.error('Payment initiation error:', error);
+    console.error("Payment initiation error:", error);
     if (options.onFailure) {
       options.onFailure({ message: error.message });
     } else {
-      alert('Payment initiation failed: ' + error.message);
+      showAlert("error", "Payment Initiation Failed", error.message);
     }
   }
 }
 
 // Export for use in other scripts
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = { RazorpayPayment, initiatePayment };
 }
-
-
-

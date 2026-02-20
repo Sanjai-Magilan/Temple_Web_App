@@ -1,78 +1,54 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/">
-            <i class="bi bi-building"></i> Temple Management
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">
-                            <i class="bi bi-house-door"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/donations">
-                            <i class="bi bi-heart"></i> Donations
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bookings/hall">
-                            <i class="bi bi-calendar-event"></i> Hall Booking
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/bookings/pooja">
-                            <i class="bi bi-stars"></i> Pooja Booking
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/family">
-                            <i class="bi bi-people"></i> Family
-                        </a>
-                    </li>
-                    <% if (user.role === 'admin') { %>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin">
-                                <i class="bi bi-shield-check"></i> Admin
-                            </a>
-                        </li>
-                    <% } %>
-                <% } %>
-            </ul>
-            <ul class="navbar-nav">
-                <% if (typeof user !== 'undefined' && user) { %>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i> <%= user.first_name %> <%= user.last_name %>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><span class="dropdown-item-text"><small class="text-muted">Role: <%= user.role %></small></span></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                <% } else { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/register">
-                            <i class="bi bi-person-plus"></i> Register
-                        </a>
-                    </li>
-                <% } %>
-            </ul>
+<nav class="nav-bar">
+
+    <!-- LEFT -->
+    <div class="nav-left">
+        <div class="mobile-menu-btn" id="mobile-menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="temple-logo">🕉️</div>
+        <div class="temple-brand">
+            <div class="temple-brand-name">Shri Temple</div>
+            <div class="temple-brand-tagline">Management System</div>
+        </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="nav-center">
+        <ul class="nav-links">
+            <li><a href="<%= user && user.role === 'admin' ? '/admin' : '/dashboard' %>">Dashboard</a></li>
+            <li><a href="/bookings/pooja">Pooja Booking</a></li>
+            <li><a href="/bookings/hall">Hall Booking</a></li>
+            <li><a href="/donations">Donate</a></li>
+            <li><a href="/family">Family</a></li>
+        </ul>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="nav-right">
+        <div class="nav-user" id="navUser">
+            <div class="nav-user-avatar">
+                <%= user && user.first_name ? user.first_name.charAt(0).toUpperCase() : ' ' %>
+            </div>
+
+            <div class="nav-user-info">
+                <div class="nav-user-name">
+                    <%= user && user.first_name ? user.first_name : 'User' %>
+                </div>
+                <div class="nav-user-role">
+                    <%= user? (user.role=='admin' ?'Admin':'Devotte'):'invalid user' %>
+                </div>
+            </div>
+
+            <div class="nav-user-dropdown">▼</div>
+
+            <!-- DROPDOWN -->
+            <div class="user-dropdown-menu">
+                <a href="/profile">Profile</a>
+                <a href="/logout" class="logout">Logout</a>
+            </div>
         </div>
     </div>
 </nav>
-
-
+<script src="/js/mobile-nav.js"></script>

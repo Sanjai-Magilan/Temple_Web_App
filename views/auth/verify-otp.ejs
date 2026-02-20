@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - Temple Management</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="auth-body">
+  <nav class="auth-nav">
+    <a href="/" class="auth-nav-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      Temple Management
+    </a>
+  </nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div style="margin-bottom: 2rem;">
+        <h1 class="auth-title" style="color: #4a4036 !important;">Verify Your Email</h1>
+        <p class="auth-subtitle">Enter the 6-digit OTP sent to your email</p>
+      </div>
+
+      <% if (typeof error !=='undefined' && error) { %>
+        <div class="alert-error">
+          <%= error %>
+        </div>
+        <% } %>
+
+          <form action="/verify-otp" method="POST" class="auth-form">
+            <input type="hidden" name="email" value="<%= email %>">
+
+            <div>
+              <label for="otp" class="auth-label">Verification Code (OTP)</label>
+              <input type="text" id="otp" name="otp" required placeholder="XXXXXX" maxlength="6"
+                class="auth-input otp-input" autofocus
+                style="text-align: center; letter-spacing: 0.5em; font-size: 1.5rem;">
+            </div>
+
+            <button type="submit" class="btn-auth">Verify Email</button>
+          </form>
+
+          <form action="/resend-otp" method="POST" style="margin-top: 1.5rem; text-align: center;">
+            <input type="hidden" name="email" value="<%= email %>">
+            <button type="submit" class="btn-link"
+              style="background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 0;">
+              Resend OTP
+            </button>
+          </form>
+
+    </div>
+  </div>
+
+  <footer class="auth-footer">
+    <p>&copy; <%= new Date().getFullYear() %> Temple Management. All rights reserved.</p>
+  </footer>
+</body>
+
+</html>

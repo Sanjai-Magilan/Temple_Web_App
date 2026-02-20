@@ -1,127 +1,189 @@
-<%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: null }) %>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container mt-4 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow">
-                    <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Create Account</h2>
-                        
-                        <% if (error) { %>
-                        <div class="alert alert-danger" role="alert">
-                            <%= error %>
-                        </div>
-                        <% } %>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Temple Management</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
 
-                        <form action="/register" method="POST" id="registerForm">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email Address *</label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       value="<%= formData.email || '' %>" required autocomplete="email">
-                            </div>
+<body class="auth-body">
+    <!-- <nav class="auth-nav">
+        <a href="/" class="auth-nav-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Temple Management
+        </a>
+        <a href="/login" style="color: white; text-decoration: none; font-size: 0.9rem; opacity: 0.9;">Sign In</a>
+    </nav> -->
 
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Phone Number *</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="<%= formData.phone || '' %>" required 
-                                       pattern="[6-9]\d{9}" maxlength="10" autocomplete="tel">
-                                <small class="form-text text-muted">10-digit Indian mobile number</small>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="first_name" class="form-label">First Name *</label>
-                                    <input type="text" class="form-control" id="first_name" name="first_name" 
-                                           value="<%= formData.first_name || '' %>" required autocomplete="given-name">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="last_name" class="form-label">Last Name *</label>
-                                    <input type="text" class="form-control" id="last_name" name="last_name" 
-                                           value="<%= formData.last_name || '' %>" required autocomplete="family-name">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password *</label>
-                                <input type="password" class="form-control" id="password" name="password" 
-                                       required autocomplete="new-password" minlength="6">
-                                <small class="form-text text-muted">Min 6 characters, must include uppercase, lowercase, and number</small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Confirm Password *</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
-                                       required autocomplete="new-password">
-                            </div>
-
-                            <hr class="my-4">
-                            <h5 class="mb-3">Family Details (Optional)</h5>
-
-                            <div class="mb-3">
-                                <label for="family_name" class="form-label">Family Name</label>
-                                <input type="text" class="form-control" id="family_name" name="family_name" 
-                                       value="<%= formData.family_name || '' %>">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="address" class="form-label">Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="2"><%= formData.address || '' %></textarea>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="city" class="form-label">City</label>
-                                    <input type="text" class="form-control" id="city" name="city" 
-                                           value="<%= formData.city || '' %>">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="state" class="form-label">State</label>
-                                    <input type="text" class="form-control" id="state" name="state" 
-                                           value="<%= formData.state || '' %>">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="pincode" class="form-label">Pincode</label>
-                                <input type="text" class="form-control" id="pincode" name="pincode" 
-                                       value="<%= formData.pincode || '' %>" maxlength="10">
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
-                        </form>
-
-                        <div class="text-center">
-                            <p class="mb-0">Already have an account? <a href="/login">Login here</a></p>
-                        </div>
-                    </div>
-                </div>
+    <div class="auth-wrapper" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <div class="auth-card" style="max-width: 40rem;">
+            <div style="margin-bottom: 2rem;">
+                <h1 class="auth-title" style="color: #4a4036 !important;">Create Account</h1>
+                <p class="auth-subtitle">Join us to access digital temple services</p>
             </div>
+
+            <% if (typeof error !=='undefined' && error) { %>
+                <div class="alert-error">
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <% if (typeof step !=='undefined' && step==='otp' ) { %>
+                        <form action="/verify-register-otp" method="POST" class="auth-form">
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <p class="auth-subtitle">We've sent a verification code to <strong>
+                                        <%= typeof email !=='undefined' ? email : '' %>
+                                    </strong></p>
+                            </div>
+
+                            <% if (typeof devOtp !=='undefined' && devOtp) { %>
+                                <div
+                                    style="background-color: #dbeafe; color: #1e40af; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #bfdbfe;">
+                                    <strong>Demo OTP:</strong>
+                                    <%= devOtp %>
+                                </div>
+                                <% } %>
+
+                                    <div>
+                                        <label for="otp" class="auth-label">Verification Code (OTP)</label>
+                                        <input type="text" id="otp" name="otp" required placeholder="XXXX" maxlength="4"
+                                            class="auth-input otp-input" autofocus
+                                            style="text-align: center; letter-spacing: 0.5em; font-size: 1.5rem;">
+                                    </div>
+
+                                    <button type="submit" class="btn-auth">Verify Account</button>
+
+                                    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                                        <a href="/register" class="auth-link">Back</a>
+                                    </div>
+                        </form>
+                        <% } else { %>
+                            <form action="/register" method="POST" class="auth-form" id="registerForm">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="first_name" class="auth-label">First Name *</label>
+                                        <input type="text" id="first_name" name="first_name" required class="auth-input"
+                                            value="<%= typeof formData !== 'undefined' ? formData.first_name : '' %>">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="last_name" class="auth-label">Last Name *</label>
+                                        <input type="text" id="last_name" name="last_name" required class="auth-input"
+                                            value="<%= typeof formData !== 'undefined' ? formData.last_name : '' %>">
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="email" class="auth-label">Email Address *</label>
+                                        <input type="email" id="email" name="email" required class="auth-input"
+                                            value="<%= typeof formData !== 'undefined' ? formData.email : '' %>">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="phone" class="auth-label">Phone Number *</label>
+                                        <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}"
+                                            maxlength="10" class="auth-input"
+                                            value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>"
+                                            placeholder="10 digit number">
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="password" class="auth-label">Password *</label>
+                                        <input type="password" id="password" name="password" required minlength="6"
+                                            class="auth-input" placeholder="Min 6 chars">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="confirm_password" class="auth-label">Confirm Password *</label>
+                                        <input type="password" id="confirm_password" name="confirm_password" required
+                                            class="auth-input">
+                                    </div>
+                                </div>
+
+                                <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 0.5rem 0;">
+
+                                <div style="text-align: left;">
+                                    <button type="button" class="btn-link"
+                                        onclick="document.getElementById('optionalFields').style.display = document.getElementById('optionalFields').style.display === 'none' ? 'block' : 'none'"
+                                        style="background: none; border: none; color: #bf9b5f; font-size: 0.9rem; cursor: pointer; padding: 0;">
+                                        + Add Family & Address Details (Optional)
+                                    </button>
+                                </div>
+
+                                <div id="optionalFields" style="display: none;">
+                                    <div style="margin-bottom: 1rem;">
+                                        <label for="family_name" class="auth-label">Family Name
+                                            (Gothram/Surname)</label>
+                                        <input type="text" id="family_name" name="family_name" class="auth-input"
+                                            value="<%= typeof formData !== 'undefined' ? formData.family_name : '' %>">
+                                    </div>
+
+                                    <div style="margin-bottom: 1rem;">
+                                        <label for="address" class="auth-label">Address</label>
+                                        <textarea id="address" name="address" rows="2" class="auth-input"
+                                            style="resize: none;"><%= typeof formData !== 'undefined' ? formData.address : '' %></textarea>
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-4">
+                                            <label for="city" class="auth-label">City</label>
+                                            <input type="text" id="city" name="city" class="auth-input"
+                                                value="<%= typeof formData !== 'undefined' ? formData.city : '' %>">
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="state" class="auth-label">State</label>
+                                            <input type="text" id="state" name="state" class="auth-input"
+                                                value="<%= typeof formData !== 'undefined' ? formData.state : '' %>">
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="pincode" class="auth-label">Pincode</label>
+                                            <input type="text" id="pincode" name="pincode" class="auth-input"
+                                                value="<%= typeof formData !== 'undefined' ? formData.pincode : '' %>">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-auth" style="margin-top: 1rem;">Verify & Create
+                                    Account</button>
+                            </form>
+                            <% } %>
+
+                                <div style="margin-top: 2rem;">
+                                    <p style="color: #4b5563; font-size: 0.95rem;">
+                                        Already have an account? <a href="/login" class="auth-link">Sign In</a>
+                                    </p>
+                                </div>
         </div>
     </div>
 
-<script>
-        // Client-side password validation
+    <footer class="auth-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Temple Management. All rights reserved.</p>
+    </footer>
+
+    <script>
         const form = document.getElementById('registerForm');
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirm_password');
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             if (password.value !== confirmPassword.value) {
                 e.preventDefault();
                 alert('Passwords do not match!');
                 return false;
             }
-
-            // Check password strength
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
-            if (!passwordRegex.test(password.value)) {
-                e.preventDefault();
-                alert('Password must contain at least one uppercase letter, one lowercase letter, and one number');
-                return false;
-            }
         });
-</script>
+    </script>
+</body>
 
-<%- include('../partials/footer') %>
-
+</html>

@@ -1,75 +1,428 @@
 <%- include('../partials/header') %>
-<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
-<div class="container mt-4 mb-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h2><i class="bi bi-heart"></i> My Donations</h2>
-                <a href="/donations/new" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Make Donation
-                </a>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+        /* Page Background Overrides */
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover !important;
+            /* font-family: 'Inter', sans-serif !important; */
+            min-height: 100vh;
+        }
+
+        /* Page Title styling */
+        .page-title {
+            color: #f8f9fa;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-gold {
+            background-color: #bfa15f;
+            border-color: #bfa15f;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-gold:hover {
+            background-color: #a88b4d;
+            border-color: #a88b4d;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+        }
+
+        /* Card Hover Effects and Styling */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #FFFBF5;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+            z-index: 10;
+        }
+
+        /* Modal Specific Styles */
+        .modal-content {
+            background: #FFFBF5;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 2rem 2rem 0;
+            text-align: center;
+            display: block;
+        }
+
+        .modal-body {
+            padding: 1rem 2.5rem 2.5rem;
+        }
+
+        .donation-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #2c241b;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .donation-subtitle {
+            color: #8c7b65;
+            font-size: 0.9rem;
+        }
+
+        /* Form Styles inside Modal */
+        .form-group-custom {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label-custom {
+            display: block;
+            font-weight: 500;
+            color: #5d5145;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-control-custom,
+        .form-select-custom {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            color: #2c241b;
+            background-color: #fff;
+            border: 1px solid #e0d8cc;
+            border-radius: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-control-custom:focus,
+        .form-select-custom:focus {
+            border-color: #bfa15f;
+            outline: 0;
+            box-shadow: 0 0 0 4px rgba(191, 161, 95, 0.1);
+        }
+
+        .amount-wrapper {
+            position: relative;
+        }
+
+        .amount-symbol {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5d5145;
+            font-weight: 600;
+        }
+
+        .amount-input {
+            padding-left: 2rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: #bfa15f;
+            font-size: 1.2rem;
+        }
+
+        /* Hide spinner for number input */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .btn-submit-custom {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            background-color: #bfa15f;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-submit-custom:hover {
+            background-color: #a88b4d;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+        }
+    </style>
+
+    <%- include('../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
+
+        <div class="container mt-4 mb-5">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h2 class="page-title"><i class="bi bi-heart-fill me-2"></i> My Donations</h2>
+                        <!-- Trigger Modal -->
+                        <button type="button" class="btn btn-gold shadow-sm" data-bs-toggle="modal"
+                            data-bs-target="#newDonationModal">
+                            <i class="bi bi-plus-circle me-2"></i> Make Donation
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <% if (typeof donations !== 'undefined' && donations.length > 0) { %>
-        <div class="row">
-            <% donations.forEach(donation => { %>
-                <div class="col-12 col-md-6 col-lg-4 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <h5 class="card-title mb-1">₹<%= donation.amount.toLocaleString() %></h5>
-                                    <p class="text-muted small mb-0"><%= donation.donation_type %></p>
+            <% if (typeof donations !=='undefined' && donations.length> 0) { %>
+                <div class="row">
+                    <% donations.forEach(donation=> { %>
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header text-white"
+                                    style="background:linear-gradient(90deg, #bfa15f, #a88b4d);">
+                                    <h6 class="mb-0 d-flex justify-content-between align-items-center">
+                                        <span>₹<%= donation.amount.toLocaleString() %></span>
+                                        <span class="badge bg-white text-dark" style="font-size: 0.7em;">
+                                            <%= donation.payment_status || 'pending' %>
+                                        </span>
+                                    </h6>
                                 </div>
-                                <span class="badge bg-<%= donation.payment_status === 'completed' ? 'success' : donation.payment_status === 'failed' ? 'danger' : 'warning' %>">
-                                    <%= donation.payment_status || 'pending' %>
-                                </span>
-                            </div>
-                            <% if (donation.purpose) { %>
-                                <p class="card-text small text-muted"><%= donation.purpose %></p>
-                            <% } %>
-                            <div class="mt-3">
-                                <small class="text-muted">
-                                    <i class="bi bi-calendar"></i> <%= new Date(donation.created_at).toLocaleDateString() %>
-                                    <% if (donation.receipt_number) { %>
-                                        <br><i class="bi bi-receipt"></i> Receipt: <%= donation.receipt_number %>
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-family: 'Playfair Display', serif; color: #333;">
+                                        <%= donation.donation_type.charAt(0).toUpperCase() +
+                                            donation.donation_type.slice(1).replace('_', ' ' ) %>
+                                    </h5>
+
+                                    <div class="card-text text-muted mb-3">
+                                        <small>
+                                            <i class="bi bi-calendar me-1"></i>
+                                            <%= new Date(donation.created_at).toLocaleDateString() %>
+                                        </small>
+                                        <% if (donation.is_anonymous) { %>
+                                            <br><small><i class="bi bi-eye-slash me-1"></i> Anonymous</small>
+                                            <% } %>
+                                                <% if (donation.receipt_number) { %>
+                                                    <br><small><i class="bi bi-receipt me-1"></i> Receipt: <%=
+                                                            donation.receipt_number %></small>
+                                                    <% } %>
+                                    </div>
+
+                                    <% if (donation.purpose) { %>
+                                        <div class="p-2 rounded mb-3" style="background: rgba(212, 175, 55, 0.1);">
+                                            <p class="card-text small text-secondary fst-italic mb-0">
+                                                "<%= donation.purpose %>"
+                                            </p>
+                                        </div>
+                                        <% } %>
+                                </div>
+
+                                <% if (donation.payment_status==='completed' && donation.receipt_number) { %>
+                                    <div class="card-footer bg-transparent border-top-0 pb-3">
+                                        <a href="/donations/<%= donation.id %>/receipt"
+                                            class="btn btn-sm btn-outline-warning w-100"
+                                            style="color: #bfa15f; border-color: #bfa15f; font-weight: 500;">
+                                            <i class="bi bi-download me-1"></i> Download Receipt
+                                        </a>
+                                    </div>
                                     <% } %>
-                                </small>
                             </div>
                         </div>
-                        <% if (donation.payment_status === 'completed' && donation.receipt_number) { %>
-                            <div class="card-footer bg-light">
-                                <a href="/donations/<%= donation.id %>/receipt" class="btn btn-sm btn-outline-primary w-100">
-                                    <i class="bi bi-download"></i> Download Receipt
-                                </a>
-                            </div>
-                        <% } %>
-                    </div>
+                        <% }); %>
                 </div>
-            <% }); %>
+
+                <!-- Pagination -->
+                <% if (typeof totalPages !=='undefined' && totalPages> 1) { %>
+                    <nav aria-label="Donation navigation" class="mt-4 mb-4">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous -->
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/donations?page=<%= currentPage - 1 %>" aria-label="Previous"
+                                    style="color: #bfa15f;">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <!-- Page Numbers -->
+                            <% for(let i=1; i <=totalPages; i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="/donations?page=<%= i %>"
+                                        style="<%= currentPage === i ? 'background-color: #bfa15f; border-color: #bfa15f; color: white;' : 'color: #bfa15f;' %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                            <% } %>
+
+                                    <!-- Next -->
+                                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/donations?page=<%= currentPage + 1 %>"
+                                            aria-label="Next" style="color: #bfa15f;">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                        </ul>
+                    </nav>
+                    <% } %>
+                        <% } else { %>
+                            <div class="row">
+                                <div class="col-12 col-md-6 offset-md-3">
+                                    <div class="card text-center py-4 shadow-lg border-0"
+                                        style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+                                        <div class="card-body">
+                                            <i class="bi bi-heart text-muted" style="font-size: 3rem;"></i>
+                                            <h4 class="mt-3" style="font-family: 'Playfair Display', serif;">No
+                                                Donations Yet
+                                            </h4>
+                                            <p class="text-muted">Start supporting the temple with your first donation
+                                            </p>
+                                            <button type="button" class="btn btn-gold btn-lg mt-3"
+                                                data-bs-toggle="modal" data-bs-target="#newDonationModal">
+                                                <i class="bi bi-plus-circle me-2"></i> Make Your First Donation
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
         </div>
-    <% } else { %>
-        <div class="row">
-            <div class="col-12">
-                <div class="card text-center py-5">
-                    <div class="card-body">
-                        <i class="bi bi-heart text-muted" style="font-size: 4rem;"></i>
-                        <h4 class="mt-3">No Donations Yet</h4>
-                        <p class="text-muted">Start supporting the temple with your first donation</p>
-                        <a href="/donations/new" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> Make Your First Donation
-                        </a>
+
+        <!-- NEW DONATION MODAL -->
+        <div class="modal fade" id="newDonationModal" tabindex="-1" aria-labelledby="newDonationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="header-icon-wrapper"
+                            style="width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="bi bi-heart-fill" style="font-size: 1.5rem; color: #bfa15f;"></i>
+                        </div>
+                        <h5 class="donation-title" id="newDonationModalLabel">Make a Donation</h5>
+                        <p class="donation-subtitle">Support our spiritual activities and community services</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="position: absolute; right: 1.5rem; top: 1.5rem;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="donationForm">
+                            <!-- Amount -->
+                            <div class="form-group-custom">
+                                <label for="amount" class="form-label-custom">Donation Amount</label>
+                                <div class="amount-wrapper">
+                                    <span class="amount-symbol">₹</span>
+                                    <input type="number" class="form-control-custom amount-input" id="amount"
+                                        name="amount" min="1" step="0.01" required placeholder="0.00">
+                                </div>
+                                <small class="text-muted"
+                                    style="display: block; margin-top: 0.5rem; font-size: 0.8rem; font-style: italic;">
+                                    * Minimum donation amount is ₹1
+                                </small>
+                            </div>
+
+                            <!-- Donation Type -->
+                            <div class="form-group-custom">
+                                <label for="donation_type" class="form-label-custom">Donation Type</label>
+                                <select class="form-select-custom" id="donation_type" name="donation_type" required>
+                                    <option value="">Select type</option>
+                                    <option value="general">General Donation</option>
+                                    <option value="construction">Construction Fund</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="festival">Festival Fund</option>
+                                    <option value="specific_pooja">Specific Pooja</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Purpose -->
+                            <div class="form-group-custom">
+                                <label for="purpose" class="form-label-custom">Purpose / Note (Optional)</label>
+                                <textarea class="form-control-custom" id="purpose" name="purpose" rows="3"
+                                    placeholder="Any specific intentions or prayers..."></textarea>
+                            </div>
+
+
+
+                            <!-- Buttons -->
+                            <button type="submit" class="btn-submit-custom" id="submitBtn">
+                                Proceed to Payment <span style="margin-left: 5px;">→</span>
+                            </button>
+
+                            <button type="button" class="btn btn-link text-muted w-100 mt-2" data-bs-dismiss="modal"
+                                style="text-decoration: none;">Cancel</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    <% } %>
-</div>
 
-<%- include('../partials/footer') %>
+        <script>
+            document.getElementById('donationForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
 
+                const submitBtn = document.getElementById('submitBtn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
+                const formData = {
+                    amount: document.getElementById('amount').value,
+                    donation_type: document.getElementById('donation_type').value,
+                    purpose: document.getElementById('purpose').value,
+                    is_anonymous: false
+                };
 
+                try {
+                    // Note: initiatePayment must be available in the global scope (e.g. from footer scripts)
+                    if (typeof initiatePayment !== 'function') {
+                        throw new Error('Payment function not loaded. Please contact support.');
+                    }
+
+                    await initiatePayment('donation', formData, {
+  onSuccess: () => {
+    showAlert('success', 'Donation Successful', 'Thank you for your donation!');
+    setTimeout(() => {
+      window.location.href = '/donations';
+    }, 1500);
+  },
+  onFailure: (error) => {
+    showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+});
+                } catch (error) {
+                    showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+submitBtn.disabled = false;
+submitBtn.innerHTML = originalText;
+                }
+            });
+        </script>
+
+        <%- include('../partials/footer') %>
+
+        <script>
+            const donationModal = document.getElementById('newDonationModal');
+            if (donationModal) {
+                donationModal.addEventListener('hidden.bs.modal', function () {
+                    window.location.reload();
+                });
+            }
+        </script>

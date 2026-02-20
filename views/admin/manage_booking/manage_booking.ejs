@@ -1,0 +1,443 @@
+<%- include('../../partials/header') %>
+    <%- include('../../partials/navbar') %>
+
+        <style>
+            .nav-pills .nav-link.active {
+                background-color: #bfa15f;
+            }
+
+            .nav-pills .nav-link {
+                color: #5d5145;
+            }
+
+            .booking-card {
+                transition: all 0.3s;
+                border-left: 4px solid transparent;
+            }
+
+            .booking-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .booking-card.hall {
+                border-left-color: #bfa15f;
+            }
+
+            .booking-card.pooja {
+                border-left-color: #d1b570;
+            }
+
+            .badge-custom {
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+
+            .rounded-end-custom {
+                border-top-right-radius: 10px !important;
+                border-bottom-right-radius: 10px !important;
+            }
+
+            .cursor-pointer {
+                cursor: pointer;
+            }
+        </style>
+
+        <div class="container py-5 ">
+
+            <div class="mb-4 d-flex align-items-center gap-3">
+                
+                <!-- Back Arrow -->
+                <a href="/admin"
+                class="btn btn-light border shadow-sm d-flex align-items-center justify-content-center"
+                style="width:40px;height:40px;">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+
+                <h2 class="mb-0" 
+                    style="font-family: 'Playfair Display', serif; color: #2c241b;">
+                    Manage Bookings
+                </h2>
+
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-pills mb-4" id="bookingTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link <%= activeTab === 'hall' ? 'active' : '' %> rounded-pill px-4" id="hall-tab"
+                        data-bs-toggle="pill" data-bs-target="#hall" type="button" role="tab" aria-controls="hall"
+                        aria-selected="<%= activeTab === 'hall' %>">
+                        Hall Bookings
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link <%= activeTab === 'pooja' ? 'active' : '' %> rounded-pill px-4"
+                        id="pooja-tab" data-bs-toggle="pill" data-bs-target="#pooja" type="button" role="tab"
+                        aria-controls="pooja" aria-selected="<%= activeTab === 'pooja' %>">
+                        Pooja Bookings
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="bookingTabsContent">
+
+                <!-- Hall Bookings -->
+                <div class="tab-pane fade <%= activeTab === 'hall' ? 'show active' : '' %>" id="hall" role="tabpanel"
+                    aria-labelledby="hall-tab">
+
+                    <!-- Hall Search -->
+                    <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+                        <div class="card-body p-4 bg-white">
+                            <form id="hall-search-form" class="row g-3 align-items-center" onsubmit="return false;">
+                                <!-- Maintain Pooja search if exists -->
+                                <input type="hidden" name="activeTab" value="hall">
+                                <% if (typeof poojaSearch !=='undefined' && poojaSearch) { %>
+                                    <input type="hidden" name="poojaSearch" value="<%= poojaSearch %>">
+                                    <% } %>
+                                        <% if (typeof poojaFilter !=='undefined' ) { %>
+                                            <input type="hidden" name="poojaFilter" value="<%= poojaFilter %>">
+                                            <% } %>
+                                                <div class="col-md-10">
+                                                    <input type="hidden" name="hallFilter" id="hallFilterInput"
+                                                        value="<%= typeof hallFilter !== 'undefined' ? hallFilter : 'upcoming' %>">
+                                                    <div class="input-group input-group-lg">
+                                                        <span class="input-group-text bg-transparent border-end-0"
+                                                            style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                                            <i class="bi bi-search text-muted"></i>
+                                                        </span>
+                                                        <input type="text" name="hallSearch" id="hallSearchInput"
+                                                            class="form-control border-start-0 border-end-0 shadow-none"
+                                                            style="border-right: none !important;"
+                                                            placeholder="Search Hall Bookings by Hall Name, Payment ID, User ID or User Name..."
+                                                            value="<%= typeof hallSearch !== 'undefined' ? hallSearch : '' %>"
+                                                            onkeydown="handleEnter(event, 'hall')">
+
+                                                        <!-- Filter Dropdown -->
+                                                        <div id="hallFilterContainer"
+                                                            class="input-group-text bg-transparent border-start-0 <%= (typeof hallSearch !== 'undefined' && hallSearch) ? 'border-end-0' : 'rounded-end-custom' %> p-0"
+                                                            style="border-left: none !important;">
+                                                            <div class="dropdown">
+                                                                <button
+                                                                    class="btn btn-link text-decoration-none text-muted p-2"
+                                                                    type="button" data-bs-toggle="dropdown"
+                                                                    aria-expanded="false">
+                                                                    <i
+                                                                        class="bi bi-funnel<%= hallFilter === 'recent' ? '-fill text-primary' : '' %>"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><button
+                                                                            class="dropdown-item <%= hallFilter === 'upcoming' ? 'active' : '' %>"
+                                                                            type="button"
+                                                                            onclick="applyFilter('hall', 'upcoming'); return false;">Upcoming
+                                                                            Bookings</button></li>
+                                                                    <li><button
+                                                                            class="dropdown-item <%= hallFilter === 'recent' ? 'active' : '' %>"
+                                                                            type="button"
+                                                                            onclick="applyFilter('hall', 'recent'); return false;">Recent
+                                                                            Bookings</button></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
+                                                        <a href="#" onclick="return clearSearch(event, 'hall')"
+                                                            id="hallClearSearch"
+                                                            class="input-group-text bg-transparent border-start-0 text-decoration-none rounded-end-custom cursor-pointer <%= (typeof hallSearch !== 'undefined' && hallSearch) ? '' : 'd-none' %>">
+                                                            <i class="bi bi-x-circle-fill text-danger"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" onclick="submitSearch(event, 'hall')"
+                                                        class="btn btn-primary w-100 btn-lg"
+                                                        style="background-color: #bfa15f; border-color: #bfa15f; border-radius: 10px;">Search
+                                                        Hall</button>
+                                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="hall-bookings-container">
+                        <%- include('hall_bookings', { hallBookings: hallBookings }) %>
+                    </div>
+                </div>
+
+                <!-- Pooja Bookings -->
+                <div class="tab-pane fade <%= activeTab === 'pooja' ? 'show active' : '' %>" id="pooja" role="tabpanel"
+                    aria-labelledby="pooja-tab">
+
+                    <!-- Pooja Search -->
+                    <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+                        <div class="card-body p-4 bg-white">
+                            <form id="pooja-search-form" class="row g-3 align-items-center" onsubmit="return false;">
+                                <!-- Maintain Hall search if exists -->
+                                <input type="hidden" name="activeTab" value="pooja">
+                                <% if (typeof hallSearch !=='undefined' && hallSearch) { %>
+                                    <input type="hidden" name="hallSearch" value="<%= hallSearch %>">
+                                    <% } %>
+                                        <% if (typeof hallFilter !=='undefined' ) { %>
+                                            <input type="hidden" name="hallFilter" value="<%= hallFilter %>">
+                                            <% } %>
+
+                                                <div class="col-md-10">
+                                                    <input type="hidden" name="poojaFilter" id="poojaFilterInput"
+                                                        value="<%= typeof poojaFilter !== 'undefined' ? poojaFilter : 'upcoming' %>">
+                                                    <div class="input-group input-group-lg">
+                                                        <span class="input-group-text bg-transparent border-end-0"
+                                                            style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                                            <i class="bi bi-search text-muted"></i>
+                                                        </span>
+                                                        <input type="text" name="poojaSearch" id="poojaSearchInput"
+                                                            class="form-control border-start-0 border-end-0"
+                                                            placeholder="Search Pooja Bookings by Pooja Name, Payment ID, User ID or User Name..."
+                                                            value="<%= typeof poojaSearch !== 'undefined' ? poojaSearch : '' %>"
+                                                            onkeydown="handleEnter(event, 'pooja')">
+
+                                                        <!-- Filter Dropdown -->
+                                                        <div id="poojaFilterContainer"
+                                                            class="input-group-text bg-transparent border-start-0 <%= (typeof poojaSearch !== 'undefined' && poojaSearch) ? 'border-end-0' : 'rounded-end-custom' %> p-0">
+                                                            <div class="dropdown">
+                                                                <button
+                                                                    class="btn btn-link text-decoration-none text-muted p-2"
+                                                                    type="button" data-bs-toggle="dropdown"
+                                                                    aria-expanded="false">
+                                                                    <i
+                                                                        class="bi bi-funnel<%= poojaFilter === 'recent' ? '-fill text-primary' : '' %>"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><button
+                                                                            class="dropdown-item <%= poojaFilter === 'upcoming' ? 'active' : '' %>"
+                                                                            type="button"
+                                                                            onclick="applyFilter('pooja', 'upcoming'); return false;">Upcoming
+                                                                            Bookings</button></li>
+                                                                    <li><button
+                                                                            class="dropdown-item <%= poojaFilter === 'recent' ? 'active' : '' %>"
+                                                                            type="button"
+                                                                            onclick="applyFilter('pooja', 'recent'); return false;">Recent
+                                                                            Bookings</button></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
+                                                        <a href="#" onclick="return clearSearch(event, 'pooja')"
+                                                            id="poojaClearSearch"
+                                                            class="input-group-text bg-transparent border-start-0 text-decoration-none rounded-end-custom cursor-pointer <%= (typeof poojaSearch !== 'undefined' && poojaSearch) ? '' : 'd-none' %>">
+                                                            <i class="bi bi-x-circle-fill text-danger"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" onclick="submitSearch(event, 'pooja')"
+                                                        class="btn btn-primary w-100 btn-lg"
+                                                        style="background-color: #bfa15f; border-color: #bfa15f; border-radius: 10px;">Search
+                                                        Pooja</button>
+                                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="pooja-bookings-container">
+                        <%- include('pooja_bookings', { poojaBookings: poojaBookings }) %>
+                    </div>
+                </div>
+
+                <%- include('../../partials/footer') %>
+
+                    <script>
+                        function changePage(type, pageNum) {
+                            try {
+                                const urlParams = new URLSearchParams(window.location.search);
+                                urlParams.set(type + 'Page', pageNum);
+                                urlParams.set('activeTab', type);
+
+                                const url = `/admin/bookings?${urlParams.toString()}`;
+                                window.history.pushState({}, '', url);
+                                fetchAndRender(url, type);
+                            } catch (e) {
+                                console.error('Error in changePage:', e);
+                            }
+                            return false;
+                        }
+
+                        function updateSearchState(type, hasSearch) {
+                            const filterContainer = document.getElementById(type + 'FilterContainer');
+                            const clearBtn = document.getElementById(type + 'ClearSearch');
+
+                            if (hasSearch) {
+                                filterContainer.classList.remove('rounded-end-custom');
+                                filterContainer.classList.add('border-end-0');
+
+                                clearBtn.classList.remove('d-none');
+                            } else {
+                                filterContainer.classList.remove('border-end-0');
+                                filterContainer.classList.add('rounded-end-custom');
+
+                                clearBtn.classList.add('d-none');
+                            }
+                        }
+
+                        function fetchAndRender(url, type) {
+                            console.log('fetchAndRender called for:', url);
+                            fetch(url, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.text();
+                                })
+                                .then(html => {
+                                    const containerId = type + '-bookings-container';
+                                    const container = document.getElementById(containerId);
+                                    if (container) {
+                                        container.innerHTML = html;
+                                    } else {
+                                        console.error('Container not found:', containerId);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching bookings:', error);
+                                    // Optionally alert user instead of redirect:
+                                    // alert('Failed to load bookings. Please check your connection.');
+                                    // Only reload if indispensable
+                                    // window.location.href = url;
+                                    // For now, no reload, just log.
+                                });
+                        }
+
+                        function applyFilter(type, filter) {
+                            try {
+                                // Update the hidden input
+                                const inputId = type + 'FilterInput';
+                                const input = document.getElementById(inputId);
+                                if (input) input.value = filter;
+
+                                // Get current URL params
+                                const urlParams = new URLSearchParams(window.location.search);
+
+                                // Update params
+                                urlParams.set(type + 'Filter', filter);
+                                urlParams.set('activeTab', type);
+                                urlParams.set(type + 'Page', 1); // Reset page
+
+                                // Construct URL
+                                const url = `/admin/bookings?${urlParams.toString()}`;
+
+                                // Update browser Iistory
+                                window.history.pushState({}, '', url);
+
+                                fetchAndRender(url, type);
+
+                                // Update active state in dropdown
+                                const dropdownItems = document.querySelectorAll(`button[onclick^="applyFilter('${type}'"]`);
+                                dropdownItems.forEach(item => {
+                                    if (item.textContent.toLowerCase().includes(filter)) {
+                                        item.classList.add('active');
+                                    } else {
+                                        item.classList.remove('active');
+                                    }
+                                });
+
+                                // Update funnel icon
+                                const tabPane = document.getElementById(type);
+                                const funnelIcon = tabPane.querySelector('.bi-funnel, .bi-funnel-fill');
+                                if (funnelIcon) { // Added null check for funnelIcon
+                                    if (filter === 'recent') {
+                                        funnelIcon.classList.remove('bi-funnel');
+                                        funnelIcon.classList.add('bi-funnel-fill', 'text-primary');
+                                    } else {
+                                        funnelIcon.classList.remove('bi-funnel-fill', 'text-primary');
+                                        funnelIcon.classList.add('bi-funnel');
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Error in applyFilter:', e);
+                            }
+
+                            return false;
+                        }
+
+                        function handleEnter(event, type) {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                submitSearch(event, type);
+                            }
+                        }
+
+                        function submitSearch(event, type) {
+                            if (event) event.preventDefault();
+
+                            try {
+                                const form = document.getElementById(type + '-search-form');
+                                const formData = new FormData(form);
+
+                                // Start with current URL params to preserve other tab's state
+                                const params = new URLSearchParams(window.location.search);
+
+                                // Update activeTab stuff
+                                params.set('activeTab', type);
+                                params.set(type + 'Page', 1); // Reset page
+
+                                // Update search
+                                const searchVal = formData.get(type + 'Search');
+                                if (searchVal) {
+                                    params.set(type + 'Search', searchVal);
+                                } else {
+                                    params.delete(type + 'Search');
+                                }
+
+                                // Update filter
+                                const filterVal = formData.get(type + 'Filter');
+                                if (filterVal) {
+                                    params.set(type + 'Filter', filterVal);
+                                }
+
+                                const url = `/admin/bookings?${params.toString()}`;
+
+                                // Update browser Iistory
+                                window.history.pushState({}, '', url);
+
+                                // Update UI State
+                                updateSearchState(type, !!searchVal);
+
+                                fetchAndRender(url, type);
+                            } catch (e) {
+                                console.error('Error in submitSearch:', e);
+                            }
+
+                            return false;
+                        }
+
+                        function clearSearch(event, type) {
+                            if (event) event.preventDefault();
+
+                            try {
+                                // Clear input
+                                const input = document.getElementById(type + 'SearchInput');
+                                if (input) input.value = '';
+
+                                // Update URL params
+                                const urlParams = new URLSearchParams(window.location.search);
+                                urlParams.delete(type + 'Search');
+                                urlParams.set('activeTab', type);
+                                urlParams.set(type + 'Page', 1); // Reset page
+
+                                const url = `/admin/bookings?${urlParams.toString()}`;
+
+                                // Update browser history
+                                window.history.pushState({}, '', url);
+
+                                // Update UI State
+                                updateSearchState(type, false);
+
+                                fetchAndRender(url, type);
+                            } catch (e) {
+                                console.error('Error in clearSearch:', e);
+                            }
+
+                            return false;
+                        }
+                    </script>

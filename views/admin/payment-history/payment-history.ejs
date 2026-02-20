@@ -1,0 +1,27 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container py-4">
+
+    <%- include('./partials/payment-header') %>
+    <%- include('./partials/payment-search-bar') %>
+
+    <% if (payments && payments.length > 0) { %>
+
+        <%- include('./partials/payment-table') %>
+
+        <% if(totalPages > 1){ %>
+            <%- include('./partials/payment-pagination') %>
+        <% } %>
+
+    <% } else { %>
+
+        <div class="alert alert-warning">
+            No payment records found.
+        </div>
+
+    <% } %>
+
+</div>
+
+<%- include('../../partials/footer') %>

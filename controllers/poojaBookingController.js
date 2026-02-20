@@ -20,7 +20,6 @@ exports.list = async (req, res) => {
       50,
       0,
     );
-
     res.render("bookings/pooja/list", {
       title: "Pooja Bookings",
       user: req.user,
@@ -34,7 +33,6 @@ exports.list = async (req, res) => {
     });
   }
 };
-
 /**
  * Show pooja booking form
  */

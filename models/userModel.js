@@ -288,3 +288,4 @@ exports.updatePassword = async (userId, newPassword) => {
     [passwordHash, userId],
   );
 };
+

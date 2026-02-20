@@ -417,3 +417,12 @@ submitBtn.innerHTML = originalText;
         </script>
 
         <%- include('../partials/footer') %>
+
+        <script>
+            const donationModal = document.getElementById('newDonationModal');
+            if (donationModal) {
+                donationModal.addEventListener('hidden.bs.modal', function () {
+                    window.location.reload();
+                });
+            }
+        </script>

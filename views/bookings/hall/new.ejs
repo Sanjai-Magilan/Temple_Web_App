@@ -1,8 +1,7 @@
 <%- include('../../partials/header') %>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
+       
         /* Page Background Overrides */
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
@@ -447,6 +446,24 @@
             // Toggle Meal Options
             const foodRadios = document.getElementsByName('food_required');
             const mealContainer = document.getElementById('meal_options_container');
+
+            function setMinHallDate() {
+                const dateInput = document.getElementById('booking_date');
+                if (!dateInput) return;
+
+                const now = new Date();
+                now.setDate(now.getDate() + 3); // Lock today + 2 days -> start from 3rd day
+
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const minDate = `${year}-${month}-${day}`;
+
+                dateInput.setAttribute("min", minDate);
+            }
+
+            // Initialize min date
+            setMinHallDate();
 
             foodRadios.forEach(radio => {
                 radio.addEventListener('change', function () {

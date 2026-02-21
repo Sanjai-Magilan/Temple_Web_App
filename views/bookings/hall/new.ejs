@@ -299,14 +299,17 @@
                                                     // Handle both Date object and date string
                                                     const d = new Date(booking.booking_date);
                                                     if (!isNaN(d)) {
-                                                        dateVal = d.toISOString().split('T')[0];
+                                                        const year = d.getFullYear();
+                                                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                                                        const day = String(d.getDate()).padStart(2, '0');
+                                                        dateVal = `${year}-${month}-${day}`;
                                                     } else {
                                                         dateVal = booking.booking_date;
                                                     }
                                                 }
                                             %>
                                             <input type="date" class="form-control-custom" id="booking_date"
-                                                name="booking_date" min="<%= new Date().toISOString().split('T')[0] %>"
+                                                name="booking_date"
                                                 value="<%= dateVal %>"
                                                 required>
                                         </div>

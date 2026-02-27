@@ -7,3 +7,4 @@ logs/*
 !logs/.gitkeep
 docker-compose.override.yml
 *.pid
+temple_schema.sql

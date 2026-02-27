@@ -10,13 +10,14 @@ require('dotenv').config();
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "127.0.0.1",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "deepi__24",
+  password: process.env.DB_PASSWORD || "rootpassword",
   database: process.env.DB_NAME || "temple_db",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
+  connectTimeout: 10000
 });
 
 logger.info(`Database config: Host=${process.env.DB_HOST || "localhost"}, User=${process.env.DB_USER || "root"}, DB=${process.env.DB_NAME || "temple_db"}`);

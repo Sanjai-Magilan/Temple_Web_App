@@ -1,4 +1,10 @@
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .env
 logs/*
 !logs/.gitkeep
+docker-compose.override.yml
+*.pid
+temple_schema.sql

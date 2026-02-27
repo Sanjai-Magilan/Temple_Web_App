@@ -581,8 +581,8 @@
                                         'Booking Successful',
                                         'Your hall booking has been confirmed!'
                                     );
-                                    setTimeout(() => {
-                                        window.location.href = '/payment/success?payment_id=' + result.payment_id;
+                                   setTimeout(() => {
+                                        window.location.href = "/bookings/hall";
                                     }, 1500);
                                 },
                                 onFailure: (error) => {
@@ -616,8 +616,8 @@
                                 );
 
                                 setTimeout(() => {
-                                    window.location.href = '/payment/success?payment_id=' + result.payment_id;
-                                }, 1500);
+                                        window.location.href = "/bookings/hall";
+                                    }, 1500);
 
                             },
                             onFailure: (error) => {

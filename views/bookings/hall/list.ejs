@@ -1,7 +1,6 @@
 <%- include('../../partials/header') %>
 
     <style>
-       
         /* Page Background Overrides */
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
@@ -201,7 +200,8 @@
             <% if (typeof bookings !=='undefined' && bookings.length> 0) { %>
                 <div class="row">
                     <% bookings.sort((a, b)=> new Date(b.created_at) - new Date(a.created_at)).forEach(booking => { %>
-                        <div class="col-12 col-md-6 col-lg-4 mb-3 booking-card" data-booking-number="<%= booking.booking_number %>">
+                        <div class="col-12 col-md-6 col-lg-4 mb-3 booking-card"
+                            data-booking-number="<%= booking.booking_number %>">
                             <div class="card h-100 shadow-sm border-0"
                                 style="border-radius: 15px; overflow: hidden; background: #FFFBF5;">
                                 <div class="card-header text-white"
@@ -240,13 +240,13 @@
                                                 <div class="d-flex justify-content-between gap-2 mb-3">
                                                     <span
                                                         class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> flex-grow-1"
-                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">
+                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">
                                                         <%= booking.status.charAt(0).toUpperCase() +
                                                             booking.status.slice(1) %>
                                                     </span>
 
                                                     <span class="badge bg-light text-dark border flex-grow-1"
-                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">₹
+                                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">₹
                                                         <%= booking.amount.toLocaleString() %>
                                                     </span>
                                                 </div>
@@ -255,10 +255,10 @@
                                                 <% if (booking.status==='pending' ) { %>
                                                     <div class="d-flex justify-content-between gap-2">
                                                         <a href="/bookings/hall/continue-form/<%= booking.id %>"
-    class="btn btn-success flex-grow-1"
-    style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">
-    Continue
-</a>
+                                                            class="btn btn-success flex-grow-1"
+                                                            style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">
+                                                            Continue
+                                                        </a>
 
                                                         <button class="btn btn-danger flex-grow-1"
                                                             style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
@@ -471,7 +471,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-body text-center p-4">
-                        <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?</h5>
+                        <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?
+                        </h5>
                         <p class="text-muted mb-4">Are you sure you want to cancel this booking?</p>
                         <div class="d-flex gap-2 justify-content-center">
                             <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
@@ -635,7 +636,7 @@
                 modal.show();
             }
 
-            document.getElementById('confirmCancelHallBtn').addEventListener('click', function() {
+            document.getElementById('confirmCancelHallBtn').addEventListener('click', function () {
                 if (!hallBookingIdToCancel) return;
 
                 const btn = document.getElementById('confirmCancelHallBtn');
@@ -643,9 +644,9 @@
                 btn.innerHTML = 'Cancelling...';
                 btn.disabled = true;
 
-                fetch(`/bookings/hall/cancel/${hallBookingIdToCancel}`, { 
-                    method: "DELETE", 
-                    headers: { "Content-Type": "application/json" } 
+                fetch(`/bookings/hall/cancel/${hallBookingIdToCancel}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" }
                 })
                     .then(res => res.json())
                     .then(data => {

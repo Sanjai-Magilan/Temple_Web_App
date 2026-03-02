@@ -248,27 +248,31 @@
                                   <!-- Row 1: Status & Amount -->
                                   <div class="d-flex justify-content-between gap-2 mb-3">
                                     <span
-                                      class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %> flex-grow-1"
-                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">
+                                      class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> flex-grow-1"
+                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">
                                       <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
                                     </span>
 
-                                    <span class="amount-badge flex-grow-1"
-                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; display: inline-flex; justify-content: center; align-items: center;">
-                                      ₹ <%= booking.amount.toLocaleString() %>
+                                    <span class="badge bg-light text-dark border flex-grow-1"
+                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">₹
+                                      <%= booking.amount.toLocaleString() %>
                                     </span>
                                   </div>
 
                                   <!-- Row 2: Buttons -->
                                   <% if (booking.status==='pending' ) { %>
-                                    <a href="/bookings/pooja/continue-form/<%= booking.id %>"
-                                      class="btn btn-success"
-                                      style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;">
-                                      Continue
-                                    </a>
-                                    <button class="btn btn-danger"
-                                      style="padding: 0.25rem 0.75rem; font-size: 0.75rem; min-width: 80px;"
-                                      onclick="cancelPoojaBooking('<%= booking.id %>', this)">Cancel</button>
+                                    <div class="d-flex justify-content-between gap-2">
+                                      <a href="/bookings/pooja/continue-form/<%= booking.id %>"
+                                        class="btn btn-success flex-grow-1"
+                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">
+                                        Continue
+                                      </a>
+                                      <button class="btn btn-danger flex-grow-1"
+                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
+                                        onclick="cancelPoojaBooking('<%= booking.id %>', this)">
+                                        Cancel
+                                      </button>
+                                    </div>
                                     <% } %>
                                 </div>
 
@@ -359,7 +363,7 @@
             modal.show();
           }
 
-          document.getElementById('confirmCancelPoojaBtn').addEventListener('click', function() {
+          document.getElementById('confirmCancelPoojaBtn').addEventListener('click', function () {
             if (!bookingIdToCancel) return;
 
             const btn = document.getElementById('confirmCancelPoojaBtn');
@@ -367,19 +371,19 @@
             btn.innerHTML = 'Cancelling...';
             btn.disabled = true;
 
-            fetch(`/bookings/pooja/cancel/${bookingIdToCancel}`, { 
-              method: "DELETE", 
-              headers: { "Content-Type": "application/json" } 
+            fetch(`/bookings/pooja/cancel/${bookingIdToCancel}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" }
             })
               .then(res => res.json())
               .then(data => {
                 const modalEl = document.getElementById('cancelPoojaModal');
                 const modal = bootstrap.Modal.getInstance(modalEl);
-                
+
                 if (data.success) {
                   if (bookingElementToRemove) bookingElementToRemove.remove();
                   modal.hide();
-                  
+
                   // Optional: Show success toast/alert if needed, or just let the removal be the feedback
                 } else {
                   alert(data.message || "Failed to cancel booking");

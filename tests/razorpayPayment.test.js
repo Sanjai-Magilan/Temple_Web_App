@@ -1,21 +1,12 @@
 /**
  * @jest-environment jsdom
+ * @jest-environment-options {"url": "http://localhost/"}
  */
 
 const { RazorpayPayment, initiatePayment } = require("../public/js/razorpay");
 
 global.fetch = jest.fn();
 global.showAlert = jest.fn();
-
-global.showAlert = jest.fn();
-global.fetch = jest.fn();
-
-// Proper safe navigation mock
-delete window.location;
-window.location = {
-  assign: jest.fn(),
-  href: '',
-};
 
 // Mock Razorpay SDK
 global.Razorpay = jest.fn().mockImplementation((options) => {
@@ -33,6 +24,7 @@ describe("initiatePayment", () => {
 
   test("creates order and initializes Razorpay", async () => {
     fetch.mockResolvedValueOnce({
+      ok: true,
       json: async () => ({
         success: true,
         key: "rzp_test_key",
@@ -55,6 +47,7 @@ describe("initiatePayment", () => {
 
   test("handles order creation failure", async () => {
     fetch.mockResolvedValueOnce({
+      ok: false,
       json: async () => ({
         success: false,
         message: "Order failed",

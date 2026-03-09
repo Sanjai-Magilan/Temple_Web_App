@@ -22,18 +22,20 @@ const pool = mysql.createPool({
 
 logger.info(`Database config: Host=${process.env.DB_HOST || "localhost"}, User=${process.env.DB_USER || "root"}, DB=${process.env.DB_NAME || "temple_db"}`);
 
-// Test connection
-pool.getConnection()
-  .then(connection => {
-    logger.info('Database connected successfully');
-    connection.release();
-  })
-  .catch(err => {
-    logger.error('Database connection failed', {
-      message: err.message,
-      stack: err.stack,
+// Test connection only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  pool.getConnection()
+    .then(connection => {
+      logger.info('Database connected successfully');
+      connection.release();
+    })
+    .catch(err => {
+      logger.error('Database connection failed', {
+        message: err.message,
+        stack: err.stack,
+      });
     });
-  });
+}
 
 module.exports = pool;
 

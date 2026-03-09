@@ -1,8 +1,10 @@
 name: Build and Push Docker Image
-
 on:
-  pull_request:
-    branches: [ "main" ] 
+  workflow_run:
+    workflows: ["Run Tests"]
+    types: [completed]
+    branches:
+      - "main"
 jobs:
   build:
     runs-on: ubuntu-latest

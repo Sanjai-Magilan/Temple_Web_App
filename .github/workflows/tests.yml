@@ -1,10 +1,10 @@
-name: Node.js CI
+name: Run tests
 
 on:
   push:
     branches: [ "dev" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev" , "main" ]
 
 jobs:
   build:

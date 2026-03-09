@@ -1,4 +1,4 @@
-name: Test for all branches
+name: Run Tests
 
 on:
   pull_request:

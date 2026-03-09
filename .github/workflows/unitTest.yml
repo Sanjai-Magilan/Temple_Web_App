@@ -1,8 +1,8 @@
-name: Test for all branches
+name: Run Tests
 
 on:
   pull_request:
-    branches: ["dev"]
+    branches: [ "main" ]
 jobs:
   build:
     runs-on: ubuntu-latest

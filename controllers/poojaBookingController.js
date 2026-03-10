@@ -5,6 +5,8 @@
 
 const poojaBookingModel = require("../models/poojaBookingModel");
 const paymentModel = require("../models/paymentModel");
+const bookingCache = require("../utils/bookingCache");
+const pool = require("../config/database");
 
 /**
  * List user pooja bookings
@@ -15,15 +17,34 @@ exports.list = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const bookings = await poojaBookingModel.getUserBookings(
+    const dbBookings = await poojaBookingModel.getUserBookings(
       req.user.id,
       50,
       0,
     );
+    
+    // Also fetch pending bookings from cache
+    const pendingPayments = await paymentModel.getPendingPaymentsByType(req.user.id, "pooja_booking");
+    const cachedBookings = [];
+    
+    for (const payment of pendingPayments) {
+      const cachedData = bookingCache.get(payment.order_id);
+      if (cachedData) {
+        cachedBookings.push({
+          ...cachedData,
+          id: `p-${payment.id}`, // Use payment id with p- prefix for cached bookings
+          booking_number: "POOJA-PENDING-" + payment.id,
+          created_at: cachedData.cachedAt,
+          payment_id: payment.id,
+          is_cached: true
+        });
+      }
+    }
+
     res.render("bookings/pooja/list", {
       title: "Pooja Bookings",
       user: req.user,
-      bookings: bookings,
+      bookings: [...cachedBookings, ...dbBookings],
     });
   } catch (error) {
     console.error("Error loading pooja bookings:", error);
@@ -63,8 +84,28 @@ exports.showContinue = async (req, res) => {
         return res.redirect("/login");
       }
   
-      const bookingId = req.params.id;
-      const booking = await poojaBookingModel.findById(bookingId);
+      const bookingParam = req.params.id;
+      let booking;
+      
+      if (bookingParam.startsWith('p-')) {
+        const paymentId = bookingParam.substring(2);
+        const payment = await paymentModel.findById(paymentId);
+        if (payment && payment.order_id) {
+          const cachedData = bookingCache.get(payment.order_id);
+          if (cachedData) {
+            booking = {
+              ...cachedData,
+              id: bookingParam,
+              booking_number: "POOJA-PENDING-" + paymentId,
+              created_at: cachedData.cachedAt,
+              payment_id: payment.id,
+              is_cached: true
+            };
+          }
+        }
+      } else {
+        booking = await poojaBookingModel.findById(bookingParam);
+      }
   
       if (!booking) {
         return res.status(404).render("errors/404", {
@@ -100,12 +141,41 @@ exports.showContinue = async (req, res) => {
   };
 
 exports.continuePayment = async (req, res) => {
-  const bookingId = req.params.id;
+  const bookingParam = req.params.id;
   try {
     if (!req.user)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const booking = await poojaBookingModel.findById(bookingId);
+    let booking;
+    let paymentOrderId = null;
+    let paymentAmount = null;
+
+    if (bookingParam.startsWith("p-")) {
+      const paymentId = bookingParam.substring(2);
+      const payment = await paymentModel.findById(paymentId);
+      if (payment && payment.order_id) {
+        const cachedData = bookingCache.get(payment.order_id);
+        if (cachedData) {
+          booking = {
+            ...cachedData,
+            id: bookingParam,
+            payment_id: payment.id,
+          };
+          paymentOrderId = payment.order_id;
+          paymentAmount = payment.amount;
+        }
+      }
+    } else {
+      booking = await poojaBookingModel.findById(bookingParam);
+      if (booking && booking.payment_id) {
+        const payment = await paymentModel.findById(booking.payment_id);
+        if (payment) {
+          paymentOrderId = payment.order_id;
+          paymentAmount = payment.amount;
+        }
+      }
+    }
+
     if (!booking)
       return res
         .status(404)
@@ -118,28 +188,18 @@ exports.continuePayment = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Booking is not pending" });
-    if (!booking.payment_id)
+    if (!paymentOrderId)
       return res
         .status(400)
         .json({ success: false, message: "Payment not initialized" });
 
-    const payment = await paymentModel.findById(booking.payment_id);
-    if (!payment)
-      return res
-        .status(404)
-        .json({ success: false, message: "Payment not found" });
-    if (payment.status !== "pending")
-      return res
-        .status(400)
-        .json({ success: false, message: "Payment already processed" });
-
     return res.json({
       success: true,
-      order_id: payment.order_id,
-      amount: payment.amount,
+      order_id: paymentOrderId,
+      amount: paymentAmount,
       key: process.env.RAZORPAY_KEY_ID,
       booking_id: booking.id,
-      description: `Pooja booking ${booking.booking_number}`,
+      description: `Pooja booking ${booking.booking_number || "Pending"}`,
     });
   } catch (error) {
     console.error("Error resuming pooja booking payment:", error);
@@ -150,12 +210,26 @@ exports.continuePayment = async (req, res) => {
 };
 
 exports.cancelBooking = async (req, res) => {
-  const bookingId = req.params.id;
+  const bookingParam = req.params.id;
   try {
     if (!req.user)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    const booking = await poojaBookingModel.findById(bookingId);
+    if (bookingParam.startsWith("p-")) {
+      const paymentId = bookingParam.substring(2);
+      const payment = await paymentModel.findById(paymentId);
+      if (payment && Number(payment.user_id) === Number(req.user.id)) {
+        // Delete from cache if exists
+        if (payment.order_id) {
+          bookingCache.delete(payment.order_id);
+        }
+        // Delete payment entry to be clean
+        await pool.execute("DELETE FROM payments WHERE id = ?", [paymentId]);
+        return res.json({ success: true });
+      }
+    }
+
+    const booking = await poojaBookingModel.findById(bookingParam);
     if (!booking)
       return res
         .status(404)
@@ -165,14 +239,12 @@ exports.cancelBooking = async (req, res) => {
         .status(403)
         .json({ success: false, message: "Unauthorized access" });
     if (booking.status !== "pending")
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Only pending bookings can be cancelled",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Only pending bookings can be cancelled",
+      });
 
-    const affectedRows = await poojaBookingModel.cancelBookingById(bookingId);
+    const affectedRows = await poojaBookingModel.cancelBookingById(bookingParam);
     if (affectedRows > 0) return res.json({ success: true });
 
     return res.json({ success: false, message: "Booking not found" });

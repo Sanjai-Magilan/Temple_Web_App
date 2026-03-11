@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: temple_devcontainer
+    volumes:
+      - ..:/app:cached
+    command: sleep infinity
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: mysql
+      DB_PASSWORD: rootpassword
+    ports:
+      - "3002:3002"
+
+  mysql:
+    image: mysql:8
+    container_name: temple_mysql_dev
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: temple_db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+
+volumes:
+  mysql_dev_data:

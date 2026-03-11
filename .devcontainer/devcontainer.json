@@ -1,11 +1,13 @@
 {
   "name": "Temple App Dev Environment",
 
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": "docker-compose.dev.yml",
 
   "service": "app",
 
   "workspaceFolder": "/app",
+
+  "forwardPorts": [3002, 3307],
 
   "customizations": {
     "vscode": {

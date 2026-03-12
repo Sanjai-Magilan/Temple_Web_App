@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest",
+    "loadtest": "cd k6-tests && k6 run load-test.js",
+    "loadtest:smoke": "cd k6-tests && k6 run -e SCENARIO=smoke load-test.js",
+    "loadtest:load": "cd k6-tests && k6 run -e SCENARIO=load load-test.js",
+    "loadtest:stress": "cd k6-tests && k6 run -e SCENARIO=stress load-test.js",
+    "loadtest:menu": "cd k6-tests && ./run-tests.sh"
   },
   "keywords": [
     "temple",

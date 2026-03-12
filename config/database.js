@@ -1,7 +1,3 @@
-/**
- * Database Configuration
- * MySQL connection setup for Hostinger
- */
 const logger = require('../utils/logger');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
@@ -13,13 +9,13 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || "rootpassword",
   database: process.env.DB_NAME || "temple_db",
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 50,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-  connectTimeout: 10000
+  connectTimeout: 10000,
+  namedPlaceholders: true
 });
-
 logger.info(`Database config: Host=${process.env.DB_HOST || "localhost"}, User=${process.env.DB_USER || "root"}, DB=${process.env.DB_NAME || "temple_db"}`);
 
 // Test connection only if not in test environment

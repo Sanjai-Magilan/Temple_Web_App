@@ -8,3 +8,11 @@ logs/*
 docker-compose.override.yml
 *.pid
 Backup/
+
+# k6 Load Test outputs
+k6-tests/results/
+k6-tests/*.json
+k6-tests/*.log
+k6-tests/*.txt
+k6-tests/output/
+k6-tests/.k6-*

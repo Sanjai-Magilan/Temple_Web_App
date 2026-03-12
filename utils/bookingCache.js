@@ -4,7 +4,7 @@ const path = require('path');
 const CACHE_FILE = path.join(__dirname, '../pending_bookings.json');
 
 // Configuration for cache expiration
-const CACHE_EXPIRY_MS = 15 * 60 * 1000; // Time until a pending booking is deleted (default: 24 hours)
+const CACHE_EXPIRY_MS = 30 * 60 * 1000; // Time until a pending booking is deleted (default: 24 hours)
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;  // How often to check for expired bookings (default: 1 hour)
 
 /**

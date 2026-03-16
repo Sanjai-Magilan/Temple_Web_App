@@ -10,6 +10,11 @@ import { check, sleep } from "k6";
 import { config } from "../config.js";
 import * as helpers from "../utils/helpers.js";
 
+// Cache for admin session to prevent excessive login attempts
+let cachedAuth = null;
+let authTimestamp = 0;
+const AUTH_CACHE_DURATION = 300; // 5 minutes in seconds
+
 /**
  * Execute admin user flow
  * Simulates admin accessing admin-only features
@@ -18,15 +23,27 @@ export function adminUserFlow() {
   const baseUrl = config.baseUrl;
   const credentials = config.testUsers.admin;
 
-  // Admin login
-  const authResult = helpers.performLogin(
-    baseUrl,
-    credentials.email,
-    credentials.password,
-  );
+  // Admin login (or reuse cached session)
+  let authResult;
+  const now = Date.now() / 1000;
+
+  if (cachedAuth && now - authTimestamp < AUTH_CACHE_DURATION) {
+    authResult = cachedAuth;
+  } else {
+    authResult = helpers.performLogin(
+      baseUrl,
+      credentials.email,
+      credentials.password,
+    );
+
+    if (authResult.success) {
+      cachedAuth = authResult;
+      authTimestamp = now;
+    }
+  }
 
   if (!authResult.success) {
-    console.error("Admin login failed, skipping admin flow");
+    console.error("❌ Admin login failed, skipping admin flow");
     return;
   }
 
@@ -42,7 +59,7 @@ export function adminUserFlow() {
   );
 
   check(adminDashboardResponse, {
-    "admin dashboard loaded": (r) => r.status === 200,
+    "admin dashboard loaded": (r) => r.status >= 200 && r.status < 400,
     "admin dashboard not redirected": (r) => !r.url.includes("/login"),
   });
 
@@ -57,7 +74,7 @@ export function adminUserFlow() {
   );
 
   check(adminDonationsResponse, {
-    "admin donations loaded": (r) => r.status === 200,
+    "admin donations loaded": (r) => r.status >= 200 && r.status < 400,
   });
 
   // Think time

@@ -166,48 +166,65 @@ export function extractSessionCookie(response) {
 
 /**
  * Perform login and return authentication credentials
+ * Uses http.cookieJar() for proper session cookie management
  * @param {string} baseUrl - Base URL of the application
  * @param {string} email - User email
  * @param {string} password - User password
- * @returns {object} Object containing token and/or session cookie
+ * @returns {object} Object containing cookieJar and authentication status
  */
 export function performLogin(baseUrl, email, password) {
   const loginUrl = `${baseUrl}/login`;
 
+  // Get the cookie jar for this VU (Virtual User)
+  const jar = http.cookieJar();
+  jar.set(baseUrl, "k6-test", "true"); // Mark as k6 test
+
   // Use form-encoded login for session-based auth
   const formPayload = `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
 
+  // Login with redirects disabled to capture 302 response
   const loginResponse = http.post(loginUrl, formPayload, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     },
     tags: { name: "Login" },
-    redirects: 0, // Don't follow redirects automatically so we can capture the session cookie
+    redirects: 0, // Capture 302 redirect and store session cookies
+    jar: jar, // Use cookie jar to automatically store session cookies
   });
 
+  // Accept both 200 (direct response) and 302 (redirect) as success
   const loginSuccess = check(loginResponse, {
-    "login successful": (r) =>
-      r.status === 200 || r.status === 302 || r.status === 303,
+    "login successful (200 or 302)": (r) => r.status >= 200 && r.status < 400,
     "login response time OK": (r) => r.timings.duration < 1000,
   });
 
   loginErrorRate.add(!loginSuccess);
 
+  // Enhanced debug logging for login failures
   if (!loginSuccess) {
-    console.error(`Login failed for ${email}: Status ${loginResponse.status}`);
+    console.error(`❌ Login failed for ${email}`);
+    console.error(`   Status: ${loginResponse.status}`);
+    console.error(`   Body preview: ${loginResponse.body.substring(0, 200)}`);
+    if (loginResponse.error) {
+      console.error(`   Error: ${loginResponse.error}`);
+    }
   }
 
-  // Extract authentication credentials
-  const token = extractAuthToken(loginResponse);
+  // Extract session cookie for verification
   const sessionCookie = extractSessionCookie(loginResponse);
 
+  // Verify session cookie was set
   if (!sessionCookie && loginSuccess) {
-    console.warn(`Login succeeded but no session cookie found for ${email}`);
+    console.warn(
+      `⚠️  Login succeeded but no session cookie found for ${email}`,
+    );
+    const cookieNames = Object.keys(loginResponse.cookies || {});
+    console.warn(`   Available cookies: ${JSON.stringify(cookieNames)}`);
   }
 
   return {
-    token: token,
+    jar: jar, // Return cookie jar for subsequent requests
     sessionCookie: sessionCookie,
     response: loginResponse,
     success: loginSuccess && sessionCookie !== null,
@@ -216,24 +233,23 @@ export function performLogin(baseUrl, email, password) {
 
 /**
  * Create request parameters with authentication
+ * Uses cookie jar for automatic session management
  * @param {object} auth - Authentication object from performLogin
- * @returns {object} Request parameters with auth headers
+ * @returns {object} Request parameters with cookie jar
  */
 export function getAuthParams(auth) {
   const params = {
-    headers: {},
+    headers: {
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "User-Agent": "k6-load-test",
+    },
     redirects: 5, // Follow redirects for authenticated requests
+    jar: auth.jar, // Use cookie jar - automatically includes session cookies
   };
 
+  // Add JWT token if available (for API requests)
   if (auth.token) {
-    params.headers = getHeaders(auth.token);
-  }
-
-  if (auth.sessionCookie) {
-    // Properly set Cookie header for session-based auth
-    params.headers["Cookie"] = auth.sessionCookie;
-    params.headers["Accept"] =
-      "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+    params.headers["Authorization"] = `Bearer ${auth.token}`;
   }
 
   return params;

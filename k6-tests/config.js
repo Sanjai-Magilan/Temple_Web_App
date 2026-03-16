@@ -1,10 +1,3 @@
-/**
- * k6 Load Test Configuration
- *
- * This file contains all configuration settings for the load tests.
- * Modify these values to adjust test behavior without changing test scripts.
- */
-
 export const config = {
   // Base URL of the application under test
   // Can be overridden with environment variable: K6_BASE_URL

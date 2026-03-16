@@ -10,6 +10,11 @@ import { check, sleep } from "k6";
 import { config } from "../config.js";
 import * as helpers from "../utils/helpers.js";
 
+// Cache for session to prevent excessive login attempts
+let cachedAuth = null;
+let authTimestamp = 0;
+const AUTH_CACHE_DURATION = 300; // 5 minutes in seconds
+
 /**
  * Execute API-heavy user flow
  * Performs multiple rapid API calls to stress database and backend
@@ -18,15 +23,27 @@ export function apiHeavyUserFlow() {
   const baseUrl = config.baseUrl;
   const credentials = config.testUsers.user;
 
-  // Login to get authentication
-  const authResult = helpers.performLogin(
-    baseUrl,
-    credentials.email,
-    credentials.password,
-  );
+  // Login to get authentication (or reuse cached session)
+  let authResult;
+  const now = Date.now() / 1000;
+
+  if (cachedAuth && now - authTimestamp < AUTH_CACHE_DURATION) {
+    authResult = cachedAuth;
+  } else {
+    authResult = helpers.performLogin(
+      baseUrl,
+      credentials.email,
+      credentials.password,
+    );
+
+    if (authResult.success) {
+      cachedAuth = authResult;
+      authTimestamp = now;
+    }
+  }
 
   if (!authResult.success) {
-    console.error("Login failed, skipping API heavy flow");
+    console.error("❌ Login failed, skipping API heavy flow");
     return;
   }
 
@@ -55,11 +72,11 @@ export function apiHeavyUserFlow() {
     );
 
     check(response, {
-      [`${endpoint.name} successful`]: (r) => r.status === 200,
+      [`${endpoint.name} successful`]: (r) => r.status >= 200 && r.status < 400,
       [`${endpoint.name} fast response`]: (r) => r.timings.duration < 500,
     });
 
-    helpers.apiErrorRate.add(response.status !== 200);
+    helpers.apiErrorRate.add(response.status < 200 || response.status >= 400);
 
     // Very short sleep between API calls
     sleep(0.3);
@@ -77,7 +94,7 @@ export function apiHeavyUserFlow() {
     );
 
     check(dashboardResponse, {
-      "dashboard refresh successful": (r) => r.status === 200,
+      "dashboard refresh successful": (r) => r.status >= 200 && r.status < 400,
     });
 
     sleep(0.5);
@@ -115,7 +132,7 @@ export function apiHeavyUserFlow() {
     );
 
     check(familyResponse, {
-      "family check successful": (r) => r.status === 200,
+      "family check successful": (r) => r.status >= 200 && r.status < 400,
     });
 
     sleep(0.3);

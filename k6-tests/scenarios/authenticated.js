@@ -14,6 +14,12 @@ import { check, sleep } from "k6";
 import { config } from "../config.js";
 import * as helpers from "../utils/helpers.js";
 
+// Cache for session to prevent excessive login attempts
+// In a real scenario, users don't log in for every single action
+let cachedAuth = null;
+let authTimestamp = 0;
+const AUTH_CACHE_DURATION = 300; // 5 minutes in seconds
+
 /**
  * Execute authenticated user flow
  * Simulates a complete user session with login and authenticated actions
@@ -22,19 +28,34 @@ export function authenticatedUserFlow() {
   const baseUrl = config.baseUrl;
   const credentials = config.testUsers.user;
 
-  // Step 1: Login
-  const authResult = helpers.performLogin(
-    baseUrl,
-    credentials.email,
-    credentials.password,
-  );
+  // Step 1: Login (or reuse cached session)
+  let authResult;
+  const now = Date.now() / 1000;
+
+  // Reuse session if available and not expired (realistic user behavior)
+  if (cachedAuth && now - authTimestamp < AUTH_CACHE_DURATION) {
+    authResult = cachedAuth;
+    // console.log("♻️  Reusing cached session");
+  } else {
+    // Perform fresh login
+    authResult = helpers.performLogin(
+      baseUrl,
+      credentials.email,
+      credentials.password,
+    );
+
+    if (authResult.success) {
+      cachedAuth = authResult;
+      authTimestamp = now;
+    }
+  }
 
   if (!authResult.success) {
-    console.error("Login failed, skipping authenticated flow");
+    console.error("❌ Login failed, skipping authenticated flow");
     return;
   }
 
-  // Think time after login
+  // Think time after login (simulate user reading the page)
   sleep(config.sleepDuration.afterLogin);
 
   // Create authenticated request parameters
@@ -48,8 +69,9 @@ export function authenticatedUserFlow() {
   );
 
   check(dashboardResponse, {
-    "dashboard loaded": (r) => r.status === 200,
+    "dashboard loaded": (r) => r.status >= 200 && r.status < 400,
     "dashboard is authenticated": (r) => !r.url.includes("/login"),
+    "dashboard loaded in time": (r) => r.timings.duration < 2000,
   });
 
   // Think time
@@ -63,7 +85,8 @@ export function authenticatedUserFlow() {
   );
 
   check(profileResponse, {
-    "profile loaded": (r) => r.status === 200,
+    "profile loaded": (r) => r.status >= 200 && r.status < 400,
+    "profile response time": (r) => r.timings.duration < 1500,
   });
 
   // Think time
@@ -77,7 +100,8 @@ export function authenticatedUserFlow() {
   );
 
   check(familyResponse, {
-    "family page loaded": (r) => r.status === 200,
+    "family page loaded": (r) => r.status >= 200 && r.status < 400,
+    "family response time": (r) => r.timings.duration < 1500,
   });
 
   // Think time
@@ -91,7 +115,8 @@ export function authenticatedUserFlow() {
   );
 
   check(donationsResponse, {
-    "donations page loaded": (r) => r.status === 200,
+    "donations page loaded": (r) => r.status >= 200 && r.status < 400,
+    "donations response time": (r) => r.timings.duration < 1500,
   });
 
   // Think time

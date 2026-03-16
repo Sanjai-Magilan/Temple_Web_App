@@ -4,3 +4,4 @@ node_modules
 logs
 tests
 README.md
+pending_bookings.json

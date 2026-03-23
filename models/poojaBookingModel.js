@@ -201,3 +201,19 @@ exports.updateReceiptJson = async (bookingId, receiptJson) => {
     [JSON.stringify(receiptJson), bookingId],
   );
 };
+
+/**
+ * Cancel booking by ID
+ */
+exports.cancelBookingById = async (bookingId) => {
+  try {
+    const [result] = await pool.execute(
+      "DELETE FROM pooja_bookings WHERE id = ?",
+      [bookingId],
+    );
+    return result.affectedRows;
+  } catch (error) {
+    console.error("Error deleting pooja booking by ID:", error);
+    throw error;
+  }
+};

@@ -14,6 +14,40 @@ const hallBookingModel = require("../models/hallBookingModel");
 const poojaBookingModel = require("../models/poojaBookingModel");
 const { verifyPaymentSignature } = require("../config/razorpay");
 const receiptService = require("../utils/receiptService");
+const bookingCache = require("../utils/bookingCache");
+
+const createDonationForCapturedPayment = async (
+  paymentRecord,
+  razorpayPayment = null,
+) => {
+  if (!paymentRecord || paymentRecord.payment_type !== "donation") {
+    return null;
+  }
+
+  if (paymentRecord.related_id) {
+    return paymentRecord.related_id;
+  }
+
+  const sourcePayment =
+    razorpayPayment ||
+    (paymentRecord.razorpay_response
+      ? JSON.parse(paymentRecord.razorpay_response)
+      : null);
+
+  const notes = sourcePayment?.notes || {};
+
+  const donation = await donationModel.create({
+    user_id: paymentRecord.user_id,
+    family_id: paymentRecord.family_id || null,
+    amount: paymentRecord.amount,
+    donation_type: notes.donation_type || "general",
+    purpose: notes.purpose || null,
+    payment_id: paymentRecord.id,
+    is_anonymous: Number(notes.is_anonymous || 0),
+  });
+
+  return donation?.id || null;
+};
 
 /**
  * Create Razorpay order for donation
@@ -47,13 +81,14 @@ exports.createDonationOrder = async (req, res) => {
         user_id: req.user.id,
         donation_type: donation_type || "general",
         purpose: purpose || "",
+        is_anonymous: is_anonymous ? 1 : 0,
       },
     };
 
     const order = await razorpay.orders.create(options);
 
     // Store payment record (pending status)
-    const paymentId = await paymentModel.create({
+    await paymentModel.create({
       //payment_id: null, // Will be updated after payment
       order_id: order.id,
       user_id: req.user.id,
@@ -64,24 +99,11 @@ exports.createDonationOrder = async (req, res) => {
       payment_type: "donation",
     });
 
-    // Create donation record (pending payment)
-    const donation = await donationModel.create({
-      user_id: req.user.id,
-      family_id: null,
-      amount: donationAmount,
-      donation_type: donation_type || "general",
-      purpose: purpose || null,
-      payment_id: paymentId,
-      is_anonymous: is_anonymous || 0,
-    });
-
     res.json({
       success: true,
       order_id: order.id,
       amount: donationAmount,
       key: process.env.RAZORPAY_KEY_ID,
-      donation_id: donation.id,
-      receipt_number: donation.receipt_number,
     });
   } catch (error) {
   console.error("Error creating donation order:", error);
@@ -193,8 +215,7 @@ exports.createHallBookingOrder = async (req, res) => {
     const order = await razorpay.orders.create(options);
 
     // Store payment record
-    const paymentId = await paymentModel.create({
-      //payment_id: null,
+    await paymentModel.create({
       order_id: order.id,
       user_id: req.user.id,
       family_id: null,
@@ -204,8 +225,8 @@ exports.createHallBookingOrder = async (req, res) => {
       payment_type: "hall_booking",
     });
 
-    // Create hall booking record
-    const booking = await hallBookingModel.create({
+    // Store hall booking data in cache instead of database
+    const bookingData = {
       user_id: req.user.id,
       family_id: null,
       hall_name,
@@ -218,17 +239,17 @@ exports.createHallBookingOrder = async (req, res) => {
       food_required: foodRequired ? 1 : 0,
       food_meals: foodMealsCsv,
       amount: bookingAmount,
-      payment_id: paymentId,
       status: "pending",
-    });
+    };
+
+    bookingCache.set(order.id, bookingData);
 
     res.json({
       success: true,
       order_id: order.id,
       amount: bookingAmount,
       key: process.env.RAZORPAY_KEY_ID,
-      booking_id: booking.id,
-      booking_number: booking.booking_number,
+      // No booking_id yet as it's only in cache
     });
   } catch (error) {
     console.error("Error creating hall booking order:", error);
@@ -289,8 +310,7 @@ exports.createPoojaBookingOrder = async (req, res) => {
     const order = await razorpay.orders.create(options);
 
     // Store payment record
-    const paymentId = await paymentModel.create({
-      //payment_id: null,
+    await paymentModel.create({
       order_id: order.id,
       user_id: req.user.id,
       family_id: null,
@@ -300,8 +320,8 @@ exports.createPoojaBookingOrder = async (req, res) => {
       payment_type: "pooja_booking",
     });
 
-    // Create pooja booking record
-    const booking = await poojaBookingModel.create({
+    // Store pooja booking data in cache instead of database
+    const bookingData = {
       user_id: req.user.id,
       family_id: null,
       pooja_name,
@@ -313,17 +333,17 @@ exports.createPoojaBookingOrder = async (req, res) => {
       nakshatra: nakshatra || null,
       special_instructions: special_instructions || null,
       amount: bookingAmount,
-      payment_id: paymentId,
       status: "pending",
-    });
+    };
+
+    bookingCache.set(order.id, bookingData);
 
     res.json({
       success: true,
       order_id: order.id,
       amount: bookingAmount,
       key: process.env.RAZORPAY_KEY_ID,
-      booking_id: booking.id,
-      booking_number: booking.booking_number,
+      // No booking_id yet as it's only in cache
     });
   } catch (error) {
     console.error("Error creating pooja booking order:", error);
@@ -365,6 +385,9 @@ exports.verifyPayment = async (req, res) => {
     // Check idempotency - prevent duplicate payments
     const existingPayment = await paymentModel.findByPaymentId(payment_id);
     if (existingPayment && existingPayment.status === "completed") {
+      if (existingPayment.payment_type === "donation") {
+        await createDonationForCapturedPayment(existingPayment);
+      }
       return res.json({
         success: true,
         message: "Payment already processed",
@@ -398,38 +421,95 @@ exports.verifyPayment = async (req, res) => {
     });
 
     // Update related records based on payment type
-    if (razorpayPayment.status === "captured" && payment.related_id) {
+    if (razorpayPayment.status === "captured") {
       if (payment.payment_type === "donation") {
-        // Donation receipt is already generated during creation
-        // No additional update needed
+        await createDonationForCapturedPayment(payment, razorpayPayment);
       } else if (payment.payment_type === "hall_booking") {
-        const booking = await hallBookingModel.findById(payment.related_id);
+        let relatedId = payment.related_id;
 
-        if (booking) {
-          const hasConflict = await hallBookingModel.hasConfirmedOverlap({
-            hall_name: booking.hall_name,
-            booking_date: booking.booking_date,
-            start_time: booking.start_time,
-            end_time: booking.end_time,
-            excludeBookingId: booking.id,
-          });
-
-          if (hasConflict) {
-            await hallBookingModel.updateStatus(
-              booking.id,
-              "cancelled",
-              "Time slot already booked",
-            );
-            return res.status(409).json({
-              success: false,
-              message:
-                "Time slot already booked. Payment received; admin will contact you.",
+        // If not in database, it should be in cache
+        if (!relatedId) {
+          const cachedBooking = bookingCache.get(order_id);
+          if (cachedBooking) {
+            // Check for conflict again before creating
+            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+              hall_name: cachedBooking.hall_name,
+              booking_date: cachedBooking.booking_date,
+              start_time: cachedBooking.start_time,
+              end_time: cachedBooking.end_time,
             });
+
+            if (hasConflict) {
+              // Return conflict and don't create booking
+              // In a real scenario, we might want to refund or create as 'cancelled'
+              return res.status(409).json({
+                success: false,
+                message: "Time slot already booked. Payment received; please contact admin.",
+              });
+            }
+
+            const booking = await hallBookingModel.create({
+              ...cachedBooking,
+              payment_id: payment.id,
+              status: "confirmed",
+            });
+            relatedId = booking.id;
+            bookingCache.delete(order_id);
           }
+        } else {
+          // Booking already exists (e.g. from "Continue Payment" flow)
+          const booking = await hallBookingModel.findById(relatedId);
+
+          if (booking) {
+            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+              hall_name: booking.hall_name,
+              booking_date: booking.booking_date,
+              start_time: booking.start_time,
+              end_time: booking.end_time,
+              excludeBookingId: booking.id,
+            });
+
+            if (hasConflict) {
+              await hallBookingModel.updateStatus(
+                booking.id,
+                "cancelled",
+                "Time slot already booked",
+              );
+              return res.status(409).json({
+                success: false,
+                message:
+                  "Time slot already booked. Payment received; admin will contact you.",
+              });
+            }
+          }
+          await hallBookingModel.updateStatus(relatedId, "confirmed");
         }
-        await hallBookingModel.updateStatus(payment.related_id, "confirmed");
+
+        // Update local payment record with the new related_id if it was just created
+        if (relatedId && !payment.related_id) {
+          payment.related_id = relatedId;
+        }
       } else if (payment.payment_type === "pooja_booking") {
-        await poojaBookingModel.updateStatus(payment.related_id, "confirmed");
+        let relatedId = payment.related_id;
+
+        if (!relatedId) {
+          const cachedBooking = bookingCache.get(order_id);
+          if (cachedBooking) {
+            const booking = await poojaBookingModel.create({
+              ...cachedBooking,
+              payment_id: payment.id,
+              status: "confirmed",
+            });
+            relatedId = booking.id;
+            bookingCache.delete(order_id);
+          }
+        } else {
+          await poojaBookingModel.updateStatus(relatedId, "confirmed");
+        }
+
+        if (relatedId && !payment.related_id) {
+          payment.related_id = relatedId;
+        }
       }
     }
 
@@ -494,6 +574,9 @@ exports.handleWebhook = async (req, res) => {
       }
 
       if (existingPayment.status === "completed") {
+        if (existingPayment.payment_type === "donation") {
+          await createDonationForCapturedPayment(existingPayment, payment);
+        }
         // Already processed
         return res.json({
           success: true,
@@ -508,41 +591,78 @@ exports.handleWebhook = async (req, res) => {
         razorpay_response: payment,
       });
 
+      const updatedPayment = await paymentModel.findByPaymentId(payment.id);
+
       // Update related records
-      if (existingPayment.related_id) {
-        if (existingPayment.payment_type === "hall_booking") {
-          const booking = await hallBookingModel.findById(
-            existingPayment.related_id,
-          );
+      if (updatedPayment?.payment_type === "donation") {
+        await createDonationForCapturedPayment(updatedPayment, payment);
+      } else if (updatedPayment) {
+        let relatedId = updatedPayment.related_id;
+        const orderId = updatedPayment.order_id;
 
-          if (booking) {
-            const hasConflict = await hallBookingModel.hasConfirmedOverlap({
-              hall_name: booking.hall_name,
-              booking_date: booking.booking_date,
-              start_time: booking.start_time,
-              end_time: booking.end_time,
-              excludeBookingId: booking.id,
-            });
+        if (updatedPayment.payment_type === "hall_booking") {
+          if (!relatedId) {
+            const cachedBooking = bookingCache.get(orderId);
+            if (cachedBooking) {
+              const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+                hall_name: cachedBooking.hall_name,
+                booking_date: cachedBooking.booking_date,
+                start_time: cachedBooking.start_time,
+                end_time: cachedBooking.end_time,
+              });
 
-            if (hasConflict) {
-              await hallBookingModel.updateStatus(
-                booking.id,
-                "cancelled",
-                "Time slot already booked",
-              );
-              return res.json({ success: true });
+              if (!hasConflict) {
+                const booking = await hallBookingModel.create({
+                  ...cachedBooking,
+                  payment_id: updatedPayment.id,
+                  status: "confirmed",
+                });
+                relatedId = booking.id;
+              }
+              bookingCache.delete(orderId);
             }
-          }
+          } else {
+            const booking = await hallBookingModel.findById(relatedId);
+            if (booking) {
+              const hasConflict = await hallBookingModel.hasConfirmedOverlap({
+                hall_name: booking.hall_name,
+                booking_date: booking.booking_date,
+                start_time: booking.start_time,
+                end_time: booking.end_time,
+                excludeBookingId: booking.id,
+              });
 
-          await hallBookingModel.updateStatus(
-            existingPayment.related_id,
-            "confirmed",
-          );
-        } else if (existingPayment.payment_type === "pooja_booking") {
-          await poojaBookingModel.updateStatus(
-            existingPayment.related_id,
-            "confirmed",
-          );
+              if (hasConflict) {
+                await hallBookingModel.updateStatus(
+                  booking.id,
+                  "cancelled",
+                  "Time slot already booked",
+                );
+                return res.json({ success: true });
+              }
+            }
+            await hallBookingModel.updateStatus(relatedId, "confirmed");
+          }
+        } else if (updatedPayment.payment_type === "pooja_booking") {
+          if (!relatedId) {
+            const cachedBooking = bookingCache.get(orderId);
+            if (cachedBooking) {
+              const booking = await poojaBookingModel.create({
+                ...cachedBooking,
+                payment_id: updatedPayment.id,
+                status: "confirmed",
+              });
+              relatedId = booking.id;
+              bookingCache.delete(orderId);
+            }
+          } else {
+            await poojaBookingModel.updateStatus(relatedId, "confirmed");
+          }
+        }
+
+        // Update locally for receipt generation below
+        if (relatedId && !updatedPayment.related_id) {
+          updatedPayment.related_id = relatedId;
         }
       }
 

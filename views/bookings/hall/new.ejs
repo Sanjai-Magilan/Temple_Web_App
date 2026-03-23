@@ -279,10 +279,11 @@
                                     <label for="hall_name" class="form-label-custom">Select Venue</label>
                                     <select class="form-select-custom" id="hall_name" name="hall_name" required>
                                         <option value="">Choose a hall...</option>
-                                        <option value="Main Hall">Main Hall</option>
-                                        <option value="Community Hall">Community Hall</option>
-                                        <option value="Small Hall">Small Hall</option>
-                                        <option value="Outdoor Area">Outdoor Area</option>
+                                        <% const selectedHall = typeof booking !== 'undefined' && booking ? booking.hall_name : ''; %>
+                                        <option value="Main Hall" <%= selectedHall === 'Main Hall' ? 'selected' : '' %>>Main Hall</option>
+                                        <option value="Community Hall" <%= selectedHall === 'Community Hall' ? 'selected' : '' %>>Community Hall</option>
+                                        <option value="Small Hall" <%= selectedHall === 'Small Hall' ? 'selected' : '' %>>Small Hall</option>
+                                        <option value="Outdoor Area" <%= selectedHall === 'Outdoor Area' ? 'selected' : '' %>>Outdoor Area</option>
                                     </select>
                                 </div>
 
@@ -291,20 +292,38 @@
                                     <div class="form-col">
                                         <div class="form-group-custom">
                                             <label for="booking_date" class="form-label-custom">Event Date</label>
+                                            <% 
+                                                let dateVal = '';
+                                                if (typeof booking !== 'undefined' && booking && booking.booking_date) {
+                                                    // Handle both Date object and date string
+                                                    const d = new Date(booking.booking_date);
+                                                    if (!isNaN(d)) {
+                                                        const year = d.getFullYear();
+                                                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                                                        const day = String(d.getDate()).padStart(2, '0');
+                                                        dateVal = `${year}-${month}-${day}`;
+                                                    } else {
+                                                        dateVal = booking.booking_date;
+                                                    }
+                                                }
+                                            %>
                                             <input type="date" class="form-control-custom" id="booking_date"
-                                                name="booking_date" required onclick="this.showPicker()">
+                                                name="booking_date"
+                                                value="<%= dateVal %>"
+                                                required>
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <div class="form-group-custom">
                                             <label for="event_type" class="form-label-custom">Event Type</label>
+                                            <% const selectedType = typeof booking !== 'undefined' && booking ? booking.event_type : ''; %>
                                             <select class="form-select-custom" id="event_type" name="event_type">
                                                 <option value="">Select type</option>
-                                                <option value="wedding">Wedding</option>
-                                                <option value="function">Function</option>
-                                                <option value="ceremony">Ceremony</option>
-                                                <option value="meeting">Meeting</option>
-                                                <option value="other">Other</option>
+                                                <option value="wedding" <%= selectedType === 'wedding' ? 'selected' : '' %>>Wedding</option>
+                                                <option value="function" <%= selectedType === 'function' ? 'selected' : '' %>>Function</option>
+                                                <option value="ceremony" <%= selectedType === 'ceremony' ? 'selected' : '' %>>Ceremony</option>
+                                                <option value="meeting" <%= selectedType === 'meeting' ? 'selected' : '' %>>Meeting</option>
+                                                <option value="other" <%= selectedType === 'other' ? 'selected' : '' %>>Other</option>
                                             </select>
                                         </div>
                                     </div>
@@ -316,14 +335,14 @@
                                         <div class="form-group-custom">
                                             <label for="start_time" class="form-label-custom">Start Time</label>
                                             <input type="time" class="form-control-custom" id="start_time"
-                                                name="start_time" required>
+                                                name="start_time" value="<%= typeof booking !== 'undefined' && booking ? booking.start_time : '' %>" required>
                                         </div>
                                     </div>
                                     <div class="form-col">
                                         <div class="form-group-custom">
                                             <label for="end_time" class="form-label-custom">End Time</label>
                                             <input type="time" class="form-control-custom" id="end_time" name="end_time"
-                                                required>
+                                                value="<%= typeof booking !== 'undefined' && booking ? booking.end_time : '' %>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -332,23 +351,26 @@
                                 <div class="form-group-custom">
                                     <label for="expected_guests" class="form-label-custom">Expected Guests</label>
                                     <input type="number" class="form-control-custom" id="expected_guests"
-                                        name="expected_guests" min="1" placeholder="Number of attendees">
+                                        name="expected_guests" min="1" placeholder="Number of attendees"
+                                        value="<%= typeof booking !== 'undefined' && booking ? booking.expected_guests : '' %>">
                                 </div>
 
                                 <!-- Food Arrangements -->
                                 <div class="form-group-custom">
                                     <label class="form-label-custom mb-3">Do you require food arrangements?</label>
-
+                                    <% 
+                                        const foodRequired = typeof booking !== 'undefined' && booking ? (booking.food_required == 1 || booking.food_required === true) : false;
+                                    %>
                                     <div class="d-flex gap-3 mb-3">
                                         <input type="radio" class="btn-check" name="food_required" id="food_yes"
-                                            value="yes" autocomplete="off">
+                                            value="yes" autocomplete="off" <%= foodRequired ? 'checked' : '' %>>
                                         <label class="btn btn-outline-warning w-50 py-2" for="food_yes"
                                             style="color: #2c241b; border-color: #bfa15f;">
                                             <i class="bi bi-check-circle me-2"></i>Yes, Required
                                         </label>
 
                                         <input type="radio" class="btn-check" name="food_required" id="food_no"
-                                            value="no" autocomplete="off" checked>
+                                            value="no" autocomplete="off" <%= !foodRequired ? 'checked' : '' %>>
                                         <label class="btn btn-outline-warning w-50 py-2" for="food_no"
                                             style="color: #2c241b; border-color: #bfa15f;">
                                             <i class="bi bi-x-circle me-2"></i>No, Thanks
@@ -356,24 +378,30 @@
                                     </div>
 
                                     <!-- Meal Options (Inline) -->
+                                    <% 
+                                        let meals = [];
+                                        if (typeof booking !== 'undefined' && booking && booking.food_meals) {
+                                            meals = Array.isArray(booking.food_meals) ? booking.food_meals : [];
+                                        }
+                                    %>
                                     <div id="meal_options_container"
-                                        style="display: none; margin-bottom: 0.5rem; padding-left: 0.5rem; transition: all 0.3s ease;">
+                                        style="<%= foodRequired ? 'display: block;' : 'display: none;' %> margin-bottom: 0.5rem; padding-left: 0.5rem; transition: all 0.3s ease;">
                                         <div class="d-flex flex-wrap gap-4 mt-2">
                                             <div class="form-check p-2">
                                                 <input class="form-check-input" type="checkbox" id="meal_breakfast"
-                                                    value="Breakfast" style="margin-top: 0.3em;">
+                                                    value="Breakfast" style="margin-top: 0.3em;" <%= meals.includes('Breakfast') ? 'checked' : '' %>>
                                                 <label class="form-check-label fw-bold" for="meal_breakfast"
                                                     style="color: #5d5145;">Breakfast</label>
                                             </div>
                                             <div class="form-check p-2">
                                                 <input class="form-check-input" type="checkbox" id="meal_lunch"
-                                                    value="Lunch" style="margin-top: 0.3em;">
+                                                    value="Lunch" style="margin-top: 0.3em;" <%= meals.includes('Lunch') ? 'checked' : '' %>>
                                                 <label class="form-check-label fw-bold" for="meal_lunch"
                                                     style="color: #5d5145;">Lunch</label>
                                             </div>
                                             <div class="form-check p-2">
                                                 <input class="form-check-input" type="checkbox" id="meal_dinner"
-                                                    value="Dinner" style="margin-top: 0.3em;">
+                                                    value="Dinner" style="margin-top: 0.3em;" <%= meals.includes('Dinner') ? 'checked' : '' %>>
                                                 <label class="form-check-label fw-bold" for="meal_dinner"
                                                     style="color: #5d5145;">Dinner</label>
                                             </div>
@@ -387,7 +415,7 @@
                                         Description</label>
                                     <textarea class="form-control-custom" id="event_description"
                                         name="event_description" rows="3"
-                                        placeholder="Additional details or requirements..."></textarea>
+                                        placeholder="Additional details or requirements..."><%= typeof booking !== 'undefined' && booking ? booking.event_description : '' %></textarea>
                                 </div>
 
                                 <!-- Amount -->
@@ -396,7 +424,8 @@
                                     <div class="amount-wrapper">
                                         <span class="amount-symbol">₹</span>
                                         <input type="number" class="form-control-custom amount-input" id="amount"
-                                            name="amount" min="1" step="0.01" required placeholder="0.00">
+                                            name="amount" min="1" step="0.01" required placeholder="0.00"
+                                            value="<%= typeof booking !== 'undefined' && booking ? booking.amount : '' %>">
                                     </div>
                                     <small class="text-muted"
                                         style="display: block; margin-top: 0.5rem; font-size: 0.8rem; font-style: italic;">
@@ -462,6 +491,7 @@
                 e.preventDefault();
                 const MAX_HALL_AMOUNT = 500000; // ₹5,00,000
                 const bookingAmount = Number(document.getElementById('amount').value);
+                const existingBookingId = "<%= typeof booking !== 'undefined' && booking ? booking.id : '' %>";
 
                 if (bookingAmount > MAX_HALL_AMOUNT) {
                     showAlert(
@@ -503,11 +533,6 @@
 
 
                 if (foodYes) {
-                    const meals = [];
-                    if (document.getElementById('meal_breakfast').checked) meals.push('Breakfast');
-                    if (document.getElementById('meal_lunch').checked) meals.push('Lunch');
-                    if (document.getElementById('meal_dinner').checked) meals.push('Dinner');
-
                     baseDescription += `\n\n--- Food Arrangements ---\nRequired: Yes\nMeals: ${meals.join(', ')}`;
                 } else {
                     baseDescription += `\n\n--- Food Arrangements ---\nRequired: No`;
@@ -528,25 +553,79 @@
                 };
 
                 try {
-                    await initiatePayment('hall-booking', formData, {
-                        onSuccess: (result) => {
-                            showAlert(
-                                'success',
-                                'Booking Successful',
-                                'Your hall booking has been confirmed!'
-                            );
+                    if (existingBookingId) {
+                        // Resume existing booking payment
+                        fetch(`/bookings/hall/continue/${existingBookingId}`, {
+                            method: "GET",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include"
+                        })
+                        .then(async (res) => {
+                            const data = await res.json();
+                            if (!res.ok || !data.success) {
+                                throw new Error(data.message || "Failed to resume payment");
+                            }
+                            return data;
+                        })
+                        .then((data) => {
+                            if (typeof RazorpayPayment !== "function") {
+                                throw new Error("Payment function not loaded. Please contact support.");
+                            }
 
-                            setTimeout(() => {
-                                window.location.href = '/payment/success?payment_id=' + result.payment_id;
-                            }, 1500);
+                            const razorpayPayment = new RazorpayPayment({
+                                key: data.key,
+                                onSuccess: (result) => {
+                                     showAlert(
+                                        'success',
+                                        'Booking Successful',
+                                        'Your hall booking has been confirmed!'
+                                    );
+                                   setTimeout(() => {
+                                        window.location.href = "/bookings/hall";
+                                    }, 1500);
+                                },
+                                onFailure: (error) => {
+                                    showAlert('error', 'Payment Failed', error.message || "Unknown error");
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = originalText;
+                                }
+                            });
 
-                        },
-                        onFailure: (error) => {
-                            showAlert('error', 'Payment Failed', error.message);
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        }
-                    });
+                            return razorpayPayment.initCheckout({
+                                order_id: data.order_id,
+                                amount: data.amount,
+                                description: data.description || "Hall booking payment",
+                                payment_type: "hall-booking"
+                            });
+                        })
+                        .catch((err) => {
+                             showAlert('error', 'Error', err.message);
+                             submitBtn.disabled = false;
+                             submitBtn.innerHTML = originalText;
+                        });
+
+                    } else {
+                        // Create new booking
+                        await initiatePayment('hall-booking', formData, {
+                            onSuccess: (result) => {
+                                showAlert(
+                                    'success',
+                                    'Booking Successful',
+                                    'Your hall booking has been confirmed!'
+                                );
+
+                                setTimeout(() => {
+                                        window.location.href = "/bookings/hall";
+                                    }, 1500);
+
+                            },
+                            onFailure: (error) => {
+                                showAlert('error', 'Payment Failed', error.message);
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalText;
+                            }
+                        });
+                    }
                 } catch (error) {
                     showAlert('error', 'Error', error.message);
                     submitBtn.disabled = false;

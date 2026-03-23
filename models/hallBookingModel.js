@@ -239,3 +239,18 @@ exports.updateReceiptJson = async (bookingId, receiptJson) => {
     [JSON.stringify(receiptJson), bookingId],
   );
 };
+
+exports.cancelBookingById = async (bookingId) => {
+  try {
+    const [result] = await pool.execute(
+      "DELETE FROM hall_bookings WHERE id = ?",
+      [bookingId]
+    );
+
+    return result.affectedRows;
+
+  } catch (error) {
+    console.error("Error deleting hall booking by ID:", error);
+    throw error;
+  }
+};

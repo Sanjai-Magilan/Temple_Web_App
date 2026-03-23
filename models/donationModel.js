@@ -112,14 +112,17 @@ exports.getUserDonations = async (userId, limit = 20, offset = 0) => {
       `SELECT d.*, p.status as payment_status, p.payment_method 
        FROM donations d
        LEFT JOIN payments p ON d.payment_id = p.id
-       WHERE d.user_id = ?
+       WHERE d.user_id = ? AND p.status = 'completed'
        ORDER BY d.created_at DESC
        LIMIT ? OFFSET ?`,
       [userId, String(limit), String(offset)],
     );
 
     const [countRows] = await pool.execute(
-      "SELECT COUNT(*) as count FROM donations WHERE user_id = ?",
+      `SELECT COUNT(*) as count 
+       FROM donations d
+       LEFT JOIN payments p ON d.payment_id = p.id
+       WHERE d.user_id = ? AND p.status = 'completed'`,
       [userId],
     );
 

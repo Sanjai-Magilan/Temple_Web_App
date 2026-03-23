@@ -324,8 +324,8 @@ exports.getAllPayments = async ({
   const [countResult] = await pool.execute(countQuery, values);
   const [rows] = await pool.execute(dataQuery, [
     ...values,
-    safeLimit,
-    safeOffset,
+    String(safeLimit),
+    String(safeOffset),
   ]);
 
   return {

@@ -5,23 +5,11 @@ pipeline {
         }
     }
 
-    options {
-        skipDefaultCheckout(true)
-    }
-
     environment {
         NODE_ENV = 'test'
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/Sanjai-Magilan/Temple_Web_App.git',
-                    branch: 'main',
-                    credentialsId: 'github-token'
-            }
-        }
 
         stage('Install Dependencies') {
             steps {

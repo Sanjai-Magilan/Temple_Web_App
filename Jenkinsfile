@@ -19,7 +19,7 @@ pipeline {
             steps {
                 git url: 'https://github.com/Sanjai-Magilan/Temple_Web_App.git',
                     branch: 'main',
-                    credentialsId: 'github-creds'
+                    credentialsId: 'github-token'
             }
         }
 

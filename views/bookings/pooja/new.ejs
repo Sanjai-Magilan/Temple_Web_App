@@ -1,509 +1,723 @@
-<%- include('../../partials/header') %>
+<% if (!Array.isArray(bookings)) { bookings=bookings ? [bookings] : []; } %>
+  <%- include('../../partials/header') %>
 
-  <style>
-        /* ===== Global Reset ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* ===== Allow FULL WINDOW SCROLL ===== */
-
-    body {
-      overflow-y: auto;
-    }
-
-    /* ===== Overlay ===== */
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .65);
-      backdrop-filter: blur(4px);
-
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-
-      padding: 40px 15px;
-      overflow-y: auto;
-
-      z-index: 9999;
-    }
-
-    /* ===== Modal Box ===== */
-
-    .booking-modal {
-      width: 100%;
-      max-width: 650px;
-
-      background: #fffaf3;
-      padding: 35px 40px;
-
-      border-radius: 22px;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, .5);
-
-      position: relative;
-      animation: popup .3s ease;
-    }
-
-    @keyframes popup {
-      from {
-        transform: translateY(20px) scale(.95);
-        opacity: 0;
+    <style>
+      /* ===== GLOBAL RESET AND SCROLL ===== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+      body {
+        overflow: hidden;
+        background: linear-gradient(180deg, #7a7a7a, #5f5f5f);
       }
-    }
 
-    /* ===== Close Button ===== */
+      /* ===== NAVBAR COLOR SAME AS HALL BOOKING ===== */
+      .navbar {
+        background: linear-gradient(90deg, #2c241b, #8c7b65) !important;
+        border-bottom: 1px solid rgba(191, 161, 95, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
 
-    .close-btn {
-      position: absolute;
-      right: 18px;
-      top: 15px;
-      font-size: 22px;
-      cursor: pointer;
-      color: #999;
-    }
+      .navbar-brand,
+      .navbar .nav-link {
+        color: #f5f5f5 !important;
+        font-weight: 500;
+      }
 
-    .close-btn:hover {
-      color: #000;
-    }
+      .navbar .nav-link:hover {
+        color: #bfa15f !important;
+      }
 
-    /* ===== Header ===== */
+      .navbar .dropdown-toggle {
+        color: #ffffff !important;
+      }
 
-    .booking-title {
-      text-align: center;
-      font-family: 'Playfair Display', serif;
-      font-size: 30px;
-      font-weight: 700;
-    }
+      .navbar-toggler {
+        border-color: rgba(191, 161, 95, 0.6);
+      }
 
-    .booking-subtitle {
-      text-align: center;
-      font-size: 14px;
-      color: #8c7b65;
-      margin-bottom: 25px;
-    }
+      .navbar-toggler-icon {
+        filter: invert(1) sepia(1) saturate(4) hue-rotate(10deg);
+      }
 
-    /* ===== Form ===== */
+      /* ===== PAGE TITLE ===== */
+      .page-title {
+        font-family: 'Playfair Display', serif;
+        color: #ffffff;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+      }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
+      /* ===== CARD ===== */
+      .pooja-card {
+        background: #fffaf2;
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 12px 22px rgba(0, 0, 0, .30);
+        transition: .3s ease;
+      }
 
-    .form-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #5d5145;
-      margin-bottom: 7px;
-      display: block;
-    }
+      .pooja-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 35px rgba(0, 0, 0, .45);
+      }
 
-    .form-input {
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-    }
+      .pooja-header {
+        background: linear-gradient(90deg, #c6a75d, #b1934e);
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #2c241b;
+      }
 
-    .form-input::placeholder {
-      color: #aaa;
-    }
+      .card-body {
+        padding: 16px 18px;
+      }
 
-    .form-input:focus {
-      outline: none;
-      border-color: #bfa15f;
-      box-shadow: 0 0 0 4px rgba(191, 161, 95, .15);
-    }
+      .card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #2c241b;
+      }
 
+      .info-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        margin-bottom: 7px;
+        color: #444;
+      }
 
+      .badge-pending {
+        background: #ffc107;
+        color: #000;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-    /* ===== Two Column Layout ===== */
+      .badge-confirmed {
+        background: #28a745;
+        color: #fff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-    .row-2 {
-      display: flex;
-      gap: 16px;
-    }
+      .badge-cancelled {
+        background: #dc3545;
+        color: #fff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-    .col-2 {
-      flex: 1;
-    }
+      .amount-badge {
+        background: #f1f1f1;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
 
-    /* ===== Amount Field ===== */
+      .card-footer {
+        padding: 10px 16px 14px;
+        font-size: 12px;
+        color: #666;
+      }
 
-    .amount-box {
-      position: relative;
-    }
+      .btn-gold {
+        background: linear-gradient(90deg, #c6a75d, #b1934e);
+        color: white;
+        border-radius: 20px;
+        padding: 8px 18px;
+        border: none;
+      }
 
-    .amount-symbol {
-      position: absolute;
-      left: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-weight: bold;
-      color: #bfa15f;
-    }
+      .btn-gold:hover {
+        background: linear-gradient(90deg, #b1934e, #9f823e);
+      }
 
-    .amount-input {
-      padding-left: 32px;
-      font-weight: 600;
-      color: #bfa15f;
-    }
-
-    /* Hide spinner specifically for amount input */
-    .amount-input::-webkit-inner-spin-button,
-    .amount-input::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    .amount-input {
-      -moz-appearance: textfield;
-      appearance: textfield;
-    }
-
-    /* ===== Buttons ===== */
-
-    .btn-book {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-
-      background: linear-gradient(135deg, #bfa15f, #a88b4d);
-      color: white;
-
-      font-size: 15px;
-      font-weight: 600;
-      margin-top: 10px;
-
-      cursor: pointer;
-    }
-
-    .btn-book:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(168, 139, 77, .35);
-    }
-
-    .btn-book:disabled {
-      background: #dcdcdc;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* ===== Cancel Link ===== */
-
-    .cancel-link {
-      display: block;
-      text-align: center;
-      margin-top: 14px;
-      font-size: 14px;
-      color: #777;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .cancel-link:hover {
-      color: #bfa15f;
-      text-decoration: underline;
-    }
-
-    /* ===== Mobile ===== */
-
-    @media (max-width:600px) {
-
+      /* ===== Overlay ===== */
       .modal-overlay {
-        padding: 20px 10px;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .65);
+        display: flex;
+        justify-content: center;
         align-items: flex-start;
+        padding: 40px 15px;
+        overflow-y: auto;
+        z-index: 9999;
       }
 
-      .row-2 {
-        flex-direction: column;
-      }
-
+      /* ===== Modal Box (Using Hall Booking Styles) ===== */
       .booking-modal {
-        padding: 25px 20px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-      }
-    }
-
-    .swal2-container {
-      z-index: 20000 !important;
-    }
-  </style>
-
-  <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
-
-    <!-- ===== POPUP ===== -->
-
-    <div class="modal-overlay">
-
-      <div class="booking-modal">
-
-        <!-- Close Button -->
-        <div class="close-btn" onclick="closeModal()">✖</div>
-
-        <!-- Header -->
-        <h2 class="booking-title">Book a Pooja</h2>
-        <p class="booking-subtitle">
-          A Guide to Daily Rituals and Divine Connection
-        </p>
-
-        <!-- Form -->
-
-        <form id="poojaBookingForm">
-
-          <!-- Select Pooja -->
-
-          <div class="form-group">
-            <label class="form-label">Select Pooja</label>
-
-            <select id="pooja_name" class="form-input" onchange="setAmount()" required>
-
-              <option value="">Choose Pooja</option>
-              <option value="Ganapathi Homam" data-price="500">Ganapathi Homam — ₹500</option>
-              <option value="Satyanarayana Pooja" data-price="750">Satyanarayana Pooja — ₹750</option>
-              <option value="Navagraha Pooja" data-price="1000">Navagraha Pooja — ₹1000</option>
-              <option value="Abhishekam" data-price="300">Abhishekam — ₹300</option>
-              <option value="Lakshmi Pooja" data-price="1200">Lakshmi Pooja — ₹1200</option>
-
-            </select>
-          </div>
-
-          <!-- Booking Date & Time -->
-
-          <div class="row-2">
-
-            <div class="col-2 form-group">
-              <label class="form-label">Booking Date</label>
-              <input type="date" name="booking_date" class="form-input" required onclick="this.showPicker()">
-            </div>
-
-            <div class="col-2 form-group">
-              <label class="form-label">Booking Time</label>
-              <input type="time" name="booking_time" class="form-input" required>
-            </div>
-
-          </div>
-
-          <!-- Devotee Name -->
-
-          <div class="form-group">
-            <label class="form-label">Devotee Name</label>
-            <input type="text" name="devotee_name" class="form-input" placeholder="Enter devotee full name" required>
-          </div>
-
-          <!-- Gotra & Nakshatra -->
-
-          <div class="row-2">
-
-            <div class="col-2 form-group">
-              <label class="form-label">Gotra</label>
-              <input type="text" name="gotra" class="form-input" placeholder="Eg: Bharadwaj">
-            </div>
-
-            <div class="col-2 form-group">
-              <label class="form-label">Nakshatra</label>
-
-              <select name="nakshatra" class="form-input">
-                <option value="">Choose Nakshatra</option>
-                <option>Ashwini</option>
-                <option>Bharani</option>
-                <option>Krittika</option>
-                <option>Rohini</option>
-                <option>Mrigashirsha</option>
-                <option>Ardra</option>
-                <option>Punarvasu</option>
-                <option>Pushya</option>
-                <option>Ashlesha</option>
-                <option>Magha</option>
-                <option>Purva Phalguni</option>
-                <option>Uttara Phalguni</option>
-                <option>Hasta</option>
-                <option>Chitra</option>
-                <option>Swati</option>
-                <option>Vishakha</option>
-                <option>Anuradha</option>
-                <option>Jyeshtha</option>
-                <option>Mula</option>
-                <option>Purva Ashadha</option>
-                <option>Uttara Ashadha</option>
-                <option>Shravana</option>
-                <option>Dhanishta</option>
-                <option>Shatabhisha</option>
-                <option>Purva Bhadrapada</option>
-                <option>Uttara Bhadrapada</option>
-                <option>Revati</option>
-              </select>
-
-            </div>
-
-          </div>
-
-          <!-- Special Instructions -->
-
-          <div class="form-group">
-            <label class="form-label">Special Instructions</label>
-
-            <textarea name="special_instructions" rows="3" class="form-input"
-              placeholder="Flowers, preferred timings, sankalpam details..."></textarea>
-          </div>
-
-          <!-- Amount -->
-
-          <div class="form-group">
-            <label class="form-label">Pooja Amount</label>
-
-            <div class="amount-box">
-              <span class="amount-symbol">₹</span>
-              <input type="number" id="amount" class="form-input amount-input"
-                placeholder="Auto filled from pooja selection" required readonly>
-            </div>
-
-          </div>
-
-          <!-- Buttons -->
-
-          <button type="submit" class="btn-book" id="submitBtn">
-            Proceed To Payment →
-          </button>
-
-          <a class="cancel-link" onclick="closeModal()">Cancel Booking</a>
-
-        </form>
-
-      </div>
-    </div>
-
-    <script>
-      if (typeof window.showAlert !== 'function') {
-        window.showAlert = function (type, title, message) {
-          if (window.Swal) {
-            const icons = {
-              success: 'success',
-              error: 'error',
-              warning: 'warning',
-              info: 'info'
-            };
-
-            Swal.fire({
-              icon: icons[type] || 'info',
-              title: title || 'Notice',
-              html: `<p style="font-size:15px;">${message || ''}</p>`,
-              confirmButtonText: 'Okay',
-              confirmButtonColor: '#bfa15f'
-            });
-          } else {
-            alert(message || title || 'Notice');
-          }
-        };
-      }
-      function closeModal() {
-        window.location.href = "/bookings/pooja";
+        background: #FFFBF5;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, .5);
+        width: 100%;
+        max-width: 600px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        overflow: hidden;
+        position: relative;
+        animation: popup .3s ease;
       }
 
-      function setAmount() {
-        const select = document.getElementById("pooja_name");
-        const option = select.options[select.selectedIndex];
-        const price = option.getAttribute("data-price");
-        document.getElementById("amount").value = price || "";
-      }
-
-      function setMinDate() {
-        const dateInput = document.querySelector('[name="booking_date"]');
-        if (!dateInput) return;
-
-        const now = new Date();
-        now.setDate(now.getDate() + 3); // Lock today + 2 days -> start from 3rd day
-
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const minDate = `${year}-${month}-${day}`;
-
-        dateInput.setAttribute("min", minDate);
-      }
-
-      // Initialize min date
-      setMinDate();
-
-      document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
-
-        e.preventDefault();
-
-        const submitBtn = document.getElementById("submitBtn");
-        const originalText = submitBtn.innerHTML;
-        let redirected = false;
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "⏳ Processing...";
-
-        const formData = {
-          pooja_name: document.getElementById("pooja_name").value,
-          booking_date: document.querySelector('[name="booking_date"]').value,
-          booking_time: document.querySelector('[name="booking_time"]').value,
-          devotee_name: document.querySelector('[name="devotee_name"]').value,
-          gotra: document.querySelector('[name="gotra"]').value,
-          nakshatra: document.querySelector('[name="nakshatra"]').value,
-          special_instructions: document.querySelector('[name="special_instructions"]').value,
-          amount: document.getElementById("amount").value
-        };
-
-        try {
-
-          await initiatePayment("pooja-booking", formData, {
-            onSuccess: () => {
-              redirected = true;
-              showAlert(
-                'success',
-                'Booking Confirmed',
-                'Your pooja booking has been confirmed!'
-              );
-              setTimeout(() => {
-                window.location.href = "/bookings/pooja";
-              }, 1500);
-            },
-            onCancel: () => {
-              showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
-              setTimeout(() => {
-                window.location.href = "/bookings/pooja";
-              }, 500);
-            },
-            onFailure: (error) => {
-              showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalText;
-            }
-          });
-
-
-        } catch (error) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-          showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
-
-
-        } finally {
-
-          setTimeout(() => {
-            if (!redirected) {
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalText;
-            }
-          }, 2000);
-
+      @keyframes popup {
+        from {
+          transform: translateY(20px) scale(.95);
+          opacity: 0;
         }
 
-      });
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
 
-    </script>
+      /* Decorative top bar removed as per request */
 
-    <%- include('../../partials/footer') %>
+      .card-header-custom {
+        text-align: center;
+        padding: 2.5rem 2rem 1.5rem;
+        background: transparent;
+        position: relative;
+      }
+
+      /* Header Icon */
+      .header-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+      }
+
+      .header-icon {
+        font-size: 1.8rem;
+        color: #bfa15f;
+      }
+
+      /* Close Button */
+      .close-btn {
+        position: absolute;
+        right: 18px;
+        top: 15px;
+        font-size: 22px;
+        cursor: pointer;
+        color: #999;
+        z-index: 10;
+      }
+
+      .close-btn:hover {
+        color: #000;
+      }
+
+      .booking-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        color: #2c241b;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .booking-subtitle {
+        color: #8c7b65;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      /* Form Styles */
+      .card-body-custom {
+        padding: 0 2.5rem 3rem;
+      }
+
+      .form-group-custom {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label-custom {
+        display: block;
+        font-weight: 500;
+        color: #5d5145;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .form-control-custom,
+      .form-select-custom {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #2c241b;
+        background-color: #fff;
+        border: 1px solid #e0d8cc;
+        border-radius: 10px;
+        transition: all 0.2s ease-in-out;
+      }
+
+      .form-control-custom:focus,
+      .form-select-custom:focus {
+        border-color: #bfa15f;
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba(191, 161, 95, 0.1);
+      }
+
+      .form-control-custom::placeholder {
+        color: #b0a69a;
+      }
+
+      /* Row Layout */
+      .form-row {
+        display: flex;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-col {
+        flex: 1;
+      }
+
+      .form-col .form-group-custom {
+        margin-bottom: 0;
+      }
+
+      /* Amount Input specifically */
+      .amount-wrapper {
+        position: relative;
+      }
+
+      .amount-symbol {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #5d5145;
+        font-weight: 600;
+      }
+
+      .amount-input {
+        padding-left: 2rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: #bfa15f;
+        font-size: 1.2rem;
+      }
+
+      .amount-input::-webkit-inner-spin-button,
+      .amount-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .amount-input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+      }
+
+      /* Buttons */
+      .btn-submit-custom {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
+        background-color: #bfa15f;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .btn-submit-custom:hover {
+        background-color: #a88b4d;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+      }
+
+      .btn-submit-custom:disabled {
+        background-color: #dcdcdc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-cancel-custom {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 1rem;
+        color: #8c7b65;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+        cursor: pointer;
+      }
+
+      .btn-cancel-custom:hover {
+        color: #5d5145;
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .card-header-custom {
+          padding: 2rem 1.5rem 1rem;
+        }
+
+        .card-body-custom {
+          padding: 0 1.5rem 2.5rem;
+        }
+
+        .form-row {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .booking-title {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+
+    <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
+
+      <!-- BACKGROUND CONTENT -->
+      <div class="container mt-4 mb-5">
+        <div class="row mb-3">
+          <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="page-title"><i class="bi bi-stars me-2"></i> Pooja Bookings</h2>
+            <a href="/bookings/pooja/new" class="btn btn-gold"><i class="bi bi-plus-circle"></i> New Booking</a>
+          </div>
+        </div>
+
+        <% if (bookings.length> 0) { %>
+          <div class="row">
+            <% bookings.forEach(booking=> { %>
+              <div class="col-12 col-md-6 col-lg-4 mb-4">
+                <div class="pooja-card h-100">
+                  <div class="pooja-header">
+                    <%= booking.booking_number %>
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <%= booking.pooja_name %>
+                    </h5>
+                    <div class="info-line"><i class="bi bi-calendar"></i>
+                      <%= new Date(booking.booking_date).toLocaleDateString() %>
+                    </div>
+                    <div class="info-line"><i class="bi bi-clock"></i>
+                      <%= booking.booking_time %>
+                    </div>
+                    <div class="info-line"><i class="bi bi-person"></i>
+                      <%= booking.devotee_name %>
+                    </div>
+                    <% if (booking.gotra) { %>
+                      <div class="info-line"><strong>Gotra:</strong>
+                        <%= booking.gotra %>
+                      </div>
+                      <% } %>
+                        <% if (booking.nakshatra) { %>
+                          <div class="info-line"><strong>Nakshatra:</strong>
+                            <%= booking.nakshatra %>
+                          </div>
+                          <% } %>
+                            <% if (booking.special_instructions) { %>
+                              <div class="info-line text-muted"><i class="bi bi-info-circle"></i>
+                                <%= booking.special_instructions %>
+                              </div>
+                              <% } %>
+                                <div class="d-flex gap-2 mt-3">
+                                  <span
+                                    class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>">
+                                    <%= booking.status %>
+                                  </span>
+                                  <span class="amount-badge">₹ <%= booking.amount.toLocaleString() %></span>
+                                </div>
+                  </div>
+                  <div class="card-footer">
+                    Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
+                      <% if (booking.payment_status==="completed" ) { %>
+                        <div class="mt-2">
+                          <a href="/bookings/pooja/<%= booking.id %>/receipt"
+                            class="btn btn-sm btn-outline-warning w-100"
+                            style="color: #bfa15f; border-color: #bfa15f; font-weight: 500;">
+                            <i class="bi bi-download me-1"></i> Download Receipt
+                          </a>
+                        </div>
+                        <% } %>
+                  </div>
+                </div>
+              </div>
+              <% }) %>
+          </div>
+          <% } else { %>
+            <div class="row justify-content-center">
+              <div class="col-md-7">
+                <div class="card text-center p-4 shadow-lg border-0" style="border-radius:15px;background:#fff;">
+                  <i class="bi bi-stars text-warning" style="font-size:50px"></i>
+                  <h4 class="mt-3">No Pooja Bookings Yet</h4>
+                  <p class="text-muted">Book a pooja and receive divine blessings 🙏</p>
+                  <div>
+                    <a href="/bookings/pooja/new" class="btn btn-gold btn-lg mt-3"><i class="bi bi-plus-circle me-2"></i> Book Pooja</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
+      </div>
+      <!-- /BACKGROUND CONTENT -->
+
+
+      <!-- ===== POPUP OVERLAY ===== -->
+      <div class="modal-overlay">
+        <div class="booking-modal">
+
+          <div class="close-btn" onclick="closeModal()">✖</div>
+
+          <div class="card-header-custom" style="padding-top: 1rem;">
+            <div class="header-icon-wrapper">
+              <i class="bi bi-fire header-icon"></i>
+            </div>
+            <h2 class="booking-title" style="font-size: 2.2rem;">Book a Pooja</h2>
+            <p class="booking-subtitle">A Guide to Daily Rituals and Divine Connection</p>
+          </div>
+
+          <div class="card-body-custom">
+            <form id="poojaBookingForm">
+              <!-- Select Pooja -->
+              <div class="form-group-custom">
+                <label class="form-label-custom">Select Pooja</label>
+                <select id="pooja_name" class="form-select-custom" onchange="setAmount()" required>
+                  <option value="">Choose Pooja</option>
+                  <option value="Ganapathi Homam" data-price="500">Ganapathi Homam — ₹500</option>
+                  <option value="Satyanarayana Pooja" data-price="750">Satyanarayana Pooja — ₹750</option>
+                  <option value="Navagraha Pooja" data-price="1000">Navagraha Pooja — ₹1000</option>
+                  <option value="Abhishekam" data-price="300">Abhishekam — ₹300</option>
+                  <option value="Lakshmi Pooja" data-price="1200">Lakshmi Pooja — ₹1200</option>
+                </select>
+              </div>
+
+              <!-- Booking Date & Time -->
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">Booking Date</label>
+                    <input type="date" name="booking_date" class="form-control-custom" required
+                      onclick="this.showPicker()">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">Booking Time</label>
+                    <input type="time" name="booking_time" class="form-control-custom" required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Devotee Name -->
+              <div class="form-group-custom">
+                <label class="form-label-custom">Devotee Name</label>
+                <input type="text" name="devotee_name" class="form-control-custom" placeholder="Enter devotee full name"
+                  required>
+              </div>
+
+              <!-- Gotra & Nakshatra -->
+              <div class="form-row">
+                <div class="form-col">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">Gotra</label>
+                    <input type="text" name="gotra" class="form-control-custom" placeholder="Eg: Bharadwaj">
+                  </div>
+                </div>
+                <div class="form-col">
+                  <div class="form-group-custom">
+                    <label class="form-label-custom">Nakshatra</label>
+                    <select name="nakshatra" class="form-select-custom">
+                      <option value="">Choose Nakshatra</option>
+                      <option>Ashwini</option>
+                      <option>Bharani</option>
+                      <option>Krittika</option>
+                      <option>Rohini</option>
+                      <option>Mrigashirsha</option>
+                      <option>Ardra</option>
+                      <option>Punarvasu</option>
+                      <option>Pushya</option>
+                      <option>Ashlesha</option>
+                      <option>Magha</option>
+                      <option>Purva Phalguni</option>
+                      <option>Uttara Phalguni</option>
+                      <option>Hasta</option>
+                      <option>Chitra</option>
+                      <option>Swati</option>
+                      <option>Vishakha</option>
+                      <option>Anuradha</option>
+                      <option>Jyeshtha</option>
+                      <option>Mula</option>
+                      <option>Purva Ashadha</option>
+                      <option>Uttara Ashadha</option>
+                      <option>Shravana</option>
+                      <option>Dhanishta</option>
+                      <option>Shatabhisha</option>
+                      <option>Purva Bhadrapada</option>
+                      <option>Uttara Bhadrapada</option>
+                      <option>Revati</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Special Instructions -->
+              <div class="form-group-custom">
+                <label class="form-label-custom">Special Instructions</label>
+                <textarea name="special_instructions" rows="3" class="form-control-custom"
+                  placeholder="Flowers, preferred timings, sankalpam details..."></textarea>
+              </div>
+
+              <!-- Amount -->
+              <div class="form-group-custom">
+                <label class="form-label-custom">Pooja Amount</label>
+                <div class="amount-wrapper">
+                  <span class="amount-symbol">₹</span>
+                  <input type="number" id="amount" class="form-control-custom amount-input" placeholder="0.00" required
+                    readonly>
+                </div>
+              </div>
+
+              <!-- Buttons -->
+              <button type="submit" class="btn-submit-custom" id="submitBtn">Proceed To Payment <span
+                  style="margin-left: 5px;">→</span></button>
+              <a onclick="closeModal()" class="btn-cancel-custom">Cancel Booking</a>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+      <script>
+        if (typeof window.showAlert !== 'function') {
+          window.showAlert = function (type, title, message) {
+            if (window.Swal) {
+              const icons = { success: 'success', error: 'error', warning: 'warning', info: 'info' };
+              Swal.fire({
+                icon: icons[type] || 'info',
+                title: title || 'Notice',
+                html: `<p style="font-size:15px;">${message || ''}</p>`,
+                confirmButtonText: 'Okay',
+                confirmButtonColor: '#bfa15f'
+              });
+            } else {
+              alert(message || title || 'Notice');
+            }
+          };
+        }
+
+        function closeModal() {
+          window.location.href = "/bookings/pooja";
+        }
+
+        function setAmount() {
+          const select = document.getElementById("pooja_name");
+          const option = select.options[select.selectedIndex];
+          const price = option ? option.getAttribute("data-price") : "";
+          document.getElementById("amount").value = price || "";
+        }
+
+        function setMinDate() {
+          const dateInput = document.querySelector('[name="booking_date"]');
+          if (!dateInput) return;
+          const now = new Date();
+          now.setDate(now.getDate() + 3);
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+          dateInput.setAttribute("min", `${year}-${month}-${day}`);
+        }
+
+        setMinDate();
+
+        document.getElementById("poojaBookingForm").addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const submitBtn = document.getElementById("submitBtn");
+          const originalText = submitBtn.innerHTML;
+          let redirected = false;
+
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+          const formData = {
+            pooja_name: document.getElementById("pooja_name").value,
+            booking_date: document.querySelector('[name="booking_date"]').value,
+            booking_time: document.querySelector('[name="booking_time"]').value,
+            devotee_name: document.querySelector('[name="devotee_name"]').value,
+            gotra: document.querySelector('[name="gotra"]').value,
+            nakshatra: document.querySelector('[name="nakshatra"]').value,
+            special_instructions: document.querySelector('[name="special_instructions"]').value,
+            amount: document.getElementById("amount").value
+          };
+
+          try {
+            if (typeof initiatePayment === 'function') {
+              await initiatePayment("pooja-booking", formData, {
+                onSuccess: () => {
+                  redirected = true;
+                  showAlert('success', 'Booking Confirmed', 'Your pooja booking has been confirmed!');
+                  setTimeout(() => { window.location.href = "/bookings/pooja"; }, 1500);
+                },
+                onCancel: () => {
+                  showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+                  setTimeout(() => { window.location.href = "/bookings/pooja"; }, 500);
+                },
+                onFailure: (error) => {
+                  showAlert('error', 'Payment Failed', error?.message || 'Payment failed.');
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = originalText;
+                }
+              });
+            } else {
+              console.warn("initiatePayment is not defined yet.");
+              setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+              }, 2000);
+            }
+          } catch (error) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            showAlert('warning', 'Payment Cancelled', 'Your booking is pending.');
+          } finally {
+            setTimeout(() => {
+              if (!redirected) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+              }
+            }, 2000);
+          }
+        });
+      </script>
+
+      <%- include('../../partials/footer') %>

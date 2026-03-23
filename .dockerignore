@@ -5,3 +5,5 @@ logs
 tests
 README.md
 k6-tests
+*.md
+**/*.md

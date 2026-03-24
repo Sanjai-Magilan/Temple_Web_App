@@ -1,316 +1,496 @@
-jest.mock('../models/familyModel');
+jest.mock("../models/familyModel", () => ({
+  findByHeadUserId: jest.fn(),
+  findByUserId: jest.fn(),
+  findById: jest.fn(),
+  getMembers: jest.fn(),
+  isHead: jest.fn(),
+  addMember: jest.fn(),
+  getMemberById: jest.fn(),
+  updateMember: jest.fn(),
+  deleteMember: jest.fn(),
+  isMember: jest.fn(),
+}));
 
-const familyController = require('../controllers/familyController');
-const familyModel = require('../models/familyModel');
+const familyController = require("../controllers/familyController");
+const familyModel = require("../models/familyModel");
 
-const mockResponse = () => {
-  const res = {};
-  res.render = jest.fn().mockReturnValue(res);
-  res.redirect = jest.fn().mockReturnValue(res);
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  return res;
-};
+const createRes = () => ({
+  render: jest.fn().mockReturnThis(),
+  redirect: jest.fn().mockReturnThis(),
+  status: jest.fn().mockReturnThis(),
+  json: jest.fn().mockReturnThis(),
+});
 
-const mockRequest = (data = {}) => ({
+const createReq = (overrides = {}) => ({
   user: { id: 1 },
   params: {},
   body: {},
-  ...data
+  ...overrides,
 });
 
-describe('Family Controller Tests', () => {
-
+describe("Family Controller", () => {
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
-  // =============================
-  // listMembers
-  // =============================
+  describe("listMembers", () => {
+    test("renders an empty family state when the user has no family", async () => {
+      const req = createReq();
+      const res = createRes();
 
-  describe('listMembers', () => {
-
-    test('should render empty family if none found', async () => {
       familyModel.findByHeadUserId.mockResolvedValue(null);
       familyModel.findByUserId.mockResolvedValue([]);
 
-      const req = mockRequest();
-      const res = mockResponse();
-
       await familyController.listMembers(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('family/list', expect.objectContaining({
+      expect(res.render).toHaveBeenCalledWith("family/list", {
+        title: "Family Members",
         family: null,
         members: [],
-        isHead: false
-      }));
+        isHead: false,
+        message:
+          "You have not created a family yet. Create one during registration or contact admin.",
+      });
     });
 
-    test('should render family members if found', async () => {
-      const mockFamily = { id: 10 };
-      const mockMembers = [{ id: 1, name: 'Test' }];
+    test("loads the family through membership when the user is not the head", async () => {
+      const req = createReq();
+      const res = createRes();
+      const family = { id: 22, family_name: "Lakshmi Family" };
+      const members = [{ id: 7, member_name: "Asha" }];
 
-      familyModel.findByHeadUserId.mockResolvedValue(mockFamily);
-      familyModel.getMembers.mockResolvedValue(mockMembers);
-      familyModel.isHead.mockResolvedValue(true);
-
-      const req = mockRequest();
-      const res = mockResponse();
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+      familyModel.findByUserId.mockResolvedValue([{ id: 22 }]);
+      familyModel.findById.mockResolvedValue(family);
+      familyModel.getMembers.mockResolvedValue(members);
+      familyModel.isHead.mockResolvedValue(false);
 
       await familyController.listMembers(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('family/list', expect.objectContaining({
-        family: mockFamily,
-        members: mockMembers,
-        isHead: true
-      }));
+      expect(familyModel.findById).toHaveBeenCalledWith(22);
+      expect(res.render).toHaveBeenCalledWith("family/list", {
+        title: "Family Members",
+        family,
+        members,
+        isHead: false,
+        message: null,
+      });
     });
 
+    test("renders the 500 page when listing members fails", async () => {
+      const req = createReq();
+      const res = createRes();
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+      familyModel.findByHeadUserId.mockRejectedValue(new Error("DB Error"));
+
+      await familyController.listMembers(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith("errors/500", { title: "Error" });
+
+      consoleSpy.mockRestore();
+    });
   });
 
-  // =============================
-  // showAddMember
-  // =============================
+  describe("showAddMember", () => {
+    test("redirects when the user does not manage a family", async () => {
+      const req = createReq();
+      const res = createRes();
 
-  describe('showAddMember', () => {
-
-    test('should redirect if no family', async () => {
       familyModel.findByHeadUserId.mockResolvedValue(null);
-
-      const req = mockRequest();
-      const res = mockResponse();
 
       await familyController.showAddMember(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith('/family?error=no_family');
+      expect(res.redirect).toHaveBeenCalledWith("/family?error=no_family");
     });
 
-    test('should deny access if not head', async () => {
+    test("denies access when the user is not the family head", async () => {
+      const req = createReq();
+      const res = createRes();
+
       familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
       familyModel.isHead.mockResolvedValue(false);
-
-      const req = mockRequest();
-      const res = mockResponse();
 
       await familyController.showAddMember(req, res);
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.render).toHaveBeenCalledWith("errors/403", {
+        title: "Access Denied",
+      });
     });
 
+    test("renders the add-member form for the family head", async () => {
+      const req = createReq();
+      const res = createRes();
+      const family = { id: 1, family_name: "Lakshmi Family" };
+
+      familyModel.findByHeadUserId.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(true);
+
+      await familyController.showAddMember(req, res);
+
+      expect(res.render).toHaveBeenCalledWith("family/add", {
+        title: "Add Family Member",
+        family,
+        error: null,
+        formData: {},
+      });
+    });
   });
 
-  // =============================
-  // addMember
-  // =============================
-
-  describe('addMember', () => {
-
-    test('should validate missing name', async () => {
-      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
-      familyModel.isHead.mockResolvedValue(true);
-
-      const req = mockRequest({
-        body: { member_name: '', relationship: 'son' }
-      });
-
-      const res = mockResponse();
-
-      await familyController.addMember(req, res);
-
-      expect(res.render).toHaveBeenCalled();
-    });
-
-    test('should add member and redirect', async () => {
-      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
-      familyModel.isHead.mockResolvedValue(true);
-      familyModel.addMember.mockResolvedValue(true);
-
-      const req = mockRequest({
+  describe("addMember", () => {
+    test("validates that member name is required", async () => {
+      const req = createReq({
         body: {
-          member_name: 'John',
-          relationship: 'son'
-        }
+          member_name: "  ",
+          relationship: "son",
+        },
       });
+      const res = createRes();
+      const family = { id: 1 };
 
-      const res = mockResponse();
+      familyModel.findByHeadUserId.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(true);
 
       await familyController.addMember(req, res);
 
-      expect(familyModel.addMember).toHaveBeenCalled();
-      expect(res.redirect).toHaveBeenCalledWith('/family?success=member_added');
+      expect(res.render).toHaveBeenCalledWith("family/add", {
+        title: "Add Family Member",
+        family,
+        error: "Member name is required",
+        formData: req.body,
+      });
+      expect(familyModel.addMember).not.toHaveBeenCalled();
     });
 
+    test("validates that relationship is required", async () => {
+      const req = createReq({
+        body: {
+          member_name: "Anu",
+          relationship: "",
+        },
+      });
+      const res = createRes();
+      const family = { id: 1 };
+
+      familyModel.findByHeadUserId.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(true);
+
+      await familyController.addMember(req, res);
+
+      expect(res.render).toHaveBeenCalledWith("family/add", {
+        title: "Add Family Member",
+        family,
+        error: "Relationship is required",
+        formData: req.body,
+      });
+    });
+
+    test("adds a member with trimmed and normalized data", async () => {
+      const req = createReq({
+        body: {
+          member_name: "  John  ",
+          relationship: "son",
+          email: "",
+          mobile: "9876543210",
+          address: "",
+          occupation: "Student",
+          age: "15",
+          date_of_birth: "2010-01-01",
+        },
+      });
+      const res = createRes();
+
+      familyModel.findByHeadUserId.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(true);
+
+      await familyController.addMember(req, res);
+
+      expect(familyModel.addMember).toHaveBeenCalledWith({
+        family_id: 1,
+        member_name: "John",
+        relationship: "son",
+        email: null,
+        mobile: "9876543210",
+        address: null,
+        occupation: "Student",
+        age: 15,
+        date_of_birth: "2010-01-01",
+      });
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=member_added");
+    });
   });
 
-  // =============================
-  // showEditMember
-  // =============================
+  describe("showEditMember", () => {
+    test("returns 404 when the member does not exist", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
 
-  describe('showEditMember', () => {
-
-    test('should return 404 if member not found', async () => {
       familyModel.getMemberById.mockResolvedValue(null);
-
-      const req = mockRequest({ params: { id: 5 } });
-      const res = mockResponse();
 
       await familyController.showEditMember(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.render).toHaveBeenCalledWith("errors/404", {
+        title: "Not Found",
+      });
     });
 
-  });
+    test("denies access when the current user is not the head", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
+      const member = { id: 5, family_id: 2 };
+      const family = { id: 2 };
 
-  // =============================
-  // editMember
-  // =============================
+      familyModel.getMemberById.mockResolvedValue(member);
+      familyModel.findById.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(false);
 
-  describe('editMember', () => {
+      await familyController.showEditMember(req, res);
 
-    test('should validate missing relationship', async () => {
-      const mockMember = { id: 5, family_id: 1 };
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.render).toHaveBeenCalledWith("errors/403", {
+        title: "Access Denied",
+      });
+    });
 
-      familyModel.getMemberById.mockResolvedValue(mockMember);
-      familyModel.findById.mockResolvedValue({ id: 1 });
+    test("renders the edit form when the user is the family head", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
+      const member = { id: 5, family_id: 2, member_name: "John" };
+      const family = { id: 2 };
+
+      familyModel.getMemberById.mockResolvedValue(member);
+      familyModel.findById.mockResolvedValue(family);
       familyModel.isHead.mockResolvedValue(true);
 
-      const req = mockRequest({
-        params: { id: 5 },
-        body: { member_name: 'John', relationship: '' }
+      await familyController.showEditMember(req, res);
+
+      expect(res.render).toHaveBeenCalledWith("family/edit", {
+        title: "Edit Family Member",
+        family,
+        member,
+        error: null,
       });
-
-      const res = mockResponse();
-
-      await familyController.editMember(req, res);
-
-      expect(res.render).toHaveBeenCalled();
     });
-
-    test('should update member successfully', async () => {
-      const mockMember = { id: 5, family_id: 1 };
-
-      familyModel.getMemberById.mockResolvedValue(mockMember);
-      familyModel.findById.mockResolvedValue({ id: 1 });
-      familyModel.isHead.mockResolvedValue(true);
-      familyModel.updateMember.mockResolvedValue(true);
-
-      const req = mockRequest({
-        params: { id: 5 },
-        body: { member_name: 'John', relationship: 'son' }
-      });
-
-      const res = mockResponse();
-
-      await familyController.editMember(req, res);
-
-      expect(familyModel.updateMember).toHaveBeenCalled();
-      expect(res.redirect).toHaveBeenCalledWith('/family?success=member_updated');
-    });
-
   });
 
-  // =============================
-  // deleteMember
-  // =============================
+  describe("editMember", () => {
+    test("returns 404 when the member does not exist", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
 
-  describe('deleteMember', () => {
-
-    test('should return 404 if member not found', async () => {
       familyModel.getMemberById.mockResolvedValue(null);
 
-      const req = mockRequest({ params: { id: 5 } });
-      const res = mockResponse();
+      await familyController.editMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.render).toHaveBeenCalledWith("errors/404", {
+        title: "Not Found",
+      });
+    });
+
+    test("renders validation errors when relationship is missing", async () => {
+      const req = createReq({
+        params: { id: "5" },
+        body: {
+          member_name: "John",
+          relationship: "",
+          mobile: "9876543210",
+        },
+      });
+      const res = createRes();
+      const member = { id: 5, family_id: 2, member_name: "Old Name" };
+      const family = { id: 2 };
+
+      familyModel.getMemberById.mockResolvedValue(member);
+      familyModel.findById.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(true);
+
+      await familyController.editMember(req, res);
+
+      expect(res.render).toHaveBeenCalledWith("family/edit", {
+        title: "Edit Family Member",
+        family,
+        member: { ...member, ...req.body },
+        error: "Relationship is required",
+      });
+      expect(familyModel.updateMember).not.toHaveBeenCalled();
+    });
+
+    test("updates a member with parsed age and trimmed name", async () => {
+      const req = createReq({
+        params: { id: "5" },
+        body: {
+          member_name: "  John  ",
+          relationship: "son",
+          email: "",
+          mobile: "9876543210",
+          address: "",
+          occupation: "Engineer",
+          age: "27",
+          date_of_birth: "1999-02-03",
+        },
+      });
+      const res = createRes();
+      const member = { id: 5, family_id: 2 };
+
+      familyModel.getMemberById.mockResolvedValue(member);
+      familyModel.findById.mockResolvedValue({ id: 2 });
+      familyModel.isHead.mockResolvedValue(true);
+
+      await familyController.editMember(req, res);
+
+      expect(familyModel.updateMember).toHaveBeenCalledWith("5", {
+        member_name: "John",
+        relationship: "son",
+        email: null,
+        mobile: "9876543210",
+        address: null,
+        occupation: "Engineer",
+        age: 27,
+        date_of_birth: "1999-02-03",
+      });
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=member_updated");
+    });
+  });
+
+  describe("deleteMember", () => {
+    test("returns 404 when the member does not exist", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
+
+      familyModel.getMemberById.mockResolvedValue(null);
 
       await familyController.deleteMember(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Member not found",
+      });
     });
 
-    test('should prevent deleting head', async () => {
+    test("returns 403 when the current user is not the family head", async () => {
+      const req = createReq({ params: { id: "5" } });
+      const res = createRes();
+
+      familyModel.getMemberById.mockResolvedValue({
+        id: 5,
+        family_id: 1,
+        relationship: "son",
+      });
+      familyModel.findById.mockResolvedValue({ id: 1 });
+      familyModel.isHead.mockResolvedValue(false);
+
+      await familyController.deleteMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Access denied",
+      });
+    });
+
+    test("prevents deleting the family head", async () => {
+      const req = createReq({ params: { id: "1" } });
+      const res = createRes();
+
       familyModel.getMemberById.mockResolvedValue({
         id: 1,
         family_id: 1,
-        relationship: 'head'
+        relationship: "head",
       });
-
       familyModel.findById.mockResolvedValue({ id: 1 });
       familyModel.isHead.mockResolvedValue(true);
-
-      const req = mockRequest({ params: { id: 1 } });
-      const res = mockResponse();
 
       await familyController.deleteMember(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Cannot delete family head",
+      });
     });
 
-    test('should delete member successfully', async () => {
+    test("deletes a non-head family member", async () => {
+      const req = createReq({ params: { id: "2" } });
+      const res = createRes();
+
       familyModel.getMemberById.mockResolvedValue({
         id: 2,
         family_id: 1,
-        relationship: 'son'
+        relationship: "son",
       });
-
       familyModel.findById.mockResolvedValue({ id: 1 });
       familyModel.isHead.mockResolvedValue(true);
-      familyModel.deleteMember.mockResolvedValue(true);
-
-      const req = mockRequest({ params: { id: 2 } });
-      const res = mockResponse();
 
       await familyController.deleteMember(req, res);
 
-      expect(familyModel.deleteMember).toHaveBeenCalledWith(2);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true
-      }));
+      expect(familyModel.deleteMember).toHaveBeenCalledWith("2");
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "Member deleted successfully",
+      });
     });
-
   });
 
-  // =============================
-  // viewMember
-  // =============================
+  describe("viewMember", () => {
+    test("returns 404 when the member does not exist", async () => {
+      const req = createReq({ params: { id: "3" } });
+      const res = createRes();
 
-  describe('viewMember', () => {
+      familyModel.getMemberById.mockResolvedValue(null);
 
-    test('should deny access if not head or member', async () => {
-      familyModel.getMemberById.mockResolvedValue({
-        id: 1,
-        family_id: 1
+      await familyController.viewMember(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.render).toHaveBeenCalledWith("errors/404", {
+        title: "Not Found",
       });
+    });
 
+    test("denies access when the user is neither head nor member", async () => {
+      const req = createReq({ params: { id: "3" } });
+      const res = createRes();
+
+      familyModel.getMemberById.mockResolvedValue({
+        id: 3,
+        family_id: 1,
+      });
       familyModel.findById.mockResolvedValue({ id: 1 });
       familyModel.isHead.mockResolvedValue(false);
       familyModel.isMember.mockResolvedValue(false);
 
-      const req = mockRequest({ params: { id: 1 } });
-      const res = mockResponse();
-
       await familyController.viewMember(req, res);
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.render).toHaveBeenCalledWith("errors/403", {
+        title: "Access Denied",
+      });
     });
 
-    test('should render view page if access allowed', async () => {
-      const mockMember = { id: 1, family_id: 1 };
+    test("renders the member view for an authorized family member", async () => {
+      const req = createReq({ params: { id: "3" } });
+      const res = createRes();
+      const member = { id: 3, family_id: 1, member_name: "Asha" };
+      const family = { id: 1, family_name: "Lakshmi Family" };
 
-      familyModel.getMemberById.mockResolvedValue(mockMember);
-      familyModel.findById.mockResolvedValue({ id: 1 });
-      familyModel.isHead.mockResolvedValue(true);
-      familyModel.isMember.mockResolvedValue(false);
-
-      const req = mockRequest({ params: { id: 1 } });
-      const res = mockResponse();
+      familyModel.getMemberById.mockResolvedValue(member);
+      familyModel.findById.mockResolvedValue(family);
+      familyModel.isHead.mockResolvedValue(false);
+      familyModel.isMember.mockResolvedValue(true);
 
       await familyController.viewMember(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('family/view', expect.objectContaining({
-        member: mockMember
-      }));
+      expect(res.render).toHaveBeenCalledWith("family/view", {
+        title: "View Family Member",
+        family,
+        member,
+        isHead: false,
+      });
     });
-
   });
-
 });

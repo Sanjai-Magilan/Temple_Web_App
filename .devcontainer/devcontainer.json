@@ -1,0 +1,26 @@
+{
+  "name": "Temple App Dev Environment",
+
+  "dockerComposeFile": "docker-compose.dev.yml",
+
+  "service": "app",
+
+  "workspaceFolder": "/app",
+
+  "forwardPorts": [3002, 3307],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "postCreateCommand": "npm install"
+}

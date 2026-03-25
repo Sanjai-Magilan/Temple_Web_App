@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   res.locals.info = req.flash("info");
   next();
 });
-
+ 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
 

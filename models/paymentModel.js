@@ -5,6 +5,16 @@
 
 const pool = require("../config/database");
 
+const ALLOWED_SORT_FIELDS = new Set([
+  "created_at",
+  "amount",
+  "status",
+  "payment_method",
+  "payment_type",
+]);
+
+const ALLOWED_SORT_ORDERS = new Set(["ASC", "DESC"]);
+
 /**
  * Create payment record
  */
@@ -227,140 +237,99 @@ exports.getAllPayments = async ({
   method,
   payment_type,
   limit,
-  offset
+  offset,
 }) => {
+  const safeLimit = Number.isInteger(Number(limit))
+    ? Math.min(Math.max(Number(limit), 1), 100)
+    : 20;
+  const safeOffset = Number.isInteger(Number(offset))
+    ? Math.max(Number(offset), 0)
+    : 0;
 
-let query = `
-  SELECT 
-    p.payment_id, p.user_id, p.created_at, p.payment_method, p.amount, p.currency, p.status, p.payment_type,
-    u.first_name AS first_name,
-    u.last_name AS last_name,
-    u.email AS user_email,
-    hb.start_time AS start_time,
-    hb.end_time AS end_time,
-    pb.booking_time AS booking_time,
-
-    /* Unified booking date */
-    COALESCE(hb.booking_date, pb.booking_date) AS booking_date
-
-  FROM payments p
-
-  LEFT JOIN users u
-    ON p.user_id = u.id
-
-  /* Hall Booking */
-  LEFT JOIN hall_bookings hb
-    ON p.id = hb.payment_id
-    AND p.payment_type = 'hall_booking'
-
-  /* Pooja Booking */
-  LEFT JOIN pooja_bookings pb
-    ON p.id = pb.payment_id
-    AND p.payment_type = 'pooja_booking'`;
-
-  let where = ` WHERE 1=1 `;
-  let values = [];
-
-  /* ===============================
-     SEARCH
-  =============================== */
-
-  if (search) {
-    where += `
-      AND (
-        p.payment_id LIKE ?
-        OR u.first_name LIKE ?
-        OR u.last_name LIKE ?
-        OR u.email LIKE ?
-      )
-    `;
-    values.push(
-      `%${search}%`,
-      `%${search}%`,
-      `%${search}%`,
-      `%${search}%`
-    );
-  }
-
-  /* ===============================
-      METHOD
-  =============================== */  
-
-  if(method){
-   where += ` AND p.payment_method = ?`;
-   values.push(method);
-  }
-
-  /* ===============================
-      PAYMENT TYPE
-  =============================== */  
-
-  if(payment_type){
-   where += ` AND p.payment_type = ?`;
-   values.push(payment_type);
-  }
-
-  /* ===============================
-     FILTER
-  =============================== */
-
-  if (filter === "completed") {
-    where += ` AND p.status = 'completed'`;
-  }
+  let safeSort = ALLOWED_SORT_FIELDS.has(sort) ? sort : "created_at";
+  let safeOrder = ALLOWED_SORT_ORDERS.has(String(order || "").toUpperCase())
+    ? String(order).toUpperCase()
+    : "DESC";
 
   if (filter === "recent") {
-    sort = "created_at";
-    order = "DESC";
+    safeSort = "created_at";
+    safeOrder = "DESC";
+  } else if (filter === "high") {
+    safeSort = "amount";
+    safeOrder = "DESC";
+  } else if (filter === "low") {
+    safeSort = "amount";
+    safeOrder = "ASC";
   }
 
-  if (filter === "high") {
-    sort = "amount";
-    order = "DESC";
+  const whereClauses = ["1=1"];
+  const values = [];
+
+  if (search) {
+    whereClauses.push(`(
+      p.payment_id LIKE ?
+      OR u.first_name LIKE ?
+      OR u.last_name LIKE ?
+      OR u.email LIKE ?
+    )`);
+    const searchParam = "%" + search + "%";
+    values.push(searchParam, searchParam, searchParam, searchParam);
   }
 
-  if (filter === "low") {
-    sort = "amount";
-    order = "ASC";
+  if (method) {
+    whereClauses.push("p.payment_method = ?");
+    values.push(method);
   }
 
-  if (filter === "low") {
-    sort = "amount";
-    order = "ASC";
+  if (payment_type) {
+    whereClauses.push("p.payment_type = ?");
+    values.push(payment_type);
   }
 
-  /* ===============================
-     SORTING
-  =============================== */
+  if (filter === "completed") {
+    whereClauses.push("p.status = 'completed'");
+  }
 
-  where += ` ORDER BY p.${sort} ${order}`;
+  const whereSql = " WHERE " + whereClauses.join(" AND ");
 
-  /* ===============================
-    LIMIT OFFSET FOR PAGINATION
-  =============================== */
+  const baseQuery = `
+    FROM payments p
+    LEFT JOIN users u ON p.user_id = u.id
+    LEFT JOIN hall_bookings hb ON p.id = hb.payment_id AND p.payment_type = 'hall_booking'
+    LEFT JOIN pooja_bookings pb ON p.id = pb.payment_id AND p.payment_type = 'pooja_booking'
+  `;
 
-  limit_offset = ` LIMIT ${limit} OFFSET ${offset}`;
-
-  query += where;
+  const dataQuery = `
+    SELECT
+      p.payment_id, p.user_id, p.created_at, p.payment_method, p.amount, p.currency, p.status, p.payment_type,
+      u.first_name AS first_name,
+      u.last_name AS last_name,
+      u.email AS user_email,
+      hb.start_time AS start_time,
+      hb.end_time AS end_time,
+      pb.booking_time AS booking_time,
+      COALESCE(hb.booking_date, pb.booking_date) AS booking_date
+    ${baseQuery}
+    ${whereSql}
+    ORDER BY p.${safeSort} ${safeOrder}
+    LIMIT ? OFFSET ?
+  `;
 
   const countQuery = `
-        SELECT COUNT(*) AS total
-        FROM payments p
-        LEFT JOIN users u ON p.user_id = u.id
-        LEFT JOIN hall_bookings hb ON p.related_id = hb.id AND p.payment_type = 'hall_booking'
-        LEFT JOIN pooja_bookings pb ON p.related_id = pb.id AND p.payment_type = 'pooja_booking'
-        ${where}`;
+    SELECT COUNT(*) AS total
+    ${baseQuery}
+    ${whereSql}
+  `;
 
-  query += limit_offset;
-
-   const [countResult] = await pool.query(countQuery, values);  
-
-  const [rows] = await pool.query(query, values);
+  const [countResult] = await pool.execute(countQuery, values);
+  const [rows] = await pool.execute(dataQuery, [
+    ...values,
+    safeLimit,
+    safeOffset,
+  ]);
 
   return {
     payments: rows,
-    totalCount: countResult[0].total
+    totalCount: countResult[0].total,
   };
 };
-
-
-

@@ -79,6 +79,21 @@ exports.findByOrderId = async (orderId) => {
 };
 
 /**
+ * Find payment by internal ID
+ */
+exports.findById = async (id) => {
+  try {
+    const [rows] = await pool.execute("SELECT * FROM payments WHERE id = ?", [
+      id,
+    ]);
+    return rows[0] || null;
+  } catch (error) {
+    console.error("Error finding payment by ID:", error);
+    throw error;
+  }
+};
+
+/**
  * Update payment status
  */
 exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
@@ -176,6 +191,24 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
     return rows;
   } catch (error) {
     console.error("Error getting user payments:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get pending payments of a certain type for a user
+ */
+exports.getPendingPaymentsByType = async (userId, paymentType) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT * FROM payments 
+       WHERE user_id = ? AND payment_type = ? AND status = 'pending' AND related_id IS NULL
+       ORDER BY created_at DESC`,
+      [userId, paymentType],
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error getting pending payments by type:", error);
     throw error;
   }
 };

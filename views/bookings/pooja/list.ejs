@@ -244,17 +244,36 @@
 
                                 <!-- STATUS + AMOUNT -->
 
-                                <div class="d-flex gap-2 mt-3">
+                                <div class="mt-3">
+                                  <!-- Row 1: Status & Amount -->
+                                  <div class="d-flex justify-content-between gap-2 mb-3">
+                                    <span
+                                      class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : booking.status === 'cancelled' ? 'danger' : 'secondary' %> flex-grow-1"
+                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">
+                                      <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                                    </span>
 
-                                  <span
-                                    class="<%= booking.status === 'confirmed' ? 'badge-confirmed' : booking.status === 'pending' ? 'badge-pending' : 'badge-cancelled' %>">
-                                    <%= booking.status %>
-                                  </span>
+                                    <span class="badge bg-light text-dark border flex-grow-1"
+                                      style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; display: inline-flex; justify-content: center; align-items: center;">₹
+                                      <%= booking.amount.toLocaleString() %>
+                                    </span>
+                                  </div>
 
-                                  <span class="amount-badge">
-                                    ₹ <%= booking.amount.toLocaleString() %>
-                                  </span>
-
+                                  <!-- Row 2: Buttons -->
+                                  <% if (booking.status==='pending' ) { %>
+                                    <div class="d-flex justify-content-between gap-2">
+                                      <a href="/bookings/pooja/continue-form/<%= booking.id %>"
+                                        class="btn btn-success flex-grow-1"
+                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px; text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">
+                                        Continue
+                                      </a>
+                                      <button class="btn btn-danger flex-grow-1"
+                                        style="font-size: 0.9rem; padding: 0.5rem 1rem; min-width: 110px;"
+                                        onclick="cancelPoojaBooking('<%= booking.id %>', this)">
+                                        Cancel
+                                      </button>
+                                    </div>
+                                    <% } %>
                                 </div>
 
                   </div>
@@ -300,11 +319,9 @@
                     Book a pooja and receive divine blessings 🙏
                   </p>
 
-                  <div>
-                    <a href="/bookings/pooja/new" class="btn btn-gold btn-lg mt-3">
-                      <i class="bi bi-plus-circle me-2"></i> Book Pooja 
-                    </a>
-                  </div>
+                  <a href="/bookings/pooja/new" class="btn btn-gold mt-2">
+                    Book Pooja
+                  </a>
 
                 </div>
 
@@ -314,6 +331,79 @@
 
             <% } %>
 
+                  <div>
+                    <a href="/bookings/pooja/new" class="btn btn-gold btn-lg mt-3">
+                      <i class="bi bi-plus-circle me-2"></i> Book Pooja 
+                    </a>
+                  </div>
+
+      <!-- Cancel Confirmation Modal -->
+      <div class="modal fade" id="cancelPoojaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body text-center p-4">
+              <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?</h5>
+              <p class="text-muted mb-4">Are you sure you want to cancel this booking?</p>
+              <div class="d-flex gap-2 justify-content-center">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger px-4" id="confirmCancelPoojaBtn">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <%- include('../../partials/footer') %>
+
+        <script>
+
+          let bookingIdToCancel = null;
+          let bookingElementToRemove = null;
+
+          function cancelPoojaBooking(id, btn) {
+            bookingIdToCancel = id;
+            bookingElementToRemove = btn.closest(".pooja-card").parentElement; // Get the col wrapper to remove entire grid item
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('cancelPoojaModal'));
+            modal.show();
+          }
+
+          document.getElementById('confirmCancelPoojaBtn').addEventListener('click', function () {
+            if (!bookingIdToCancel) return;
+
+            const btn = document.getElementById('confirmCancelPoojaBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Cancelling...';
+            btn.disabled = true;
+
+            fetch(`/bookings/pooja/cancel/${bookingIdToCancel}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" }
+            })
+              .then(res => res.json())
+              .then(data => {
+                const modalEl = document.getElementById('cancelPoojaModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+
+                if (data.success) {
+                  if (bookingElementToRemove) bookingElementToRemove.remove();
+                  modal.hide();
+
+                  // Optional: Show success toast/alert if needed, or just let the removal be the feedback
+                } else {
+                  alert(data.message || "Failed to cancel booking");
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                alert("Server error");
+              })
+              .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                bookingIdToCancel = null;
+                bookingElementToRemove = null;
+              });
+          });
+
+
+        </script>

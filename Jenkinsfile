@@ -38,6 +38,11 @@ pipeline {
                 sh 'npm test || echo "No tests configured"'
             }
         }
+        stage('Test Docker Access') {
+             steps {
+                sh 'docker ps'
+        }
+    }
     }
 
     post {

@@ -6,45 +6,30 @@ pipeline {
     }
 
     stages {
+
         stage('Install & Test') {
             agent {
                 docker {
                     image 'node:20'
                 }
             }
-        }
-        stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'
                 sh 'npm install'
-            }
-        }
 
-        stage('Check App Start') {
-            steps {
                 echo 'Starting app for verification...'
-                sh '''
-                timeout 10s npm start || true
-                '''
-            }
-        }
+                sh 'timeout 10s npm start || true'
 
-        stage('Lint (Optional)') {
-            steps {
                 sh 'npm run lint || echo "No lint configured"'
-            }
-        }
-
-        stage('Test (Optional)') {
-            steps {
                 sh 'npm test || echo "No tests configured"'
             }
         }
+
         stage('Test Docker Access') {
-             steps {
+            steps {
                 sh 'docker ps'
+            }
         }
-    }
     }
 
     post {

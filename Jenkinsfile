@@ -62,6 +62,14 @@ pipeline {
                 sh 'docker image prune -f'
             }
         }
+        stage('Deploy to K3s') {
+            steps {
+                sh '''
+                kubectl apply -f deployment.yaml
+                kubectl rollout restart deployment temple-app
+                '''
+            }
+        }
     }
 
     post {

@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         NODE_ENV = 'test'
+        IMAGE = 'sanjaimagilan/temple_app'
     }
 
     stages {
@@ -25,16 +26,50 @@ pipeline {
             }
         }
 
-        stage('Test Docker Access') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker ps'
+                sh '''
+                docker build -t $IMAGE:$BUILD_NUMBER .
+                docker tag $IMAGE:$BUILD_NUMBER $IMAGE:latest
+                '''
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh '''
+                    docker login -u $USER --password-stdin <<EOF
+                    $PASS
+                    EOF
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh '''
+                docker push $IMAGE:$BUILD_NUMBER
+                docker push $IMAGE:latest
+                '''
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker image prune -f'
             }
         }
     }
 
     post {
         success {
-            echo 'Build Successful'
+            echo 'Build & Push Successful'
         }
         failure {
             echo 'Build Failed'

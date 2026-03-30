@@ -5,3 +5,5 @@ logs
 tests
 README.md
 pending_bookings.json
+*.md
+**/*.md

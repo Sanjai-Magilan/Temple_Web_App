@@ -97,8 +97,6 @@ exports.findById = async (id) => {
 
 /* ===============================
    UPDATE METHODS
-=============================== */
-
 exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
   try {
     const updateFields = ["status = ?"];
@@ -210,31 +208,12 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
 
 /* ===============================
    PENDING PAYMENTS (ADDED BACK)
-=============================== */
-
-exports.getPendingPaymentsByType = async (userId, paymentType) => {
-  try {
-    const [rows] = await pool.execute(
-      `SELECT * FROM payments
-       WHERE user_id = ?
-       AND payment_type = ?
-       AND status = 'pending'
-       AND related_id IS NULL
-       ORDER BY created_at DESC`,
-      [userId, paymentType]
-    );
-
-    return rows;
-  } catch (error) {
-    console.error("Error getting pending payments:", error);
     throw error;
   }
 };
 
 /* ===============================
    IDEMPOTENCY CHECK
-=============================== */
-
 exports.paymentExists = async (paymentId) => {
   try {
     const [rows] = await pool.execute(

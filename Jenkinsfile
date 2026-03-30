@@ -7,7 +7,6 @@ pipeline {
     }
 
     stages {
-
         stage('Install & Test') {
             agent {
                 docker {
@@ -43,9 +42,7 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     sh '''
-                    docker login -u $USER --password-stdin <<EOF
-                    $PASS
-                    EOF
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
                     '''
                 }
             }

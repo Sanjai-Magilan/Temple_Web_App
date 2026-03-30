@@ -8,4 +8,4 @@ logs/*
 docker-compose.override.yml
 *.pid
 Backup/
-*.json
+pending_bookings.json

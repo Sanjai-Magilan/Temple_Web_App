@@ -57,22 +57,15 @@ exports.list = async (req, res) => {
 /**
  * Show pooja booking form
  */
-exports.showNew = async (req, res) => {
+exports.showNew = (req, res) => {
   try {
     if (!req.user) {
       return res.redirect("/login");
     }
 
-    const bookings = await poojaBookingModel.getUserBookings(
-      req.user.id,
-      50,
-      0,
-    );
-
     res.render("bookings/pooja/new", {
       title: "Book a Pooja",
       user: req.user,
-      bookings: bookings,
       error: null,
       booking: null
     });

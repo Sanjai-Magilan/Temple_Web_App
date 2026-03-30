@@ -3,9 +3,11 @@ pipeline {
 
     environment {
         NODE_ENV = 'test'
+        IMAGE = 'sanjaimagilan/temple_app'
     }
 
     stages {
+
         stage('Install & Test') {
             agent {
                 docker {
@@ -23,32 +25,51 @@ pipeline {
                 sh 'npm test || echo "No tests configured"'
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t sanjai/temple-app:$BUILD_NUMBER .'
+                sh '''
+                docker build -t $IMAGE:$BUILD_NUMBER .
+                docker tag $IMAGE:$BUILD_NUMBER $IMAGE:latest
+                '''
             }
         }
+
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub',
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
-        )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-        }
+                )]) {
+                    sh '''
+                    docker login -u $USER --password-stdin <<EOF
+                    $PASS
+                    EOF
+                    '''
+                }
             }
         }
+
         stage('Push Docker Image') {
             steps {
-                sh 'docker push sanjai/temple-app:$BUILD_NUMBER'
+                sh '''
+                docker push $IMAGE:$BUILD_NUMBER
+                docker push $IMAGE:latest
+                '''
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker image prune -f'
             }
         }
     }
 
     post {
         success {
-            echo 'Build Successful'
+            echo 'Build & Push Successful'
         }
         failure {
             echo 'Build Failed'

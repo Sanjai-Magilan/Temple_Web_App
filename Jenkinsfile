@@ -6,7 +6,6 @@ pipeline {
     }
 
     stages {
-
         stage('Install & Test') {
             agent {
                 docker {
@@ -24,10 +23,25 @@ pipeline {
                 sh 'npm test || echo "No tests configured"'
             }
         }
-
-        stage('Test Docker Access') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker ps'
+                sh 'docker build -t sanjai/temple-app:$BUILD_NUMBER .'
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+        )]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+        }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push sanjai/temple-app:$BUILD_NUMBER'
             }
         }
     }

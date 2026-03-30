@@ -1,16 +1,18 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20'
-        }
-    }
+    agent any
 
     environment {
         NODE_ENV = 'test'
     }
 
     stages {
-
+        stage('Install & Test') {
+            steps {
+                docker {
+                    image 'node:20'
+                }
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies...'

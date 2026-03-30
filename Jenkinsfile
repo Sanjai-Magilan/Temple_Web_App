@@ -7,7 +7,7 @@ pipeline {
 
     stages {
         stage('Install & Test') {
-            steps {
+            agent {
                 docker {
                     image 'node:20'
                 }

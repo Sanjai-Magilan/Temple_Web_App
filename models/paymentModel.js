@@ -290,73 +290,46 @@ exports.getAllPayments = async ({
     const whereClauses = ["1=1"];
     const values = [];
 
-    if (search) {
-      const searchParam = `%${search}%`;
-      whereClauses.push(`(
-        p.payment_id LIKE ?
-        OR u.first_name LIKE ?
-        OR u.last_name LIKE ?
-        OR u.email LIKE ?
-      )`);
-      values.push(searchParam, searchParam, searchParam, searchParam);
-    }
+  const whereSql = " WHERE " + whereClauses.join(" AND ");
 
-    if (method) {
-      whereClauses.push("p.payment_method = ?");
-      values.push(method);
-    }
+  const baseQuery = `
+    FROM payments p
+    LEFT JOIN users u ON p.user_id = u.id
+    LEFT JOIN hall_bookings hb ON p.id = hb.payment_id AND p.payment_type = 'hall_booking'
+    LEFT JOIN pooja_bookings pb ON p.id = pb.payment_id AND p.payment_type = 'pooja_booking'
+  `;
 
-    if (payment_type) {
-      whereClauses.push("p.payment_type = ?");
-      values.push(payment_type);
-    }
+  const dataQuery = `
+    SELECT
+      p.payment_id, p.user_id, p.created_at, p.payment_method, p.amount, p.currency, p.status, p.payment_type,
+      u.first_name AS first_name,
+      u.last_name AS last_name,
+      u.email AS user_email,
+      hb.start_time AS start_time,
+      hb.end_time AS end_time,
+      pb.booking_time AS booking_time,
+      COALESCE(hb.booking_date, pb.booking_date) AS booking_date
+    ${baseQuery}
+    ${whereSql}
+    ORDER BY p.${safeSort} ${safeOrder}
+    LIMIT ? OFFSET ?
+  `;
 
-    if (filter === "completed") {
-      whereClauses.push("p.status = 'completed'");
-    }
+  const countQuery = `
+    SELECT COUNT(*) AS total
+    ${baseQuery}
+    ${whereSql}
+  `;
 
-    const whereSql = " WHERE " + whereClauses.join(" AND ");
+  const [countResult] = await pool.execute(countQuery, values);
+  const [rows] = await pool.execute(dataQuery, [
+    ...values,
+    String(safeLimit),
+    String(safeOffset),
+  ]);
 
-    const baseQuery = `
-      FROM payments p
-      LEFT JOIN users u ON p.user_id = u.id
-      LEFT JOIN hall_bookings hb ON p.id = hb.payment_id AND p.payment_type = 'hall_booking'
-      LEFT JOIN pooja_bookings pb ON p.id = pb.payment_id AND p.payment_type = 'pooja_booking'
-    `;
-
-    const dataQuery = `
-      SELECT
-        p.payment_id, p.user_id, p.created_at, p.payment_method,
-        p.amount, p.currency, p.status, p.payment_type,
-        u.first_name, u.last_name, u.email AS user_email,
-        hb.start_time, hb.end_time,
-        pb.booking_time,
-        COALESCE(hb.booking_date, pb.booking_date) AS booking_date
-      ${baseQuery}
-      ${whereSql}
-      ORDER BY p.${safeSort} ${safeOrder}
-      LIMIT ? OFFSET ?
-    `;
-
-    const countQuery = `
-      SELECT COUNT(*) AS total
-      ${baseQuery}
-      ${whereSql}
-    `;
-
-    const [countResult] = await pool.execute(countQuery, values);
-    const [rows] = await pool.execute(dataQuery, [
-      ...values,
-      safeLimit,
-      safeOffset,
-    ]);
-
-    return {
-      payments: rows,
-      totalCount: countResult[0].total,
-    };
-  } catch (error) {
-    console.error("Error fetching all payments:", error);
-    throw error;
-  }
+  return {
+    payments: rows,
+    totalCount: countResult[0].total,
+  };
 };

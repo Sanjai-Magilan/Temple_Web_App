@@ -1,158 +1,190 @@
-jest.mock('../models/donationModel');
+jest.mock("../models/donationModel", () => ({
+  getUserDonations: jest.fn(),
+  getAllDonations: jest.fn(),
+}));
 
-const donationController = require('../controllers/donationController');
-const donationModel = require('../models/donationModel');
+const donationController = require("../controllers/donationController");
+const donationModel = require("../models/donationModel");
 
-const mockResponse = () => {
-  const res = {};
-  res.render = jest.fn().mockReturnValue(res);
-  res.redirect = jest.fn().mockReturnValue(res);
-  res.status = jest.fn().mockReturnValue(res);
-  return res;
-};
+const createRes = () => ({
+  render: jest.fn().mockReturnThis(),
+  redirect: jest.fn().mockReturnThis(),
+  status: jest.fn().mockReturnThis(),
+});
 
-describe('Donation Controller Tests', () => {
-
-  beforeEach(() => {
+describe("Donation Controller", () => {
+  afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
-
-  // ===============================
-  // LIST FUNCTION TESTS
-  // ===============================
-
-  describe('list()', () => {
-
-    test('should redirect to /login if user not authenticated', async () => {
-      const req = { user: null };
-      const res = mockResponse();
+  describe("list", () => {
+    test("redirects to /login when the user is not authenticated", async () => {
+      const req = { user: null, query: {} };
+      const res = createRes();
 
       await donationController.list(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith('/login');
+      expect(res.redirect).toHaveBeenCalledWith("/login");
       expect(donationModel.getUserDonations).not.toHaveBeenCalled();
     });
 
-    test('should fetch donations and render list page', async () => {
-
-      const mockDonations = [
-        { id: 1, amount: 500 },
-        { id: 2, amount: 1000 }
-      ];
+    test("renders the donation list with pagination data", async () => {
+      const req = {
+        user: { id: 1, name: "Test User" },
+        query: { page: "2" },
+      };
+      const res = createRes();
+      const mockDonations = [{ id: 13 }, { id: 14 }];
 
       donationModel.getUserDonations.mockResolvedValue({
         donations: mockDonations,
-        total: 2
+        total: 26,
       });
-
-      const req = {
-        user: { id: 1, name: 'Test User' },
-        query: {}
-      };
-
-      const res = mockResponse();
 
       await donationController.list(req, res);
 
-      expect(donationModel.getUserDonations)
-        .toHaveBeenCalledWith(1, 12, 0);
-
-      expect(res.render).toHaveBeenCalledWith('donations/list', {
-        title: 'My Donations',
+      expect(donationModel.getUserDonations).toHaveBeenCalledWith(1, 12, 12);
+      expect(res.render).toHaveBeenCalledWith("donations/list", {
+        title: "My Donations",
         user: req.user,
         donations: mockDonations,
-        currentPage: 1,
-        totalPages: 1
+        currentPage: 2,
+        totalPages: 3,
       });
     });
 
-    test('should render 500 page if error occurs in list()', async () => {
-
-      donationModel.getUserDonations.mockRejectedValue(new Error('DB Error'));
-
+    test("renders the 500 page when loading donations fails", async () => {
       const req = {
         user: { id: 1 },
-        query: {}
+        query: {},
       };
+      const res = createRes();
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const res = mockResponse();
-
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      donationModel.getUserDonations.mockRejectedValue(new Error("DB Error"));
 
       await donationController.list(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenCalledWith('errors/500', {
-        title: 'Server Error',
-        message: 'Failed to load donations'
+      expect(res.render).toHaveBeenCalledWith("errors/500", {
+        title: "Server Error",
+        message: "Failed to load donations",
       });
 
       consoleSpy.mockRestore();
     });
-
   });
 
-  // ===============================
-  // showNew FUNCTION TESTS
-  // ===============================
-
-  describe('showNew()', () => {
-
-    test('should redirect to /login if user not authenticated', () => {
+  describe("showNew", () => {
+    test("redirects to /login when the user is not authenticated", () => {
       const req = { user: null };
-      const res = mockResponse();
+      const res = createRes();
 
       donationController.showNew(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith('/login');
+      expect(res.redirect).toHaveBeenCalledWith("/login");
     });
 
-    test('should render donation form if authenticated', () => {
-      const req = {
-        user: { id: 1, name: 'Test User' }
-      };
-
-      const res = mockResponse();
+    test("renders the donation form when the user is authenticated", () => {
+      const req = { user: { id: 1, name: "Test User" } };
+      const res = createRes();
 
       donationController.showNew(req, res);
 
-      expect(res.render).toHaveBeenCalledWith('donations/new', {
-        title: 'Make a Donation',
+      expect(res.render).toHaveBeenCalledWith("donations/new", {
+        title: "Make a Donation",
         user: req.user,
-        error: null
+        error: null,
       });
     });
 
-    test('should render 500 page if error occurs in showNew()', () => {
-      const req = {
-        user: { id: 1 }
-      };
+    test("renders the 500 page when the donation form fails to render", () => {
+      const req = { user: { id: 1 } };
+      const res = createRes();
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const res = mockResponse();
-
-      // Silence console.error
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-      // First render throws error, second render works
       res.render = jest
         .fn()
         .mockImplementationOnce(() => {
-          throw new Error('Render Error');
+          throw new Error("Render Error");
         })
         .mockImplementationOnce(() => res);
 
       donationController.showNew(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.render).toHaveBeenLastCalledWith('errors/500', {
-        title: 'Server Error',
-        message: 'Failed to load donation form'
+      expect(res.render).toHaveBeenLastCalledWith("errors/500", {
+        title: "Server Error",
+        message: "Failed to load donation form",
+      });
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("listAdmin", () => {
+    test("renders the admin donation list with filters and pagination", async () => {
+      const req = {
+        user: { id: 99, role: "admin" },
+        query: {
+          page: "3",
+          search: "festival",
+          type: "annadanam",
+        },
+      };
+      const res = createRes();
+      const mockDonations = [{ id: 31 }, { id: 32 }];
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+      donationModel.getAllDonations.mockResolvedValue({
+        donations: mockDonations,
+        total: 30,
+      });
+
+      await donationController.listAdmin(req, res);
+
+      expect(donationModel.getAllDonations).toHaveBeenCalledWith(
+        12,
+        24,
+        "festival",
+        "annadanam",
+      );
+      expect(res.render).toHaveBeenCalledWith("donations/admin_list", {
+        title: "All Donations",
+        donations: mockDonations,
+        currentPage: 3,
+        totalPages: 3,
+        search: "festival",
+        donationType: "annadanam",
+        user: req.user,
       });
 
       consoleSpy.mockRestore();
     });
 
-  });
+    test("renders the 500 page when loading admin donations fails", async () => {
+      const req = {
+        user: { id: 99, role: "admin" },
+        query: {},
+      };
+      const res = createRes();
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      jest.spyOn(console, "log").mockImplementation(() => {});
 
+      donationModel.getAllDonations.mockRejectedValue(new Error("DB Error"));
+
+      await donationController.listAdmin(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.render).toHaveBeenCalledWith("errors/500", {
+        title: "Server Error",
+        message: "Failed to load donations",
+      });
+
+      consoleSpy.mockRestore();
+    });
+  });
 });

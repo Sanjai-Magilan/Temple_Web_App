@@ -129,18 +129,13 @@ describe("Pooja Booking Controller", () => {
       expect(res.redirect).toHaveBeenCalledWith("/login");
     });
 
-    test("renders the pooja booking form with the user's booking history", async () => {
-      const bookings = [{ id: 1, pooja_name: "Abhishekam" }];
-
-      poojaBookingModel.getUserBookings.mockResolvedValue(bookings);
-
+    test("renders the pooja booking form with an explicit null booking", async () => {
       await poojaBookingController.showNew(req, res);
 
-      expect(poojaBookingModel.getUserBookings).toHaveBeenCalledWith(1, 50, 0);
+      expect(poojaBookingModel.getUserBookings).not.toHaveBeenCalled();
       expect(res.render).toHaveBeenCalledWith("bookings/pooja/new", {
         title: "Book a Pooja",
         user: req.user,
-        bookings,
         error: null,
         booking: null,
       });

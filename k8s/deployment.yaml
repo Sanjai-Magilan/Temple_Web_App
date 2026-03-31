@@ -17,6 +17,15 @@ spec:
           image: sanjaimagilan/temple_app:latest
           ports:
             - containerPort: 3002
+
           envFrom:
             - secretRef:
                 name: temple-secret
+
+          env:
+            - name: DB_HOST
+              value: mysql-service
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: temple_user

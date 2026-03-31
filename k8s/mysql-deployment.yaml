@@ -22,7 +22,3 @@ spec:
           envFrom:
             - secretRef:
                 name: temple-secret
-
-          # (Optional but recommended for stability)
-          args:
-            - "--default-authentication-plugin=mysql_native_password"

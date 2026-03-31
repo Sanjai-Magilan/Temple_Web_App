@@ -148,15 +148,15 @@
       /* ===== BUTTON ===== */
 
       .btn-gold {
-        background: linear-gradient(90deg, #c6a75d, #b1934e);
+        background-color: #bfa15f;
+        border-color: #bfa15f;
         color: white;
-        border-radius: 20px;
-        padding: 8px 18px;
-        border: none;
       }
 
       .btn-gold:hover {
-        background: linear-gradient(90deg, #b1934e, #9f823e);
+        background-color: #a88b4d;
+        border-color: #a88b4d;
+        color: white;
       }
     </style>
 
@@ -166,17 +166,17 @@
 
         <!-- ===== HEADER ===== -->
 
-        <div class="row mb-3">
-          <div class="col-12 d-flex justify-content-between align-items-center">
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+              <h2 class="page-title">
+                <i class="bi bi-stars me-2"></i> Pooja Bookings
+              </h2>
 
-            <h2 class="page-title">
-              <i class="bi bi-stars me-2"></i> Pooja Bookings
-            </h2>
-
-            <a href="/bookings/pooja/new" class="btn btn-gold">
-              <i class="bi bi-plus-circle"></i> New Booking
-            </a>
-
+              <a href="/bookings/pooja/new" class="btn btn-gold shadow-sm">
+                <i class="bi bi-plus-circle me-2"></i> New Booking
+              </a>
+            </div>
           </div>
         </div>
 
@@ -305,52 +305,23 @@
 
             <!-- EMPTY STATE -->
 
-            <div class="row justify-content-center">
-
-              <div class="col-md-7">
-
-                <div class="card text-center p-4 shadow-lg border-0" style="border-radius:15px;background:#fff;">
-
-                  <i class="bi bi-stars text-warning" style="font-size:50px"></i>
-
-                  <h4 class="mt-3">No Pooja Bookings Yet</h4>
-
-                  <p class="text-muted">
-                    Book a pooja and receive divine blessings 🙏
-                  </p>
-
-                  <a href="/bookings/pooja/new" class="btn btn-gold mt-2">
-                    Book Pooja
-                  </a>
-
+            <div class="row">
+              <div class="col-12 col-md-6 offset-md-3">
+                <div class="card text-center py-4 shadow-lg border-0" style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+                  <div class="card-body">
+                    <i class="bi bi-stars text-warning" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3" style="font-family: 'Playfair Display', serif;">No Pooja Bookings Yet</h4>
+                    <p class="text-muted">Book a pooja and receive divine blessings 🙏</p>
+                    <a href="/bookings/pooja/new" class="btn btn-gold btn-lg mt-3 shadow-sm">
+                      <i class="bi bi-plus-circle me-2"></i> Book Pooja
+                    </a>
+                  </div>
                 </div>
-
               </div>
-
             </div>
 
             <% } %>
 
-                  <div>
-                    <a href="/bookings/pooja/new" class="btn btn-gold btn-lg mt-3">
-                      <i class="bi bi-plus-circle me-2"></i> Book Pooja 
-                    </a>
-                  </div>
-
-      <!-- Cancel Confirmation Modal -->
-      <div class="modal fade" id="cancelPoojaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body text-center p-4">
-              <h5 class="mb-3" style="color: #2c241b; font-family: 'Playfair Display', serif;">Cancel Booking?</h5>
-              <p class="text-muted mb-4">Are you sure you want to cancel this booking?</p>
-              <div class="d-flex gap-2 justify-content-center">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger px-4" id="confirmCancelPoojaBtn">OK</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Cancel Confirmation Modal -->

@@ -21,4 +21,4 @@ spec:
           # Load all DB credentials from Kubernetes Secret
           envFrom:
             - secretRef:
-                name: temple-secret
+                name: mysql-secret

@@ -66,8 +66,8 @@ pipeline {
             steps {
                 sh '''
                 export KUBECONFIG=/var/jenkins_home/kubeconfig
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
                 '''
             }
         }

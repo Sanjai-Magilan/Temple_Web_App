@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temple-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: temple-app
+  template:
+    metadata:
+      labels:
+        app: temple-app
+    spec:
+      containers:
+        - name: temple-app
+          image: sanjaimagilan/temple_app:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: temple-secret

@@ -65,8 +65,9 @@ pipeline {
         stage('Deploy to K3s') {
             steps {
                 sh '''
+                export KUBECONFIG=/var/jenkins_home/kubeconfig
                 kubectl apply -f deployment.yaml
-                kubectl rollout restart deployment temple-app
+                kubectl apply -f service.yaml
                 '''
             }
         }

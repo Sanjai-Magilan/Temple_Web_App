@@ -8,5 +8,5 @@ spec:
     app: temple-app
   ports:
     - port: 3000
-      targetPort: 3000
+      targetPort: 3002
       nodePort: 30007

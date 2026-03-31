@@ -5,10 +5,6 @@
 
 const pool = require("../config/database");
 
-/* ===============================
-   CONSTANTS (Security)
-=============================== */
-
 const ALLOWED_SORT_FIELDS = new Set([
   "created_at",
   "amount",
@@ -19,16 +15,12 @@ const ALLOWED_SORT_FIELDS = new Set([
 
 const ALLOWED_SORT_ORDERS = new Set(["ASC", "DESC"]);
 
-/* ===============================
-   CREATE PAYMENT
-=============================== */
-
-exports.create = async (paymentData) => {
+const create = async (paymentData) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO payments 
-      (order_id, user_id, family_id, amount, currency, payment_method, status, payment_type, related_id, razorpay_response)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO payments
+       (order_id, user_id, family_id, amount, currency, payment_method, status, payment_type, related_id, razorpay_response)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paymentData.order_id,
         paymentData.user_id || null,
@@ -52,16 +44,13 @@ exports.create = async (paymentData) => {
   }
 };
 
-/* ===============================
-   FIND METHODS
-=============================== */
-
-exports.findByPaymentId = async (paymentId) => {
+const findByPaymentId = async (paymentId) => {
   try {
     const [rows] = await pool.execute(
       "SELECT * FROM payments WHERE payment_id = ?",
       [paymentId]
     );
+
     return rows[0] || null;
   } catch (error) {
     console.error("Error finding payment by payment ID:", error);
@@ -69,12 +58,13 @@ exports.findByPaymentId = async (paymentId) => {
   }
 };
 
-exports.findByOrderId = async (orderId) => {
+const findByOrderId = async (orderId) => {
   try {
     const [rows] = await pool.execute(
       "SELECT * FROM payments WHERE order_id = ?",
       [orderId]
     );
+
     return rows[0] || null;
   } catch (error) {
     console.error("Error finding payment by order ID:", error);
@@ -82,12 +72,13 @@ exports.findByOrderId = async (orderId) => {
   }
 };
 
-exports.findById = async (id) => {
+const findById = async (id) => {
   try {
     const [rows] = await pool.execute(
       "SELECT * FROM payments WHERE id = ?",
       [id]
     );
+
     return rows[0] || null;
   } catch (error) {
     console.error("Error finding payment by ID:", error);
@@ -95,9 +86,7 @@ exports.findById = async (id) => {
   }
 };
 
-/* ===============================
-   UPDATE METHODS
-exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
+const updateStatus = async (paymentId, status, razorpayResponse = null) => {
   try {
     const updateFields = ["status = ?"];
     const updateValues = [status];
@@ -110,8 +99,8 @@ exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
     updateValues.push(paymentId);
 
     await pool.execute(
-      `UPDATE payments 
-       SET ${updateFields.join(", ")}, updated_at = NOW() 
+      `UPDATE payments
+       SET ${updateFields.join(", ")}, updated_at = NOW()
        WHERE payment_id = ?`,
       updateValues
     );
@@ -123,10 +112,10 @@ exports.updateStatus = async (paymentId, status, razorpayResponse = null) => {
   }
 };
 
-exports.update = async (paymentId, paymentData) => {
+const update = async (paymentId, paymentData) => {
   try {
     await pool.execute(
-      `UPDATE payments 
+      `UPDATE payments
        SET payment_method = ?, status = ?, razorpay_response = ?, updated_at = NOW()
        WHERE payment_id = ?`,
       [
@@ -146,10 +135,10 @@ exports.update = async (paymentId, paymentData) => {
   }
 };
 
-exports.updateByOrderId = async (orderId, paymentId, paymentData) => {
+const updateByOrderId = async (orderId, paymentId, paymentData) => {
   try {
     await pool.execute(
-      `UPDATE payments 
+      `UPDATE payments
        SET payment_id = ?, payment_method = ?, status = ?, razorpay_response = ?, updated_at = NOW()
        WHERE order_id = ?`,
       [
@@ -170,16 +159,13 @@ exports.updateByOrderId = async (orderId, paymentId, paymentData) => {
   }
 };
 
-/* ===============================
-   USER PAYMENTS
-=============================== */
-
-exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
+const getUserPayments = async (userId, limit = 20, offset = 0) => {
   try {
     const safeLimit = Math.min(Math.max(Number(limit), 1), 100);
     const safeOffset = Math.max(Number(offset), 0);
 
-    let query, params;
+    let query;
+    let params;
 
     if (userId) {
       query = `
@@ -206,20 +192,32 @@ exports.getUserPayments = async (userId, limit = 20, offset = 0) => {
   }
 };
 
-/* ===============================
-   PENDING PAYMENTS (ADDED BACK)
+const getPendingPaymentsByType = async (userId, paymentType) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT *
+       FROM payments
+       WHERE user_id = ?
+         AND payment_type = ?
+         AND status = 'pending'
+       ORDER BY created_at DESC`,
+      [Number(userId), paymentType]
+    );
+
+    return rows;
+  } catch (error) {
+    console.error("Error getting pending payments by type:", error);
     throw error;
   }
 };
 
-/* ===============================
-   IDEMPOTENCY CHECK
-exports.paymentExists = async (paymentId) => {
+const paymentExists = async (paymentId) => {
   try {
     const [rows] = await pool.execute(
-      "SELECT COUNT(*) as count FROM payments WHERE payment_id = ?",
+      "SELECT COUNT(*) AS count FROM payments WHERE payment_id = ?",
       [paymentId]
     );
+
     return rows[0].count > 0;
   } catch (error) {
     console.error("Error checking payment existence:", error);
@@ -227,11 +225,7 @@ exports.paymentExists = async (paymentId) => {
   }
 };
 
-/* ===============================
-   ADMIN: GET ALL PAYMENTS
-=============================== */
-
-exports.getAllPayments = async ({
+const getAllPayments = async ({
   search,
   filter,
   sort,
@@ -245,13 +239,8 @@ exports.getAllPayments = async ({
     const safeLimit = Math.min(Math.max(Number(limit), 1), 100);
     const safeOffset = Math.max(Number(offset), 0);
 
-    let safeSort = ALLOWED_SORT_FIELDS.has(sort)
-      ? sort
-      : "created_at";
-
-    let safeOrder = ALLOWED_SORT_ORDERS.has(
-      String(order || "").toUpperCase()
-    )
+    let safeSort = ALLOWED_SORT_FIELDS.has(sort) ? sort : "created_at";
+    let safeOrder = ALLOWED_SORT_ORDERS.has(String(order || "").toUpperCase())
       ? String(order).toUpperCase()
       : "DESC";
 
@@ -272,7 +261,7 @@ exports.getAllPayments = async ({
     if (search && String(search).trim()) {
       const searchTerm = `%${String(search).trim()}%`;
       whereClauses.push(
-        `(p.payment_id LIKE ? OR CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) LIKE ? OR u.email LIKE ?)`
+        "(p.payment_id LIKE ? OR CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) LIKE ? OR u.email LIKE ?)"
       );
       values.push(searchTerm, searchTerm, searchTerm);
     }
@@ -287,7 +276,7 @@ exports.getAllPayments = async ({
       values.push(String(payment_type).trim());
     }
 
-    const whereSql = " WHERE " + whereClauses.join(" AND ");
+    const whereSql = ` WHERE ${whereClauses.join(" AND ")}`;
 
     const baseQuery = `
       FROM payments p
@@ -298,7 +287,14 @@ exports.getAllPayments = async ({
 
     const dataQuery = `
       SELECT
-        p.payment_id, p.user_id, p.created_at, p.payment_method, p.amount, p.currency, p.status, p.payment_type,
+        p.payment_id,
+        p.user_id,
+        p.created_at,
+        p.payment_method,
+        p.amount,
+        p.currency,
+        p.status,
+        p.payment_type,
         u.first_name AS first_name,
         u.last_name AS last_name,
         u.email AS user_email,
@@ -333,4 +329,18 @@ exports.getAllPayments = async ({
     console.error("Error getting all payments:", error);
     throw error;
   }
+};
+
+module.exports = {
+  create,
+  findByPaymentId,
+  findByOrderId,
+  findById,
+  updateStatus,
+  update,
+  updateByOrderId,
+  getUserPayments,
+  getPendingPaymentsByType,
+  paymentExists,
+  getAllPayments,
 };

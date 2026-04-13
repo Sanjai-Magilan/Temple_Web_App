@@ -21,10 +21,8 @@
         <li><a href="/bookings/hall">Hall Booking</a></li>
         <li><a href="/donations">Donate</a></li>
 
-        <% if (user && user.role === 'admin') { %>
-            <li><a href="/admin/families">Family</a></li>
-        <% } else { %>
-            <li><a href="/family">Family</a></li>
+        <% if (!(user && user.role === 'admin')) { %>
+          <li><a href="/family">Family</a></li>
         <% } %>
     </ul>
 </div>

@@ -176,6 +176,16 @@ exports.createHallBookingOrder = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
+    const start = new Date(`2000-01-01T${start_time}`);
+    const end = new Date(`2000-01-01T${end_time}`);
+    
+    if (end <= start) {
+      return res.status(400).json({
+        success: false,
+        message: "End time must be after the start time"
+      });
+    }
+
     const bookingAmount = parseFloat(amount);
     // Max limit validation for hall booking
     if (bookingAmount > PAYMENT_LIMITS.hall_booking) {

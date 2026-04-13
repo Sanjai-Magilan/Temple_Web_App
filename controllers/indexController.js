@@ -18,7 +18,7 @@ exports.home = async (req, res) => {
     );
 
     res.render('index', {
-      title: 'Welcome to Temple Management System',
+      title: 'Welcome to Sri Veera Mathi Amman Thiru Kovil',
       message: 'Experience the divine with our comprehensive temple management services. Please login or register to continue.',
       user: req.user,
       latestNews: latestNews

@@ -1,0 +1,509 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="bi bi-diagram-3"></i> 3-Generation Family Setup</h4>
+        </div>
+
+        <div class="card-body p-4">
+          <% if (family) { %>
+            <div class="alert alert-info mb-4">
+              Family found:
+              <strong><%= family.family_name %></strong>
+              <% if (family.family_uid) { %>
+                (ID: <strong><%= family.family_uid %></strong>)
+              <% } %>
+              . Submitting this form will update or extend members.
+            </div>
+          <% } %>
+
+          <% if (error) { %>
+            <div class="alert alert-danger mb-4">
+              <i class="bi bi-exclamation-triangle"></i> <%= error %>
+            </div>
+          <% } %>
+
+          <form id="familySetupForm" action="/family/setup" method="POST" enctype="multipart/form-data">
+            <h5 class="mb-3">Family Details</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Family Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="family_name"
+                  value="<%= formData && formData.family_name ? formData.family_name : '' %>"
+                  placeholder="Example: Ramesh Family"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="address"
+                  value="<%= formData && formData.address ? formData.address : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">City</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="city"
+                  value="<%= formData && formData.city ? formData.city : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">State</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="state"
+                  value="<%= formData && formData.state ? formData.state : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Pincode</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="pincode"
+                  value="<%= formData && formData.pincode ? formData.pincode : '' %>"
+                >
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="mb-3">Father (Family Head)</h5>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Father Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="father_name"
+                  value="<%= formData && formData.father_name ? formData.father_name : '' %>"
+                  required
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Mobile</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="father_mobile"
+                  value="<%= formData && formData.father_mobile ? formData.father_mobile : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Occupation</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="father_occupation"
+                  value="<%= formData && formData.father_occupation ? formData.father_occupation : '' %>"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="father_dob"
+                  value="<%= formData && formData.father_dob ? formData.father_dob : '' %>"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Age</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="father_age"
+                  min="0"
+                  max="120"
+                  value="<%= formData && formData.father_age ? formData.father_age : '' %>"
+                >
+              </div>
+            </div>
+
+            <h5 class="mb-3 mt-2">Mother</h5>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Mother Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="mother_name"
+                  value="<%= formData && formData.mother_name ? formData.mother_name : '' %>"
+                  required
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Mobile</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="mother_mobile"
+                  value="<%= formData && formData.mother_mobile ? formData.mother_mobile : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Occupation</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="mother_occupation"
+                  value="<%= formData && formData.mother_occupation ? formData.mother_occupation : '' %>"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="mother_dob"
+                  value="<%= formData && formData.mother_dob ? formData.mother_dob : '' %>"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Age</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="mother_age"
+                  min="0"
+                  max="120"
+                  value="<%= formData && formData.mother_age ? formData.mother_age : '' %>"
+                >
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="mb-3">Selected Person (You)</h5>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Your Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="self_name"
+                  value="<%= formData && formData.self_name ? formData.self_name : '' %>"
+                  required
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="self_gender" required>
+                  <option value="male" <%= formData && formData.self_gender === 'male' ? 'selected' : '' %>>Male</option>
+                  <option value="female" <%= formData && formData.self_gender === 'female' ? 'selected' : '' %>>Female</option>
+                  <option value="other" <%= formData && formData.self_gender === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Mobile</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="self_mobile"
+                  value="<%= formData && formData.self_mobile ? formData.self_mobile : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Occupation</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="self_occupation"
+                  value="<%= formData && formData.self_occupation ? formData.self_occupation : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="self_dob"
+                  value="<%= formData && formData.self_dob ? formData.self_dob : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Age</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="self_age"
+                  min="0"
+                  max="120"
+                  value="<%= formData && formData.self_age ? formData.self_age : '' %>"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Profile Image (Local Upload)</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  name="self_profile_image"
+                  accept=".jpg,.jpeg,.png,.webp"
+                >
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="mb-3">Spouse (Optional)</h5>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Spouse Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="spouse_name"
+                  value="<%= formData && formData.spouse_name ? formData.spouse_name : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="spouse_gender">
+                  <option value="">Select gender</option>
+                  <option value="male" <%= formData && formData.spouse_gender === 'male' ? 'selected' : '' %>>Male</option>
+                  <option value="female" <%= formData && formData.spouse_gender === 'female' ? 'selected' : '' %>>Female</option>
+                  <option value="other" <%= formData && formData.spouse_gender === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Mobile</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="spouse_mobile"
+                  value="<%= formData && formData.spouse_mobile ? formData.spouse_mobile : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Occupation</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="spouse_occupation"
+                  value="<%= formData && formData.spouse_occupation ? formData.spouse_occupation : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Date of Birth</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="spouse_dob"
+                  value="<%= formData && formData.spouse_dob ? formData.spouse_dob : '' %>"
+                >
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Age</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="spouse_age"
+                  min="0"
+                  max="120"
+                  value="<%= formData && formData.spouse_age ? formData.spouse_age : '' %>"
+                >
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="mb-0">Siblings</h5>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="addSiblingBtn">
+                <i class="bi bi-plus-circle"></i> Add Sibling
+              </button>
+            </div>
+            <div id="siblingsRows" class="mb-4"></div>
+
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="mb-0">Children</h5>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="addChildBtn">
+                <i class="bi bi-plus-circle"></i> Add Child
+              </button>
+            </div>
+            <div id="childrenRows" class="mb-4"></div>
+
+            <input type="hidden" name="siblings_json" id="siblings_json">
+            <input type="hidden" name="children_json" id="children_json">
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-between">
+              <a href="/family" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Family
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Save Family Details
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function createRelationRow(containerId, seed) {
+    var container = document.getElementById(containerId);
+    var row = document.createElement("div");
+    row.className = "card mb-2 relation-row";
+
+    var body = document.createElement("div");
+    body.className = "card-body py-2";
+
+    body.innerHTML =
+      '<div class="row g-2">' +
+        '<div class="col-md-3">' +
+          '<input type="text" class="form-control rel-name" placeholder="Name" value="' + ((seed && seed.name) ? seed.name : "") + '">' +
+        '</div>' +
+        '<div class="col-md-2">' +
+          '<select class="form-select rel-gender">' +
+            '<option value="male">Male</option>' +
+            '<option value="female">Female</option>' +
+            '<option value="other">Other</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="col-md-2">' +
+          '<input type="text" class="form-control rel-mobile" placeholder="Mobile" value="' + ((seed && seed.mobile) ? seed.mobile : "") + '">' +
+        '</div>' +
+        '<div class="col-md-2">' +
+          '<input type="text" class="form-control rel-occupation" placeholder="Occupation" value="' + ((seed && seed.occupation) ? seed.occupation : "") + '">' +
+        '</div>' +
+        '<div class="col-md-2">' +
+          '<input type="date" class="form-control rel-dob" value="' + ((seed && seed.dob) ? seed.dob : "") + '">' +
+        '</div>' +
+        '<div class="col-md-1 d-grid">' +
+          '<button type="button" class="btn btn-outline-danger rel-remove"><i class="bi bi-trash"></i></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="row g-2 mt-1">' +
+        '<div class="col-md-2">' +
+          '<input type="number" min="0" max="120" class="form-control rel-age" placeholder="Age" value="' + ((seed && seed.age) ? seed.age : "") + '">' +
+        '</div>' +
+      '</div>';
+
+    row.appendChild(body);
+    container.appendChild(row);
+
+    var genderSelect = row.querySelector(".rel-gender");
+    genderSelect.value = (seed && seed.gender) ? seed.gender : "male";
+
+    row.querySelector(".rel-remove").addEventListener("click", function () {
+      row.remove();
+    });
+  }
+
+  function collectRelationRows(containerId) {
+    var rows = document.querySelectorAll("#" + containerId + " .relation-row");
+    var out = [];
+
+    rows.forEach(function (row) {
+      var name = row.querySelector(".rel-name").value.trim();
+      var gender = row.querySelector(".rel-gender").value;
+      var mobile = row.querySelector(".rel-mobile").value.trim();
+      var occupation = row.querySelector(".rel-occupation").value.trim();
+      var dob = row.querySelector(".rel-dob").value;
+      var age = row.querySelector(".rel-age").value;
+
+      if (name) {
+        out.push({
+          name: name,
+          gender: gender || "other",
+          mobile: mobile || null,
+          occupation: occupation || null,
+          dob: dob || null,
+          age: age ? parseInt(age, 10) : null
+        });
+      }
+    });
+
+    return out;
+  }
+
+  function parseSeed(seedRaw) {
+    if (!seedRaw) return [];
+    if (Array.isArray(seedRaw)) return seedRaw;
+
+    try {
+      var parsed = JSON.parse(seedRaw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  document.getElementById("addSiblingBtn").addEventListener("click", function () {
+    createRelationRow("siblingsRows", null);
+  });
+
+  document.getElementById("addChildBtn").addEventListener("click", function () {
+    createRelationRow("childrenRows", null);
+  });
+
+  document.getElementById("familySetupForm").addEventListener("submit", function (e) {
+    var spouseName = (document.querySelector('input[name="spouse_name"]').value || "").trim();
+    var childrenData = collectRelationRows("childrenRows");
+
+    if (childrenData.length > 0 && !spouseName) {
+      e.preventDefault();
+      alert("Please provide spouse details before adding children.");
+      return false;
+    }
+
+    document.getElementById("siblings_json").value = JSON.stringify(collectRelationRows("siblingsRows"));
+    document.getElementById("children_json").value = JSON.stringify(childrenData);
+  });
+
+  var siblingsSeedRaw = <%- JSON.stringify((formData && formData.siblings_json) ? formData.siblings_json : "[]") %>;
+  var childrenSeedRaw = <%- JSON.stringify((formData && formData.children_json) ? formData.children_json : "[]") %>;
+
+  var siblingsSeed = parseSeed(siblingsSeedRaw);
+  var childrenSeed = parseSeed(childrenSeedRaw);
+
+  siblingsSeed.forEach(function (item) {
+    createRelationRow("siblingsRows", item);
+  });
+
+  childrenSeed.forEach(function (item) {
+    createRelationRow("childrenRows", item);
+  });
+</script>
+
+<%- include('../partials/footer') %>
+

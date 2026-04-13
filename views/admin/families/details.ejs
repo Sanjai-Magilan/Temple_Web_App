@@ -1,0 +1,103 @@
+<div class="card mb-4">
+  <div class="card-header bg-dark text-white">
+    <strong><%= family.family_name %></strong> | <%= family.family_uid || '-' %>
+  </div>
+  <div class="card-body">
+    <div class="mb-2">
+      <strong>Address:</strong> <%= family.address || '-' %>, <%= family.city || '-' %>, <%= family.state || '-' %>, <%= family.pincode || '-' %>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">3-Generation Tree</div>
+      <div class="card-body" id="adminTreeContainer"></div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Relationship</th>
+            <th>Gender</th>
+            <th>Father</th>
+            <th>Mother</th>
+            <th>Spouse</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% members.forEach(function(m){ %>
+          <tr>
+            <td><%= m.id %></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary admin-node-btn" data-id="<%= m.id %>"><%= m.member_name %></button>
+            </td>
+            <td><%= m.relationship %></td>
+            <td><%= m.gender %></td>
+            <td><%= m.father_member_id || '-' %></td>
+            <td><%= m.mother_member_id || '-' %></td>
+            <td><%= m.spouse_member_id || '-' %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const adminInitialTree = <%- JSON.stringify(initialTree || null) %>;
+
+  function adminNodeHtml(member, role) {
+    if (!member) return '<span class="badge bg-light text-dark m-1">-</span>';
+    return '<button type="button" class="btn btn-sm btn-outline-secondary m-1 admin-tree-node" data-id="' + member.id + '">' +
+      member.member_name + ' (' + role + ')' +
+      '</button>';
+  }
+
+  function renderAdminTree(tree) {
+    if (!tree) {
+      document.getElementById("adminTreeContainer").innerHTML = "No tree data";
+      return;
+    }
+
+    const html =
+      '<div class="mb-2"><strong>Parents:</strong><br>' +
+      adminNodeHtml(tree.parents.father, "Father") +
+      adminNodeHtml(tree.parents.mother, "Mother") +
+      '</div>' +
+      '<div class="mb-2"><strong>Selected:</strong><br>' +
+      adminNodeHtml(tree.selected, "Person") +
+      adminNodeHtml(tree.spouse, "Spouse") +
+      '</div>' +
+      '<div><strong>Children:</strong><br>' +
+      (tree.children && tree.children.length
+        ? tree.children.map(function(c){ return adminNodeHtml(c, "Child"); }).join("")
+        : '<span class="text-muted">No children</span>') +
+      '</div>';
+
+    document.getElementById("adminTreeContainer").innerHTML = html;
+
+    document.querySelectorAll(".admin-tree-node").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        loadAdminTree(this.getAttribute("data-id"));
+      });
+    });
+  }
+
+  function loadAdminTree(memberId) {
+    fetch("/admin/families/tree/" + memberId, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data.success) renderAdminTree(data.tree);
+      });
+  }
+
+  document.querySelectorAll(".admin-node-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      loadAdminTree(this.getAttribute("data-id"));
+    });
+  });
+
+  renderAdminTree(adminInitialTree);
+</script>

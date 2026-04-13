@@ -1,0 +1,68 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container py-4">
+  <h2 class="mb-3">Admin Family Panel</h2>
+
+  <div class="card mb-3">
+    <div class="card-header">Family Heads</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Family ID</th>
+              <th>Family Name</th>
+              <th>Head Name</th>
+              <th>Members</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% families.forEach(function(f) { %>
+              <tr>
+                <td><%= f.family_uid || '-' %></td>
+                <td><%= f.family_name %></td>
+                <td><%= f.head_name %></td>
+                <td><%= f.members_count %></td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary head-btn"
+                    data-family-id="<%= f.id %>"
+                  >
+                    View Full Family
+                  </button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="familyInlineDetails"></div>
+</div>
+
+<script>
+  document.querySelectorAll(".head-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      const familyId = this.getAttribute("data-family-id");
+      fetch("/admin/families/" + familyId + "/details", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          document.getElementById("familyInlineDetails").innerHTML = html;
+          const top = document.getElementById("familyInlineDetails").offsetTop - 80;
+          window.scrollTo({ top: top, behavior: "smooth" });
+        })
+        .catch(function() {
+          alert("Failed to load family details.");
+        });
+    });
+  });
+</script>
+
+<%- include('../../partials/footer') %>

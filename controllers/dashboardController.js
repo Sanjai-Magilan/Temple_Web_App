@@ -9,7 +9,7 @@ const poojaBookingModel = require('../models/poojaBookingModel');
 const paymentModel = require('../models/paymentModel');
 const userModel = require('../models/userModel');
 const pool = require('../config/database');
-
+const familyModel = require('../models/familyModel');
 /**
  * User Dashboard
  */
@@ -55,7 +55,9 @@ exports.userDashboard = async (req, res) => {
       'SELECT COUNT(*) as count FROM family_members WHERE user_id = ?',
       [userId]
     );
-    const familyCount = familyResult[0].count;
+    //const familyCount = familyResult[0].count;
+    const familySummary = await familyModel.getDashboardFamilySummary(userId);
+    const familyCount = familySummary ? familySummary.member_count : 0;
 
     // --- 4. GET UPCOMING POOJA (Specific for "Upcoming Pooja" Card & Details) ---
     const [upcomingPoojasResult] = await pool.execute(
@@ -102,6 +104,7 @@ exports.userDashboard = async (req, res) => {
       upcomingHall: upcomingHall,
       totalDonation: parseFloat(totalDonationResult[0].total) || 0,
       familyCount: familyCount,
+      familySummary: familySummary, 
 
       // Other data for sidebar/footer/history
       donationsCount: donationsCount[0].count,

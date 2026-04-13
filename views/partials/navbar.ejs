@@ -1,54 +1,60 @@
 <nav class="nav-bar">
-
-    <!-- LEFT -->
-    <div class="nav-left">
-        <div class="mobile-menu-btn" id="mobile-menu-btn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="temple-logo">🕉️</div>
-        <div class="temple-brand">
-            <div class="temple-brand-name">Shri Temple</div>
-            <div class="temple-brand-tagline">Management System</div>
-        </div>
+  <!-- LEFT -->
+  <div class="nav-left">
+    <div class="mobile-menu-btn" id="mobile-menu-btn">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
+    <div class="temple-logo">🕉️</div>
+    <div class="temple-brand">
+      <div class="temple-brand-name">Shri Temple</div>
+      <div class="temple-brand-tagline">Management System</div>
+    </div>
+  </div>
 
-    <!-- CENTER -->
-    <div class="nav-center">
-        <ul class="nav-links">
-            <li><a href="<%= user && user.role === 'admin' ? '/admin' : '/dashboard' %>">Dashboard</a></li>
-            <li><a href="/bookings/pooja">Pooja Booking</a></li>
-            <li><a href="/bookings/hall">Hall Booking</a></li>
-            <li><a href="/donations">Donate</a></li>
+  <!-- CENTER -->
+<div class="nav-center">
+    <ul class="nav-links">
+        <li><a href="<%= user && user.role === 'admin' ? '/admin' : '/dashboard' %>">Dashboard</a></li>
+        <li><a href="/bookings/pooja">Pooja Booking</a></li>
+        <li><a href="/bookings/hall">Hall Booking</a></li>
+        <li><a href="/donations">Donate</a></li>
+
+        <% if (user && user.role === 'admin') { %>
+            <li><a href="/admin/families">Family</a></li>
+        <% } else { %>
             <li><a href="/family">Family</a></li>
-        </ul>
-    </div>
+        <% } %>
+    </ul>
+</div>
 
-    <!-- RIGHT -->
-    <div class="nav-right">
-        <div class="nav-user" id="navUser">
-            <div class="nav-user-avatar">
-                <%= user && user.first_name ? user.first_name.charAt(0).toUpperCase() : ' ' %>
-            </div>
+  <!-- RIGHT -->
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <div class="nav-user-avatar">
+        <%= user && user.first_name ? user.first_name.charAt(0).toUpperCase() :
+        ' ' %>
+      </div>
 
-            <div class="nav-user-info">
-                <div class="nav-user-name">
-                    <%= user && user.first_name ? user.first_name : 'User' %>
-                </div>
-                <div class="nav-user-role">
-                    <%= user? (user.role=='admin' ?'Admin':'Devotte'):'invalid user' %>
-                </div>
-            </div>
-
-            <div class="nav-user-dropdown">▼</div>
-
-            <!-- DROPDOWN -->
-            <div class="user-dropdown-menu">
-                <a href="/profile">Profile</a>
-                <a href="/logout" class="logout">Logout</a>
-            </div>
+      <div class="nav-user-info">
+        <div class="nav-user-name">
+          <%= user && user.first_name ? user.first_name : 'User' %>
         </div>
+        <div class="nav-user-role">
+          <%= user? (user.role=='admin' ?'Admin':'Devotte'):'invalid user' %>
+        </div>
+      </div>
+
+      <div class="nav-user-dropdown">▼</div>
+
+      <!-- DROPDOWN -->
+      <div class="user-dropdown-menu">
+        <a href="/profile">Profile</a>
+        <a href="/logout" class="logout">Logout</a>
+      </div>
     </div>
+  </div>
 </nav>
 <script src="/js/mobile-nav.js"></script>
+

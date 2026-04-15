@@ -393,6 +393,7 @@ exports.showCompleteProfile = (req, res) => {
   res.render("auth/complete-profile", {
     error: null,
     user: req.user,
+    formData: { phone: req.user.phone || "" },
   });
 };
 /**
@@ -405,20 +406,31 @@ exports.savePhone = async (req, res) => {
     }
 
     const { phone, family_name, address, city, state, pincode } = req.body;
+    const normalizedPhone = String(phone || "").trim().replace(/\D/g, "");
 
-    if (!phone) {
+    if (!normalizedPhone) {
       return res.render("auth/complete-profile", {
         error: "Phone number is required.",
         user: req.user,
+        formData: req.body,
+      });
+    }
+
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
+      return res.render("auth/complete-profile", {
+        error: "Please enter a valid 10-digit Indian phone number.",
+        user: req.user,
+        formData: req.body,
       });
     }
 
     // Check if phone is already used by another user
-    const existingUser = await userModel.findByPhone(phone);
+    const existingUser = await userModel.findByPhone(normalizedPhone);
     if (existingUser && existingUser.id !== req.user.id) {
       return res.render("auth/complete-profile", {
         error: "Phone number already in use. Please use a different number.",
         user: req.user,
+        formData: req.body,
       });
     }
 
@@ -426,7 +438,7 @@ exports.savePhone = async (req, res) => {
     await userModel.updateProfile(req.user.id, {
       first_name: req.user.first_name,
       last_name: req.user.last_name,
-      phone,
+      phone: normalizedPhone,
     });
 
     // Create family if family_name is provided
@@ -453,6 +465,7 @@ exports.savePhone = async (req, res) => {
     res.render("auth/complete-profile", {
       error: "Failed to save profile. Please try again.",
       user: req.user,
+      formData: req.body,
     });
   }
 };

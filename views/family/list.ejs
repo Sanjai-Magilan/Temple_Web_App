@@ -1,13 +1,136 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
+<style>
+  :root {
+    --booking-gold: #bfa15f;
+    --booking-gold-dark: #a88b4d;
+    --booking-ink: #2c241b;
+    --booking-muted: #8c7b65;
+    --booking-card: #fffaf2;
+  }
+
+  .family-page-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .family-page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--booking-ink);
+  }
+
+  .btn-booking-gold {
+    background: linear-gradient(135deg, var(--booking-gold), var(--booking-gold-dark));
+    border: 1px solid var(--booking-gold);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.58rem 1rem;
+    box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+  }
+
+  .btn-booking-gold:hover {
+    color: #fff;
+    background: linear-gradient(135deg, #b49455, #9f8448);
+    border-color: var(--booking-gold-dark);
+    transform: translateY(-1px);
+  }
+
+  .setup-empty-card {
+    background: var(--booking-card);
+    border: 1px solid rgba(191, 161, 95, 0.22);
+    border-radius: 22px;
+    box-shadow: 0 20px 38px rgba(44, 36, 27, 0.14);
+    max-width: 650px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .setup-empty-header {
+    background: linear-gradient(135deg, var(--booking-ink), var(--booking-muted));
+    color: #fff;
+    text-align: center;
+    padding: 1.4rem 1.2rem;
+  }
+
+  .setup-empty-title {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+  }
+
+  .setup-empty-body {
+    text-align: center;
+    padding: 2rem 2rem 2.2rem;
+  }
+
+  .setup-empty-subtitle {
+    color: #6b5b4d;
+    margin: 0.85rem auto 1.4rem;
+    max-width: 420px;
+  }
+
+  .setup-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(191, 161, 95, 0.16);
+    color: var(--booking-gold-dark);
+    font-size: 1.5rem;
+  }
+
+  .family-members-compact .card-header {
+    padding: 0.6rem 0.85rem;
+    font-size: 0.92rem;
+  }
+
+  .family-members-compact .card-body {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .members-table-compact th,
+  .members-table-compact td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .members-table-compact .badge {
+    font-size: 0.74rem;
+    padding: 0.35em 0.55em;
+  }
+
+  .members-table-compact .btn-group-sm > .btn,
+  .members-table-compact .btn-sm {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .family-members-compact .card-body,
+    .family-members-compact .card-header,
+    .members-table-compact th,
+    .members-table-compact td {
+      font-size: 0.86rem;
+    }
+  }
+</style>
+
 <div class="container mt-4 mb-5">
-  <div class="row">
+  <div class="row family-page-shell">
     <div class="col-12">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-        <h2 class="mb-0"><i class="bi bi-people"></i> Family</h2>
+        <h2 class="mb-0 family-page-title"><i class="bi bi-people"></i> Family</h2>
         <div class="d-flex gap-2">
-          <a href="/family/setup" class="btn btn-outline-primary">
+          <a href="/family/setup" class="btn btn-booking-gold">
             <i class="bi bi-diagram-3"></i> Setup / Update Family
           </a>
         </div>
@@ -74,7 +197,7 @@
         </div>
 
         <% if (myFamilyView) { %>
-          <div class="row g-3 mb-4">
+          <div class="row g-2 mb-4 family-members-compact">
             <div class="col-md-3">
               <div class="card h-100">
                 <div class="card-header">Parents</div>
@@ -143,7 +266,7 @@
           <div class="card-body p-0">
             <% if (members.length > 0) { %>
               <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
+                <table class="table table-hover mb-0 align-middle members-table-compact">
                   <thead class="table-light">
                     <tr>
                       <th>Name</th>
@@ -216,13 +339,16 @@
           </div>
         </div>
       <% } else { %>
-        <div class="card">
-          <div class="card-body text-center py-5">
-            <i class="bi bi-house-x text-muted" style="font-size: 3rem;"></i>
-            <h5 class="mt-3">No Family Found</h5>
-            <p class="text-muted">Please complete family setup to continue.</p>
-            <a href="/family/setup" class="btn btn-primary mt-2">
-              <i class="bi bi-diagram-3"></i> Setup Family
+        <div class="setup-empty-card">
+          <div class="setup-empty-header">
+            <h5 class="setup-empty-title">Family Setup</h5>
+          </div>
+          <div class="setup-empty-body">
+            <div class="setup-empty-icon"><i class="bi bi-house-x"></i></div>
+            <h5 class="mt-3 mb-2">No Family Found</h5>
+            <p class="setup-empty-subtitle">Please complete family setup to continue with member management and family tree.</p>
+            <a href="/family/setup" class="btn btn-booking-gold mt-1">
+              <i class="bi bi-diagram-3 me-1"></i> Setup Family
             </a>
           </div>
         </div>

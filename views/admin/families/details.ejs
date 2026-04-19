@@ -46,7 +46,7 @@
 </div>
 
 <script>
-  const adminInitialTree = <%- JSON.stringify(initialTree || null) %>;
+  const adminInitialTree = JSON.stringify(initialTree || null);
 
   function adminNodeHtml(member, role) {
     if (!member) return '<span class="badge bg-light text-dark m-1">-</span>';

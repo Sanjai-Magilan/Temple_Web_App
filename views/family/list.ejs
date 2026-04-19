@@ -320,19 +320,6 @@
           </div>
         <% } %>
 
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-diagram-3"></i> 3-Generation Tree</h5>
-            <% if (selectedMemberId) { %>
-              <small class="text-muted">Centered on member #<%= selectedMemberId %></small>
-            <% } %>
-          </div>
-          <div class="card-body">
-            <p class="text-muted mb-3">Click any node to rebuild the tree around that person.</p>
-            <div id="treeContainer" data-initial-tree="<%- JSON.stringify(initialTree || null).replace(/\"/g, '&quot;') %>"></div>
-          </div>
-        </div>
-
         <div class="card">
           <div class="card-header">
             <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Members (<%= members.length %>)</h5>

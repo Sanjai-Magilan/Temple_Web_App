@@ -1,20 +1,28 @@
-<div class="card mb-4">
-  <div class="card-header bg-dark text-white">
-    <strong><%= family.family_name %></strong> | <%= family.family_uid || '-' %>
+<div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+  <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+    <div>
+      <strong class="text-primary"><%= family.family_name %></strong>
+      <span class="text-muted ms-2">| <%= family.family_uid || '-' %></span>
+    </div>
+    <span class="badge bg-light text-dark">Family ID: <%= family.id %></span>
   </div>
   <div class="card-body">
-    <div class="mb-2">
-      <strong>Address:</strong> <%= family.address || '-' %>, <%= family.city || '-' %>, <%= family.state || '-' %>, <%= family.pincode || '-' %>
+    <div class="mb-3 small text-muted">
+      <strong class="text-dark">Address:</strong>
+      <%= family.address || '-' %>,
+      <%= family.city || '-' %>,
+      <%= family.state || '-' %>,
+      <%= family.pincode || '-' %>
     </div>
 
-    <div class="card mb-3">
-      <div class="card-header">3-Generation Tree</div>
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px;">
+      <div class="card-header bg-light border-0 fw-semibold">3-Generation Tree</div>
       <div class="card-body" id="adminTreeContainer"></div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
+    <div class="table-responsive bg-white rounded shadow-sm p-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
           <tr>
             <th>ID</th>
             <th>Name</th>
@@ -28,7 +36,7 @@
         <tbody>
           <% members.forEach(function(m){ %>
           <tr>
-            <td><%= m.id %></td>
+            <td><span class="fw-bold text-dark">#<%= m.id %></span></td>
             <td>
               <button class="btn btn-sm btn-outline-primary admin-node-btn" data-id="<%= m.id %>"><%= m.member_name %></button>
             </td>

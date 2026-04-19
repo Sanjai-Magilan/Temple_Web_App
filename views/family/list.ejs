@@ -3,11 +3,18 @@
 
 <style>
   :root {
-    --booking-gold: #bfa15f;
-    --booking-gold-dark: #a88b4d;
-    --booking-ink: #2c241b;
-    --booking-muted: #8c7b65;
-    --booking-card: #fffaf2;
+    --donation-gold: #bfa15f;
+    --donation-gold-dark: #a88b4d;
+    --donation-ink: #2c241b;
+    --donation-muted: #8c7b65;
+    --donation-card: #fffaf5;
+  }
+
+  body {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover !important;
+    min-height: 100vh;
   }
 
   .family-page-shell {
@@ -18,28 +25,55 @@
   .family-page-title {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    color: var(--booking-ink);
+    color: #f8f9fa;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  .btn-booking-gold {
-    background: linear-gradient(135deg, var(--booking-gold), var(--booking-gold-dark));
-    border: 1px solid var(--booking-gold);
+  .btn-gold {
+    background: var(--donation-gold);
+    border-color: var(--donation-gold);
     color: #fff;
     font-weight: 600;
-    border-radius: 12px;
-    padding: 0.58rem 1rem;
-    box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
   }
 
-  .btn-booking-gold:hover {
+  .btn-gold:hover {
     color: #fff;
-    background: linear-gradient(135deg, #b49455, #9f8448);
-    border-color: var(--booking-gold-dark);
-    transform: translateY(-1px);
+    background: var(--donation-gold-dark);
+    border-color: var(--donation-gold-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+  }
+
+  .card {
+    background: var(--donation-card);
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+    z-index: 10;
+  }
+
+  .card-header {
+    background: linear-gradient(90deg, #bfa15f, #a88b4d) !important;
+    color: #fff !important;
+    border-bottom: none;
+  }
+
+  .card-header .text-muted {
+    color: rgba(255, 255, 255, 0.86) !important;
   }
 
   .setup-empty-card {
-    background: var(--booking-card);
+    background: var(--donation-card);
     border: 1px solid rgba(191, 161, 95, 0.22);
     border-radius: 22px;
     box-shadow: 0 20px 38px rgba(44, 36, 27, 0.14);
@@ -49,7 +83,7 @@
   }
 
   .setup-empty-header {
-    background: linear-gradient(135deg, var(--booking-ink), var(--booking-muted));
+    background: linear-gradient(135deg, #2c241b, #8c7b65);
     color: #fff;
     text-align: center;
     padding: 1.4rem 1.2rem;
@@ -81,7 +115,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(191, 161, 95, 0.16);
-    color: var(--booking-gold-dark);
+    color: var(--donation-gold-dark);
     font-size: 1.5rem;
   }
 
@@ -101,6 +135,12 @@
     padding: 0.5rem 0.6rem;
     font-size: 0.9rem;
     vertical-align: middle;
+    border-bottom-color: rgba(191, 161, 95, 0.2);
+  }
+
+  .members-table-compact thead th {
+    background: rgba(191, 161, 95, 0.1);
+    color: #4b4135;
   }
 
   .members-table-compact .badge {
@@ -112,6 +152,40 @@
   .members-table-compact .btn-sm {
     padding: 0.25rem 0.4rem;
     font-size: 0.78rem;
+  }
+
+  .alert {
+    border: none;
+    border-radius: 12px;
+  }
+
+  .alert-info {
+    background: #f7f0e2;
+    color: #3f352b;
+  }
+
+  .alert-success {
+    background: #e8f5e9;
+    color: #214f31;
+  }
+
+  .alert-danger {
+    background: #fdeaea;
+    color: #842029;
+  }
+
+  .modal-content {
+    background: var(--donation-card);
+    border-radius: 20px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+  }
+
+  .modal-header {
+    border-bottom: none;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(191, 161, 95, 0.2);
   }
 
   @media (max-width: 767.98px) {
@@ -130,7 +204,7 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <h2 class="mb-0 family-page-title"><i class="bi bi-people"></i> Family</h2>
         <div class="d-flex gap-2">
-          <a href="/family/setup" class="btn btn-booking-gold">
+          <a href="/family/setup" class="btn btn-gold shadow-sm">
            Setup / Update Family
           </a>
         </div>
@@ -255,7 +329,7 @@
           </div>
           <div class="card-body">
             <p class="text-muted mb-3">Click any node to rebuild the tree around that person.</p>
-            <div id="treeContainer"></div>
+            <div id="treeContainer" data-initial-tree="<%- JSON.stringify(initialTree || null).replace(/\"/g, '&quot;') %>"></div>
           </div>
         </div>
 
@@ -341,13 +415,14 @@
       <% } else { %>
         <div class="setup-empty-card">
           <div class="setup-empty-header">
-            <h5 class="setup-empty-title">Family Setup</h5>
+            
           </div>
+          
           <div class="setup-empty-body">
             <div class="setup-empty-icon"><i class="bi bi-house-heart"></i></div>
             <h5 class="mt-2 mb-1">No Family Found</h5>
             <p class="setup-empty-subtitle">Please complete family setup </p>
-            <a href="/family/setup" class="btn btn-booking-gold mt-1">
+            <a href="/family/setup" class="btn btn-gold mt-1">
               Setup Family
             </a>
           </div>
@@ -376,7 +451,10 @@
 </div>
 
 <script>
-  const initialTree = - JSON.stringify(initialTree || null) ;
+  const treeContainer = document.getElementById("treeContainer");
+  const initialTreeData = treeContainer && treeContainer.dataset.initialTree
+    ? JSON.parse(treeContainer.dataset.initialTree)
+    : null;
   let memberIdToDelete = null;
 
   function createTreeNode(member, label, tone) {
@@ -477,7 +555,7 @@
     bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
   });
 
-  renderTree(initialTree);
+  renderTree(initialTreeData);
 </script>
 
 <%- include('../partials/footer') %>

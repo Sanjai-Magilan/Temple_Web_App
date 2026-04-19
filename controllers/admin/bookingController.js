@@ -42,8 +42,12 @@ exports.list = async (req, res) => {
 
         // Search Logic
         if (hallSearch) {
-            let whereClause = ` AND (p.payment_id LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR hb.hall_name LIKE ?`;
-            const baseParams = [`%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`];
+            let whereClause = ` AND (p.payment_id LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR hb.hall_name LIKE ? OR hb.booking_date LIKE ? OR DATE_FORMAT(hb.booking_date, '%e/%c/%Y') LIKE ? OR DATE_FORMAT(hb.booking_date, '%m/%d/%Y') LIKE ? OR hb.event_type LIKE ? OR hb.status LIKE ? OR hb.booking_number LIKE ?`;
+            const baseParams = [
+                `%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`, 
+                `%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`, `%${hallSearch}%`,
+                `%${hallSearch}%`, `%${hallSearch}%`
+            ];
             if (!isNaN(hallSearch)) {
                 whereClause += ` OR u.id = ?)`;
                 baseParams.push(hallSearch);
@@ -55,8 +59,12 @@ exports.list = async (req, res) => {
         }
 
         if (poojaSearch) {
-            let whereClause = ` AND (p.payment_id LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR pb.pooja_name LIKE ?`;
-            const baseParams = [`%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`];
+            let whereClause = ` AND (p.payment_id LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR pb.pooja_name LIKE ? OR pb.booking_date LIKE ? OR DATE_FORMAT(pb.booking_date, '%e/%c/%Y') LIKE ? OR DATE_FORMAT(pb.booking_date, '%m/%d/%Y') LIKE ? OR pb.status LIKE ? OR pb.booking_number LIKE ?`;
+            const baseParams = [
+                `%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`,
+                `%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`, `%${poojaSearch}%`, 
+                `%${poojaSearch}%`
+            ];
             if (!isNaN(poojaSearch)) {
                 whereClause += ` OR u.id = ?)`;
                 baseParams.push(poojaSearch);
@@ -65,6 +73,41 @@ exports.list = async (req, res) => {
             }
             poojaBaseQuery += whereClause;
             poojaQueryParams = [...baseParams];
+        }
+
+        // Apply explicit filters if provided
+        const filterHallName = req.query.filterHallName;
+        const filterHallDate = req.query.filterHallDate;
+        const filterHallStatus = req.query.filterHallStatus;
+
+        if (filterHallName) {
+            hallBaseQuery += ` AND hb.hall_name = ?`;
+            hallQueryParams.push(filterHallName);
+        }
+        if (filterHallDate) {
+            hallBaseQuery += ` AND hb.booking_date = ?`;
+            hallQueryParams.push(filterHallDate);
+        }
+        if (filterHallStatus) {
+            hallBaseQuery += ` AND hb.status = ?`;
+            hallQueryParams.push(filterHallStatus);
+        }
+
+        const filterPoojaName = req.query.filterPoojaName;
+        const filterPoojaDate = req.query.filterPoojaDate;
+        const filterPoojaStatus = req.query.filterPoojaStatus;
+
+        if (filterPoojaName) {
+            poojaBaseQuery += ` AND pb.pooja_name = ?`;
+            poojaQueryParams.push(filterPoojaName);
+        }
+        if (filterPoojaDate) {
+            poojaBaseQuery += ` AND pb.booking_date = ?`;
+            poojaQueryParams.push(filterPoojaDate);
+        }
+        if (filterPoojaStatus) {
+            poojaBaseQuery += ` AND pb.status = ?`;
+            poojaQueryParams.push(filterPoojaStatus);
         }
 
         // Count Queries
@@ -137,6 +180,12 @@ exports.list = async (req, res) => {
             poojaSearch,
             hallFilter,
             poojaFilter,
+            filterHallName,
+            filterHallDate,
+            filterHallStatus,
+            filterPoojaName,
+            filterPoojaDate,
+            filterPoojaStatus,
             pageTitle: 'Manage Bookings'
         });
 

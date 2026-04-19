@@ -530,6 +530,24 @@
             // Submission
             document.getElementById('hallBookingForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
+                
+                const startTime = document.getElementById('start_time').value;
+                const endTime = document.getElementById('end_time').value;
+
+                if (startTime && endTime) {
+                    const start = new Date(`2000-01-01T${startTime}`);
+                    const end = new Date(`2000-01-01T${endTime}`);
+                    
+                    if (end <= start) {
+                        showAlert(
+                            'warning',
+                            'Invalid Time',
+                            'End time must be after the start time'
+                        );
+                        return;
+                    }
+                }
+
                 // ===== Hall Booking Amount Limit Validation =====
                 const MAX_HALL_AMOUNT = 50000; // ₹50,000 limit
 

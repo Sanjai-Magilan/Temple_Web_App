@@ -109,11 +109,11 @@
                                                         <input type="text" name="hallSearch" id="hallSearchInput"
                                                             class="form-control border-start-0 border-end-0 shadow-none"
                                                             style="border-right: none !important;"
-                                                            placeholder="Search Hall Bookings by Hall Name, Payment ID, User ID or User Name..."
+                                                            placeholder="Filter by Hall Name, Date, Event, Payment ID or User..."
                                                             value="<%= typeof hallSearch !== 'undefined' ? hallSearch : '' %>"
                                                             onkeydown="handleEnter(event, 'hall')">
 
-                                                        <!-- Filter Dropdown -->
+                                                        <!-- Generic time Filter Dropdown -->
                                                         <div id="hallFilterContainer"
                                                             class="input-group-text bg-transparent border-start-0 <%= (typeof hallSearch !== 'undefined' && hallSearch) ? 'border-end-0' : 'rounded-end-custom' %> p-0"
                                                             style="border-left: none !important;">
@@ -189,7 +189,7 @@
                                                         </span>
                                                         <input type="text" name="poojaSearch" id="poojaSearchInput"
                                                             class="form-control border-start-0 border-end-0"
-                                                            placeholder="Search Pooja Bookings by Pooja Name, Payment ID, User ID or User Name..."
+                                                            placeholder="Filter by Pooja Name, Date, Payment ID or User..."
                                                             value="<%= typeof poojaSearch !== 'undefined' ? poojaSearch : '' %>"
                                                             onkeydown="handleEnter(event, 'pooja')">
 
@@ -389,6 +389,19 @@
                                     params.delete(type + 'Search');
                                 }
 
+                                // Update explicit filters
+                                const explicitName = formData.get(type === 'hall' ? 'filterHallName' : 'filterPoojaName');
+                                if (explicitName) params.set(type === 'hall' ? 'filterHallName' : 'filterPoojaName', explicitName);
+                                else params.delete(type === 'hall' ? 'filterHallName' : 'filterPoojaName');
+
+                                const explicitDate = formData.get(type === 'hall' ? 'filterHallDate' : 'filterPoojaDate');
+                                if (explicitDate) params.set(type === 'hall' ? 'filterHallDate' : 'filterPoojaDate', explicitDate);
+                                else params.delete(type === 'hall' ? 'filterHallDate' : 'filterPoojaDate');
+
+                                const explicitStatus = formData.get(type === 'hall' ? 'filterHallStatus' : 'filterPoojaStatus');
+                                if (explicitStatus) params.set(type === 'hall' ? 'filterHallStatus' : 'filterPoojaStatus', explicitStatus);
+                                else params.delete(type === 'hall' ? 'filterHallStatus' : 'filterPoojaStatus');
+
                                 // Update filter
                                 const filterVal = formData.get(type + 'Filter');
                                 if (filterVal) {
@@ -419,9 +432,29 @@
                                 const input = document.getElementById(type + 'SearchInput');
                                 if (input) input.value = '';
 
+                                // Clear explicit filters in the UI
+                                const form = document.getElementById(type + '-search-form');
+                                if (form) {
+                                  const selects = form.querySelectorAll('select');
+                                  selects.forEach(s => s.value = '');
+                                  const dates = form.querySelectorAll('input[type="date"]');
+                                  dates.forEach(d => d.value = '');
+                                }
+
                                 // Update URL params
                                 const urlParams = new URLSearchParams(window.location.search);
                                 urlParams.delete(type + 'Search');
+                                
+                                if (type === 'hall') {
+                                    urlParams.delete('filterHallName');
+                                    urlParams.delete('filterHallDate');
+                                    urlParams.delete('filterHallStatus');
+                                } else {
+                                    urlParams.delete('filterPoojaName');
+                                    urlParams.delete('filterPoojaDate');
+                                    urlParams.delete('filterPoojaStatus');
+                                }
+
                                 urlParams.set('activeTab', type);
                                 urlParams.set(type + 'Page', 1); // Reset page
 

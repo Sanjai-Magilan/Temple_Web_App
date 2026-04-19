@@ -291,7 +291,7 @@ exports.listMembers = async (req, res) => {
         family: null,
         members: [],
         isHead: false,
-        message: "No family data found. Please complete family setup.",
+      
         myFamilyView: null,
         selectedMemberId: null,
         initialTree: null,

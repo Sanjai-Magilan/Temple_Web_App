@@ -854,6 +854,12 @@ body {
         font-size: 24px;
     }
 
+    .landing-logo {
+        margin: 0 15px;
+        text-align: center;
+        line-height: 1.2;
+    }
+
     /* Mobile Menu Button Visible */
     .mobile-menu-btn {
         display: flex;
@@ -864,8 +870,8 @@ body {
     .landing-nav-links {
         position: fixed;
         top: 70px;
-        left: -50%;
-        width: 50%;
+        left: -260px;
+        width: 260px;
         height: calc(100vh - 70px);
         background-color: #ffffff;
         flex-direction: column;
@@ -994,8 +1000,13 @@ body {
         font-size: 12px;
     }
 
+    .auth-wrapper {
+        padding: 1rem;
+    }
+
     /* Remove heavy glassmorphism on mobile auth card */
     .auth-card {
+        padding: 1.5rem;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         background-color: #ffffff;
@@ -1086,5 +1097,57 @@ body {
         color: #999;
         display: none;
         /* Enable if needed */
+    }
+
+}
+
+@media (max-width: 768px) {
+    /* Convert Tables to Cards */
+    .table-responsive table,
+    table.table {
+        display: block;
+        width: 100%;
+    }
+    .table-responsive table thead, table.table thead {
+        display: none;
+    }
+    .table-responsive table tbody,
+    table.table tbody,
+    .table-responsive table tr,
+    table.table tr,
+    .table-responsive table td,
+    table.table td {
+        display: block;
+        width: 100%;
+    }
+    .table-responsive table tr, table.table tr {
+        margin-bottom: 1rem;
+        background-color: #fff;
+        border: 1px solid #e0d8c8;
+        border-radius: 8px;
+        padding: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .table-responsive table td, table.table td {
+        text-align: right;
+        padding: 12px 10px 12px 45% !important;
+        position: relative;
+        border: none !important;
+        border-bottom: 1px solid #eee !important;
+        min-height: 40px;
+        display: block;
+    }
+    .table-responsive table td:last-child, table.table td:last-child {
+        border-bottom: none !important;
+    }
+    .table-responsive table td::before, table.table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 12px;
+        width: 40%;
+        text-align: left;
+        font-weight: 600;
+        color: var(--heading-dark);
     }
 }

@@ -8,7 +8,7 @@
         © <%= year %> Temple Management System. All rights reserved.
       </div>
 
-      <ul class="list-unstyled d-flex gap-3 mb-0 mt-2 mt-md-0">
+      <ul class="list-unstyled d-flex flex-wrap justify-content-center gap-3 mb-0 mt-2 mt-md-0">
         <li><a href="/" class="text-decoration-none text-muted">Home</a></li>
         <li><a href="/privacy-policy" class="text-decoration-none text-muted">Privacy Policy</a></li>
         <li><a href="/terms-conditions" class="text-decoration-none text-muted">Terms & Conditions</a></li>
@@ -96,6 +96,23 @@
             confirmButtonColor: '#bfa15f'
         });
     };
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tables = document.querySelectorAll("table.table");
+        tables.forEach(table => {
+            const headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim());
+            const rows = table.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                const cells = row.querySelectorAll("td");
+                cells.forEach((cell, i) => {
+                    if (headers[i] && !cell.hasAttribute("data-label")) {
+                        cell.setAttribute("data-label", headers[i]);
+                    }
+                });
+            });
+        });
+    });
 </script>
 
 </body>

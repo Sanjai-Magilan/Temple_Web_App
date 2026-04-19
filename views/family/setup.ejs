@@ -1,0 +1,906 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<%
+  function safeParseArray(raw) {
+    try {
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  const siblingsSeed = safeParseArray(formData && formData.siblings_json ? formData.siblings_json : '[]');
+  const childrenSeed = safeParseArray(formData && formData.children_json ? formData.children_json : '[]');
+  const extraMembersSeed = safeParseArray(formData && formData.extra_members_json ? formData.extra_members_json : '[]');
+%>
+
+<style>
+  :root {
+    --family-bg: #1e1a14;
+    --family-card: #fffaf2;
+    --family-border: rgba(191, 161, 95, 0.26);
+    --family-accent: #bfa15f;
+    --family-accent-dark: #a88b4d;
+    --family-text: #5d5145;
+    --family-title: #2c241b;
+  }
+
+  body {
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
+      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--family-text);
+    min-height: 100vh;
+  }
+
+  .family-page {
+    position: relative;
+    padding: 2.3rem 0 3.75rem;
+    overflow: hidden;
+    min-height: calc(100vh - 76px);
+  }
+
+  .page-title {
+    color: #f8f9fa;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 0;
+  }
+
+  .btn-gold {
+    background-color: #bfa15f;
+    border-color: #bfa15f;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gold:hover {
+    background-color: #a88b4d;
+    border-color: #a88b4d;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+  }
+
+  .family-page::before,
+  .family-page::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .family-page::before {
+    width: 260px;
+    height: 260px;
+    right: -120px;
+    top: 90px;
+    background: rgba(191, 161, 95, 0.12);
+    filter: blur(8px);
+  }
+
+  .family-page::after {
+    width: 170px;
+    height: 170px;
+    left: -80px;
+    bottom: 80px;
+    background: rgba(191, 161, 95, 0.1);
+    filter: blur(8px);
+  }
+
+  .family-shell {
+    max-width: 820px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .family-booking-card {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--family-card);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 24px 52px rgba(0, 0, 0, 0.48);
+    position: relative;
+  }
+
+  .family-booking-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #bfa15f, #e6c87d, #bfa15f);
+  }
+
+  .family-booking-header {
+    padding: 2.4rem 2rem 1.3rem;
+    background: transparent;
+    color: var(--family-title);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 18px;
+    top: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #999;
+    text-decoration: none;
+    line-height: 1;
+    z-index: 2;
+  }
+
+  .close-btn:hover {
+    color: #000;
+  }
+
+  .header-icon-wrapper {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(191, 161, 95, 0.22);
+  }
+
+  .booking-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.85rem, 3.2vw, 2.35rem);
+    color: var(--family-title);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .booking-subtitle {
+    color: #8c7b65;
+    font-size: 0.95rem;
+    margin: 0.35rem 0 0;
+  }
+
+  .family-booking-body {
+    padding: 0 2rem 2.25rem;
+  }
+
+  .section-block {
+    border: 1px solid rgba(191, 161, 95, 0.17);
+    border-radius: 16px;
+    background: #fff;
+    padding: 1.15rem;
+    box-shadow: 0 8px 18px rgba(44, 36, 27, 0.08);
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-heading h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--family-title);
+    font-weight: 700;
+  }
+
+  .section-heading span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.33rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(191, 161, 95, 0.12);
+    color: var(--family-accent-dark);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .member-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .field-label {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #5d5145;
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control,
+  .form-select {
+    border-radius: 10px;
+    border-color: #e0d8cc;
+    min-height: 46px;
+    box-shadow: none;
+    color: #2c241b;
+    font-size: 0.98rem;
+    padding: 0.72rem 0.95rem;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--family-accent);
+    box-shadow: 0 0 0 4px rgba(191, 161, 95, 0.1);
+  }
+
+  .input-group-text {
+    border-radius: 10px 0 0 10px;
+    border-color: #e0d8cc;
+    background: #fff6e8;
+    color: var(--family-accent-dark);
+  }
+
+  .upload-note {
+    margin-top: 0.45rem;
+    font-size: 0.82rem;
+    color: #8b7a67;
+  }
+
+  .member-card {
+    border: 1px solid rgba(191, 161, 95, 0.2);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 10px 22px rgba(44, 36, 27, 0.1);
+    overflow: hidden;
+    animation: fadeUp 0.28s ease;
+  }
+
+  .member-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(191, 161, 95, 0.14);
+    background: rgba(191, 161, 95, 0.08);
+  }
+
+  .member-card-header strong {
+    color: var(--family-title);
+  }
+
+  .member-card-body {
+    padding: 0.95rem 1rem 1rem;
+  }
+
+  .member-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .soft-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(191, 161, 95, 0.35), transparent);
+    margin: 1.35rem 0;
+  }
+
+  .btn-family {
+    border-radius: 10px;
+    min-height: 44px;
+    padding-inline: 1rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+  }
+
+  .btn-family-primary {
+    background: linear-gradient(135deg, #bfa15f, #a88b4d);
+    border: none;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 10px 20px rgba(168, 139, 77, 0.22);
+  }
+
+  .btn-family-primary:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(168, 139, 77, 0.3);
+  }
+
+  .btn-family-outline {
+    border: 1px solid rgba(191, 161, 95, 0.36);
+    color: var(--family-accent-dark);
+    background: #fff;
+  }
+
+  .btn-family-outline:hover {
+    color: var(--family-title);
+    border-color: rgba(191, 161, 95, 0.54);
+    background: #fff;
+  }
+
+  .empty-state {
+    border: 1px dashed rgba(191, 161, 95, 0.34);
+    border-radius: 12px;
+    background: #fdf7ec;
+    padding: 1.1rem;
+    color: #7b6a59;
+  }
+
+  .alert {
+    border-radius: 12px;
+    border: 1px solid rgba(191, 161, 95, 0.22);
+    background: #f9f2e4;
+    color: #2c241b;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .family-booking-body,
+    .family-booking-header {
+      padding-left: 1.1rem;
+      padding-right: 1.1rem;
+    }
+
+    .family-booking-header {
+      padding-top: 1.7rem;
+    }
+
+    .family-booking-body {
+      padding-bottom: 1.6rem;
+    }
+
+    .section-block,
+    .member-card {
+      border-radius: 14px;
+    }
+
+    .section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="family-page">
+  <div class="container mt-2 mb-3">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h2 class="page-title"><i class="bi bi-people-fill me-2"></i> Family Setup</h2>
+          <a href="/family" class="btn btn-gold shadow-sm">
+            <i class="bi bi-house-heart me-2"></i> My Family
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="family-shell">
+      <% if (family) { %>
+        <div class="alert alert-info mb-4 shadow-sm">
+          <i class="bi bi-info-circle me-1"></i>
+          Family found: <strong><%= family.family_name %></strong>
+          <% if (family.family_uid) { %>
+            <span class="ms-1">(ID: <strong><%= family.family_uid %></strong>)</span>
+          <% } %>
+          . Saving this form updates the current family profile.
+        </div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="alert alert-danger mb-4 shadow-sm">
+          <i class="bi bi-exclamation-triangle me-1"></i> <%= error %>
+        </div>
+      <% } %>
+
+      <div class="family-booking-card">
+        <div class="family-booking-header">
+          <a href="/family" class="close-btn" aria-label="Exit family registration">
+            ✖
+          </a>
+          <div class="header-icon-wrapper">
+            <i class="bi bi-house-heart" style="font-size: 1.5rem; color: #bfa15f;"></i>
+          </div>
+          <h2 class="booking-title">Family Registration</h2>
+          <p class="booking-subtitle">A structured setup form for the full household profile</p>
+        </div>
+
+        <div class="family-booking-body">
+          <form id="familySetupForm" action="/family/setup" method="POST" enctype="multipart/form-data">
+            <section class="section-block mb-4">
+              <div class="section-heading">
+                <h3>Family Head</h3>
+                <span><i class="bi bi-person-badge"></i> Primary contact</span>
+              </div>
+
+              <div class="member-grid">
+                <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="self_name">Family Head Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="self_name"
+                    name="self_name"
+                    value="<%= formData && formData.self_name ? formData.self_name : '' %>"
+                    placeholder="Enter full name"
+                    required
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="self_mobile">Mobile</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="self_mobile"
+                    name="self_mobile"
+                    value="<%= formData && formData.self_mobile ? formData.self_mobile : '' %>"
+                    placeholder="10-digit mobile number"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="self_occupation">Occupation</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="self_occupation"
+                    name="self_occupation"
+                    value="<%= formData && formData.self_occupation ? formData.self_occupation : '' %>"
+                    placeholder="Job title"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="self_dob">Date of Birth</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="self_dob"
+                      name="self_dob"
+                      value="<%= formData && formData.self_dob ? formData.self_dob : '' %>"
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="self_age">Age</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="self_age"
+                    name="self_age"
+                    min="0"
+                    max="120"
+                    step="1"
+                    value="<%= formData && formData.self_age ? formData.self_age : '' %>"
+                    placeholder="Age"
+                  >
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="self_profile_image">Profile Image</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="self_profile_image"
+                    name="self_profile_image"
+                    accept=".jpg,.jpeg,.png,.webp"
+                  >
+                  <div class="upload-note">Accepted formats: JPG, PNG, WEBP.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <hr class="soft-divider">
+
+          <section class="section-block mb-4">
+            <div class="section-heading">
+              <h3>Father</h3>
+              <span><i class="bi bi-person"></i> Parent details</span>
+            </div>
+
+            <div class="member-grid">
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="father_name">Father Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="father_name"
+                    name="father_name"
+                    value="<%= formData && formData.father_name ? formData.father_name : '' %>"
+                    placeholder="Enter father's full name"
+                    required
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="father_mobile">Mobile</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="father_mobile"
+                    name="father_mobile"
+                    value="<%= formData && formData.father_mobile ? formData.father_mobile : '' %>"
+                    placeholder="Contact number"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="father_occupation">Occupation</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="father_occupation"
+                    name="father_occupation"
+                    value="<%= formData && formData.father_occupation ? formData.father_occupation : '' %>"
+                    placeholder="Job title"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="father_dob">Date of Birth</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="father_dob"
+                      name="father_dob"
+                      value="<%= formData && formData.father_dob ? formData.father_dob : '' %>"
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="father_age">Age</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="father_age"
+                    name="father_age"
+                    min="0"
+                    max="120"
+                    step="1"
+                    value="<%= formData && formData.father_age ? formData.father_age : '' %>"
+                    placeholder="Age"
+                  >
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="father_profile_image">Profile Image</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="father_profile_image"
+                    name="father_profile_image"
+                    accept=".jpg,.jpeg,.png,.webp"
+                  >
+                  <div class="upload-note">Accepted formats: JPG, PNG, WEBP.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-block mb-4">
+            <div class="section-heading">
+              <h3>Mother</h3>
+              <span><i class="bi bi-person-heart"></i> Parent details</span>
+            </div>
+
+            <div class="member-grid">
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="mother_name">Mother Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="mother_name"
+                    name="mother_name"
+                    value="<%= formData && formData.mother_name ? formData.mother_name : '' %>"
+                    placeholder="Enter mother's full name"
+                    required
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="mother_mobile">Mobile</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="mother_mobile"
+                    name="mother_mobile"
+                    value="<%= formData && formData.mother_mobile ? formData.mother_mobile : '' %>"
+                    placeholder="Contact number"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="mother_occupation">Occupation</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="mother_occupation"
+                    name="mother_occupation"
+                    value="<%= formData && formData.mother_occupation ? formData.mother_occupation : '' %>"
+                    placeholder="Job title"
+                  >
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="mother_dob">Date of Birth</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="mother_dob"
+                      name="mother_dob"
+                      value="<%= formData && formData.mother_dob ? formData.mother_dob : '' %>"
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                  <label class="field-label" for="mother_age">Age</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="mother_age"
+                    name="mother_age"
+                    min="0"
+                    max="120"
+                    step="1"
+                    value="<%= formData && formData.mother_age ? formData.mother_age : '' %>"
+                    placeholder="Age"
+                  >
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <label class="field-label" for="mother_profile_image">Profile Image</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="mother_profile_image"
+                    name="mother_profile_image"
+                    accept=".jpg,.jpeg,.png,.webp"
+                  >
+                  <div class="upload-note">Accepted formats: JPG, PNG, WEBP.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <hr class="soft-divider">
+
+          <section class="section-block mb-4">
+            <div class="member-actions mb-3">
+              <div>
+                <h3 class="mb-1">Additional Members</h3>
+                <div class="text-muted">Add grandparents, siblings, or children with the same core fields.</div>
+              </div>
+              <button type="button" class="btn btn-family btn-family-outline" id="addMemberBtn">
+                <i class="bi bi-plus-circle me-1"></i> Add Member
+              </button>
+            </div>
+
+            <div id="extraMembersContainer" class="d-grid gap-3"></div>
+            <div id="extraMembersEmptyState" class="empty-state">
+              No additional members yet. Use the button above to add one.
+            </div>
+          </section>
+
+          <input type="hidden" name="siblings_json" id="siblings_json" value="<%= JSON.stringify(siblingsSeed) %>">
+          <input type="hidden" name="children_json" id="children_json" value="<%= JSON.stringify(childrenSeed) %>">
+          <input type="hidden" name="extra_members_json" id="extra_members_json" value="<%= JSON.stringify(extraMembersSeed) %>">
+
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mt-2">
+            <a href="/family" class="btn btn-family btn-family-outline px-4">
+              <i class="bi bi-arrow-left me-1"></i> Back to Family
+            </a>
+            <button type="submit" class="btn btn-family btn-family-primary px-4">
+              <i class="bi bi-check2-circle me-1"></i> Save Family Setup
+            </button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var relationshipOptions = [
+      { value: 'grandfather', label: 'Grandfather' },
+      { value: 'grandmother', label: 'Grandmother' },
+      { value: 'father', label: 'Father' },
+      { value: 'mother', label: 'Mother' },
+      { value: 'siblings', label: 'Siblings' },
+      { value: 'children', label: 'Children' }
+    ];
+
+    var container = document.getElementById('extraMembersContainer');
+    var emptyState = document.getElementById('extraMembersEmptyState');
+    var addButton = document.getElementById('addMemberBtn');
+    var hiddenField = document.getElementById('extra_members_json');
+    var form = document.getElementById('familySetupForm');
+    var nextIndex = 0;
+
+    function toggleEmptyState() {
+      emptyState.style.display = container.children.length ? 'none' : 'block';
+    }
+
+    function createRelationshipOptions(selectedValue) {
+      return relationshipOptions.map(function (option) {
+        return '<option value="' + option.value + '"' + (option.value === selectedValue ? ' selected' : '') + '>' + option.label + '</option>';
+      }).join('');
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function createMemberCard(seed) {
+      var index = nextIndex++;
+      var card = document.createElement('article');
+      card.className = 'member-card';
+      card.dataset.index = String(index);
+
+      var imageFieldName = 'extra_member_image_' + index;
+      var nameValue = escapeHtml(seed && seed.name ? seed.name : '');
+      var relationshipValue = seed && seed.relationship ? String(seed.relationship) : 'siblings';
+      var mobileValue = escapeHtml(seed && seed.mobile ? seed.mobile : '');
+      var occupationValue = escapeHtml(seed && seed.occupation ? seed.occupation : '');
+      var dobValue = escapeHtml(seed && seed.dob ? seed.dob : '');
+      var ageValue = escapeHtml(seed && seed.age ? seed.age : '');
+
+      card.innerHTML = [
+        '<div class="member-card-header">',
+        '  <strong>Additional Member</strong>',
+        '  <button type="button" class="btn btn-sm btn-outline-danger remove-member-btn"><i class="bi bi-trash me-1"></i>Remove</button>',
+        '</div>',
+        '<div class="member-card-body">',
+        '  <div class="row g-3">',
+        '    <div class="col-12 col-lg-6">',
+        '      <label class="field-label">Full Name</label>',
+        '      <input type="text" class="form-control extra-member-name" placeholder="Enter full name" value="' + nameValue + '">',
+        '    </div>',
+        '    <div class="col-12 col-md-6 col-lg-3">',
+        '      <label class="field-label">Relationship</label>',
+        '      <select class="form-select extra-member-relationship">' + createRelationshipOptions(relationshipValue) + '</select>',
+        '    </div>',
+        '    <div class="col-12 col-md-6 col-lg-3">',
+        '      <label class="field-label">Mobile</label>',
+        '      <input type="tel" class="form-control extra-member-mobile" placeholder="Contact number" value="' + mobileValue + '">',
+        '    </div>',
+        '    <div class="col-12 col-md-6 col-lg-3">',
+        '      <label class="field-label">Occupation</label>',
+        '      <input type="text" class="form-control extra-member-occupation" placeholder="Job title" value="' + occupationValue + '">',
+        '    </div>',
+        '    <div class="col-12 col-md-6 col-lg-3">',
+        '      <label class="field-label">Date of Birth</label>',
+        '      <div class="input-group">',
+        '        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>',
+        '        <input type="date" class="form-control extra-member-dob" value="' + dobValue + '">',
+        '      </div>',
+        '    </div>',
+        '    <div class="col-12 col-md-6 col-lg-3">',
+        '      <label class="field-label">Age</label>',
+        '      <input type="number" class="form-control extra-member-age" min="0" max="120" step="1" placeholder="Age" value="' + ageValue + '">',
+        '    </div>',
+        '    <div class="col-12 col-lg-6">',
+        '      <label class="field-label">Profile Image</label>',
+        '      <input type="file" class="form-control extra-member-image" name="' + imageFieldName + '" accept=".jpg,.jpeg,.png,.webp">',
+        '      <div class="upload-note">Accepted formats: JPG, PNG, WEBP.</div>',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].join('');
+
+      card.querySelector('.remove-member-btn').addEventListener('click', function () {
+        card.remove();
+        syncExtraMembers();
+        toggleEmptyState();
+      });
+
+      return card;
+    }
+
+    function syncExtraMembers() {
+      var cards = container.querySelectorAll('.member-card');
+      var payload = [];
+
+      cards.forEach(function (card) {
+        var name = card.querySelector('.extra-member-name').value.trim();
+        var relationship = card.querySelector('.extra-member-relationship').value;
+        var mobile = card.querySelector('.extra-member-mobile').value.trim();
+        var occupation = card.querySelector('.extra-member-occupation').value.trim();
+        var dob = card.querySelector('.extra-member-dob').value;
+        var age = card.querySelector('.extra-member-age').value;
+        var imageField = card.querySelector('.extra-member-image').getAttribute('name');
+
+        if (!name) {
+          return;
+        }
+
+        payload.push({
+          name: name,
+          relationship: relationship,
+          mobile: mobile,
+          occupation: occupation,
+          dob: dob,
+          age: age,
+          imageField: imageField
+        });
+      });
+
+      hiddenField.value = JSON.stringify(payload);
+    }
+
+    addButton.addEventListener('click', function () {
+      container.appendChild(createMemberCard({ relationship: 'siblings' }));
+      syncExtraMembers();
+      toggleEmptyState();
+    });
+
+    form.addEventListener('submit', function () {
+      syncExtraMembers();
+    });
+
+    var initialExtraMembers = [];
+    try {
+      initialExtraMembers = JSON.parse(hiddenField.value || '[]');
+    } catch (error) {
+      initialExtraMembers = [];
+    }
+
+    initialExtraMembers.forEach(function (member) {
+      container.appendChild(createMemberCard(member));
+    });
+
+    toggleEmptyState();
+    syncExtraMembers();
+  })();
+</script>
+
+<%- include('../partials/footer') %>

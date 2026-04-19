@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
@@ -100,6 +100,11 @@ app.use("/admin", require("./routes/admin/bookingRoutes"));
 
 app.use("/",adminPayment)
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/admin", require("./routes/admin/familyRoutes"));
+
+
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).render("errors/404", {
@@ -120,6 +125,8 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+
 // Start server
 app.listen(PORT,"0.0.0.0", () => {
   logger.info(`Server running on port ${PORT}`);
@@ -127,3 +134,4 @@ app.listen(PORT,"0.0.0.0", () => {
 });
 
 module.exports = app;
+

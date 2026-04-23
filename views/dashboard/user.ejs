@@ -133,7 +133,50 @@
                                     </div>
                     </div>
 
+                    <div class="detail-card">
+                        <h3>My Family</h3>
+
+                        <% if (familySummary && familySummary.family) { %>
+                            <div class="detail-content">
+                                <div class="detail-row">
+                                    <span class="detail-label">Family ID</span>
+                                    <span class="detail-value"><%= familySummary.family.family_uid || '-' %></span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Family Name</span>
+                                    <span class="detail-value"><%= familySummary.family.family_name %></span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Members</span>
+                                    <span class="detail-value"><%= familySummary.member_count %></span>
+                                </div>
+                                <% if (familySummary.my_view && familySummary.my_view.spouse) { %>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Spouse</span>
+                                        <span class="detail-value"><%= familySummary.my_view.spouse.member_name %></span>
+                                    </div>
+                                <% } %>
+                                <div class="detail-row">
+                                    <span class="detail-label">Children</span>
+                                    <span class="detail-value"><%= familySummary.my_view ? familySummary.my_view.children.length : 0 %></span>
+                                </div>
+                            </div>
+                            <div class="detail-footer">
+                                <span class="footer-text">View complete family details</span>
+                                <a href="/family" class="view-link">Open Family</a>
+                            </div>
+                        <% } else { %>
+                            <div class="detail-content" style="display: flex; align-items: center; justify-content: center;">
+                                <p style="color: #777;">No family details available.</p>
+                            </div>
+                            <div class="detail-footer">
+                                <a href="/family/setup" class="view-link">Setup Family</a>
+                            </div>
+                        <% } %>
+                    </div>
+
                 </div>
+                
             </main>
 
             <%- include('../partials/footer') %>

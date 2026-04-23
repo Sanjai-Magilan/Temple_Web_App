@@ -1,0 +1,90 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
+
+<div class="container py-5">
+  <div class="mb-4 d-flex align-items-center gap-3">
+    <a href="/admin"
+      class="btn btn-light border shadow-sm d-flex align-items-center justify-content-center"
+      style="width:40px;height:40px;">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <h2 class="mb-0" style="font-family: 'Playfair Display', serif; color: #2c241b;">
+      Manage Families
+    </h2>
+  </div>
+
+  <% if (families && families.length > 0) { %>
+    <div class="table-responsive bg-white rounded shadow-sm p-3 mb-4">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Family Ref</th>
+            <th>Family Details</th>
+            <th>Head Details</th>
+            <th>Members</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% families.forEach(function(f) { %>
+            <tr>
+              <td>
+                <span class="fw-bold text-dark"><%= f.family_uid || ('FAM-' + f.id) %></span>
+              </td>
+              <td>
+                <div class="fw-bold text-primary"><%= f.family_name || '-' %></div>
+                <div class="small text-muted">Family ID: <%= f.id %></div>
+              </td>
+              <td>
+                <div class="fw-bold"><%= f.head_name || '-' %></div>
+              </td>
+              <td>
+                <span class="badge bg-info text-dark rounded-pill"><%= f.members_count || 0 %></span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-sm head-btn"
+                  data-family-id="<%= f.id %>"
+                  style="background-color: #bfa15f; border-color: #bfa15f; color: #fff;"
+                >
+                  View Full Family
+                </button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5 text-muted bg-white rounded shadow-sm mb-4">
+      <i class="bi bi-inbox fs-1 mb-3"></i>
+      <p class="mb-0">No families found.</p>
+    </div>
+  <% } %>
+
+  <div id="familyInlineDetails"></div>
+</div>
+
+<script>
+  document.querySelectorAll(".head-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      const familyId = this.getAttribute("data-family-id");
+      fetch("/admin/families/" + familyId + "/details", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          document.getElementById("familyInlineDetails").innerHTML = html;
+          const top = document.getElementById("familyInlineDetails").offsetTop - 80;
+          window.scrollTo({ top: top, behavior: "smooth" });
+        })
+        .catch(function() {
+          alert("Failed to load family details.");
+        });
+    });
+  });
+</script>
+
+<%- include('../../partials/footer') %>

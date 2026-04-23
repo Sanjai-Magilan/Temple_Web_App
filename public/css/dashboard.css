@@ -425,6 +425,9 @@ body {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -438,6 +441,11 @@ body {
     }
 
     .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .quick-actions-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }

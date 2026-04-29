@@ -3,6 +3,9 @@ jest.mock("../models/familyModel", () => ({
   findByUserId: jest.fn(),
   findById: jest.fn(),
   getMembers: jest.fn(),
+  getMemberByUserId: jest.fn(),
+  getThreeGenerationTree: jest.fn(),
+  getMyFamilyView: jest.fn(),
   isHead: jest.fn(),
   addMember: jest.fn(),
   getMemberById: jest.fn(),
@@ -24,6 +27,7 @@ const createRes = () => ({
 const createReq = (overrides = {}) => ({
   user: { id: 1 },
   params: {},
+  query: {},
   body: {},
   ...overrides,
 });
@@ -45,12 +49,13 @@ describe("Family Controller", () => {
       await familyController.listMembers(req, res);
 
       expect(res.render).toHaveBeenCalledWith("family/list", {
-        title: "Family Members",
+        title: "Family",
         family: null,
         members: [],
         isHead: false,
-        message:
-          "You have not created a family yet. Create one during registration or contact admin.",
+        myFamilyView: null,
+        selectedMemberId: null,
+        initialTree: null,
       });
     });
 
@@ -65,23 +70,34 @@ describe("Family Controller", () => {
       familyModel.findById.mockResolvedValue(family);
       familyModel.getMembers.mockResolvedValue(members);
       familyModel.isHead.mockResolvedValue(false);
+      familyModel.getMemberByUserId.mockResolvedValue(null);
+      familyModel.getThreeGenerationTree.mockResolvedValue({ id: 7 });
+      familyModel.getMyFamilyView.mockResolvedValue({
+        familyId: 22,
+        selectedMemberId: 7,
+      });
 
       await familyController.listMembers(req, res);
 
       expect(familyModel.findById).toHaveBeenCalledWith(22);
       expect(res.render).toHaveBeenCalledWith("family/list", {
-        title: "Family Members",
+        title: "Family",
         family,
         members,
         isHead: false,
         message: null,
+        myFamilyView: { familyId: 22, selectedMemberId: 7 },
+        selectedMemberId: 7,
+        initialTree: { id: 7 },
       });
     });
 
     test("renders the 500 page when listing members fails", async () => {
       const req = createReq();
       const res = createRes();
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       familyModel.findByHeadUserId.mockRejectedValue(new Error("DB Error"));
 
@@ -103,7 +119,7 @@ describe("Family Controller", () => {
 
       await familyController.showAddMember(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith("/family?error=no_family");
+      expect(res.redirect).toHaveBeenCalledWith("/family/setup");
     });
 
     test("denies access when the user is not the family head", async () => {
@@ -134,6 +150,7 @@ describe("Family Controller", () => {
       expect(res.render).toHaveBeenCalledWith("family/add", {
         title: "Add Family Member",
         family,
+        members: [{ id: 7, member_name: "Asha" }],
         error: null,
         formData: {},
       });
@@ -161,11 +178,12 @@ describe("Family Controller", () => {
         family,
         error: "Member name is required",
         formData: req.body,
+        members: [{ id: 7, member_name: "Asha" }],
       });
       expect(familyModel.addMember).not.toHaveBeenCalled();
     });
 
-    test("validates that relationship is required", async () => {
+    test("defaults relationship to other when it is missing", async () => {
       const req = createReq({
         body: {
           member_name: "Anu",
@@ -180,12 +198,24 @@ describe("Family Controller", () => {
 
       await familyController.addMember(req, res);
 
-      expect(res.render).toHaveBeenCalledWith("family/add", {
-        title: "Add Family Member",
-        family,
-        error: "Relationship is required",
-        formData: req.body,
+      expect(familyModel.addMember).toHaveBeenCalledWith({
+        family_id: 1,
+        user_id: null,
+        member_name: "Anu",
+        relationship: "other",
+        gender: "other",
+        father_member_id: null,
+        mother_member_id: null,
+        spouse_member_id: null,
+        email: null,
+        mobile: null,
+        address: null,
+        occupation: null,
+        age: null,
+        date_of_birth: null,
+        profile_image_path: null,
       });
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=member_added");
     });
 
     test("adds a member with trimmed and normalized data", async () => {
@@ -210,14 +240,20 @@ describe("Family Controller", () => {
 
       expect(familyModel.addMember).toHaveBeenCalledWith({
         family_id: 1,
+        user_id: null,
         member_name: "John",
         relationship: "son",
+        gender: "other",
+        father_member_id: null,
+        mother_member_id: null,
+        spouse_member_id: null,
         email: null,
         mobile: "9876543210",
         address: null,
         occupation: "Student",
-        age: 15,
+        age: "15",
         date_of_birth: "2010-01-01",
+        profile_image_path: null,
       });
       expect(res.redirect).toHaveBeenCalledWith("/family?success=member_added");
     });
@@ -272,6 +308,7 @@ describe("Family Controller", () => {
         title: "Edit Family Member",
         family,
         member,
+        members: [{ id: 7, member_name: "Asha" }],
         error: null,
       });
     });
@@ -292,7 +329,7 @@ describe("Family Controller", () => {
       });
     });
 
-    test("renders validation errors when relationship is missing", async () => {
+    test("defaults relationship to other when it is missing", async () => {
       const req = createReq({
         params: { id: "5" },
         body: {
@@ -311,13 +348,24 @@ describe("Family Controller", () => {
 
       await familyController.editMember(req, res);
 
-      expect(res.render).toHaveBeenCalledWith("family/edit", {
-        title: "Edit Family Member",
-        family,
-        member: { ...member, ...req.body },
-        error: "Relationship is required",
+      expect(familyModel.updateMember).toHaveBeenCalledWith("5", {
+        member_name: "John",
+        relationship: "other",
+        gender: "other",
+        father_member_id: null,
+        mother_member_id: null,
+        spouse_member_id: null,
+        email: null,
+        mobile: "9876543210",
+        address: null,
+        occupation: null,
+        age: null,
+        date_of_birth: null,
+        profile_image_path: null,
       });
-      expect(familyModel.updateMember).not.toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith(
+        "/family?success=member_updated",
+      );
     });
 
     test("updates a member with parsed age and trimmed name", async () => {
@@ -346,14 +394,21 @@ describe("Family Controller", () => {
       expect(familyModel.updateMember).toHaveBeenCalledWith("5", {
         member_name: "John",
         relationship: "son",
+        gender: "other",
+        father_member_id: null,
+        mother_member_id: null,
+        spouse_member_id: null,
         email: null,
         mobile: "9876543210",
         address: null,
         occupation: "Engineer",
-        age: 27,
+        age: "27",
         date_of_birth: "1999-02-03",
+        profile_image_path: null,
       });
-      expect(res.redirect).toHaveBeenCalledWith("/family?success=member_updated");
+      expect(res.redirect).toHaveBeenCalledWith(
+        "/family?success=member_updated",
+      );
     });
   });
 

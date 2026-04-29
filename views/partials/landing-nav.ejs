@@ -14,12 +14,6 @@
   </div>
 
   <div class="landing-auth-buttons">
-    <% if(!user){ %>
-      <a href="/register" class="btn landing-nav-secondary">Register</a>
-      <a href="/login" class="btn landing-nav-primary">Login</a>
-      <% } else { %>
-        <a href="<%= user.role == 'admin' ? '/admin' : '/dashboard' %>" class="btn landing-hero-primary">Dashboard</a>
-        <% } %>
   </div>
 </nav>
 <script src="/js/mobile-nav.js"></script>

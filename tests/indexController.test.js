@@ -32,7 +32,7 @@ describe("Index Controller", () => {
       "DELETE FROM news WHERE published_at < NOW()",
     );
     expect(res.render).toHaveBeenCalledWith("index", {
-      title: "Welcome to Temple Management System",
+      title: "Welcome to Sri Veera Mathi Amman Thiru Kovil",
       message:
         "Experience the divine with our comprehensive temple management services. Please login or register to continue.",
       user: req.user,
@@ -43,7 +43,9 @@ describe("Index Controller", () => {
   test("renders the 500 page when loading the home page fails", async () => {
     const req = { user: null };
     const res = createRes();
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     pool.execute.mockRejectedValue(new Error("DB Error"));
 

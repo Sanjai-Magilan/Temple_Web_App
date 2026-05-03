@@ -12,6 +12,7 @@ jest.mock("../models/familyModel", () => ({
   updateMember: jest.fn(),
   deleteMember: jest.fn(),
   isMember: jest.fn(),
+  createFullFamilySetup: jest.fn(),
 }));
 
 const familyController = require("../controllers/familyController");
@@ -36,6 +37,155 @@ describe("Family Controller", () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
+  });
+
+  describe("createSetup", () => {
+    test("maps uploaded files and extra members into the family setup payload", async () => {
+      const req = createReq({
+        body: {
+          family_name: "Lakshmi Family",
+          address: "Temple Street",
+          city: "Tirupati",
+          state: "AP",
+          pincode: "517501",
+          father_name: "Rama Rao",
+          father_mobile: "9000000001",
+          father_dob: "1970-01-01",
+          father_age: "56",
+          father_occupation: "Priest",
+          mother_name: "Sita",
+          mother_mobile: "9000000002",
+          mother_dob: "1972-02-02",
+          mother_age: "54",
+          mother_occupation: "Homemaker",
+          self_name: "Krishna",
+          self_mobile: "9000000003",
+          self_gender: "male",
+          self_dob: "1995-03-03",
+          self_age: "31",
+          self_occupation: "Engineer",
+          spouse_name: "Radha",
+          spouse_mobile: "9000000004",
+          spouse_gender: "female",
+          spouse_dob: "1996-04-04",
+          spouse_age: "30",
+          spouse_occupation: "Teacher",
+          siblings_json: "[]",
+          children_json:
+            '[{"name":"Anu","gender":"female","mobile":"9000000005","occupation":"Student","dob":"2020-05-05","age":"5"}]',
+          extra_members_json:
+            '[{"name":"Kiran","relationship":"brother","mobile":"9000000006","occupation":"Doctor","dob":"1992-06-06","age":"34","imageField":"extra_member_image_0"}]',
+        },
+        files: {
+          self_profile_image: [{ filename: "self.jpg" }],
+          father_profile_image: [{ filename: "father.jpg" }],
+          mother_profile_image: [{ filename: "mother.jpg" }],
+          extra_member_image_0: [{ filename: "extra-0.jpg" }],
+        },
+      });
+      const res = createRes();
+
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+      familyModel.findByUserId.mockResolvedValue([]);
+      familyModel.createFullFamilySetup.mockResolvedValue({ id: 99 });
+
+      await familyController.createSetup(req, res);
+
+      expect(familyModel.createFullFamilySetup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: 1,
+          family_name: "Lakshmi Family",
+          father_image_path: "/uploads/family-members/father.jpg",
+          mother_image_path: "/uploads/family-members/mother.jpg",
+          self_image_path: "/uploads/family-members/self.jpg",
+          extra_members: expect.arrayContaining([
+            expect.objectContaining({
+              name: "Kiran",
+              relationship: "brother",
+              imagePath: "/uploads/family-members/extra-0.jpg",
+            }),
+          ]),
+          children: expect.arrayContaining([
+            expect.objectContaining({
+              name: "Anu",
+              age: "5",
+            }),
+          ]),
+        }),
+      );
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=family_saved");
+    });
+
+    test("tolerates missing optional uploads and falls back to null image paths", async () => {
+      const req = createReq({
+        body: {
+          father_name: "Rama Rao",
+          father_mobile: "9000000001",
+          mother_name: "Sita",
+          mother_mobile: "9000000002",
+          self_name: "Krishna",
+          self_gender: "male",
+          extra_members_json: "[]",
+        },
+        files: {
+          self_profile_image: [],
+          father_profile_image: [],
+          mother_profile_image: [],
+        },
+      });
+      const res = createRes();
+
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+      familyModel.findByUserId.mockResolvedValue([]);
+      familyModel.createFullFamilySetup.mockResolvedValue({ id: 99 });
+
+      await familyController.createSetup(req, res);
+
+      expect(familyModel.createFullFamilySetup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          self_image_path: null,
+          father_image_path: null,
+          mother_image_path: null,
+          extra_members: [],
+        }),
+      );
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=family_saved");
+    });
+
+    test("falls back to an empty extra member list when extra_members_json is invalid", async () => {
+      const req = createReq({
+        body: {
+          father_name: "Rama Rao",
+          father_mobile: "9000000001",
+          mother_name: "Sita",
+          mother_mobile: "9000000002",
+          self_name: "Krishna",
+          self_gender: "male",
+          extra_members_json: "not-json",
+        },
+        files: {},
+      });
+      const res = createRes();
+      const consoleSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+
+      familyModel.findByHeadUserId.mockResolvedValue(null);
+      familyModel.findByUserId.mockResolvedValue([]);
+      familyModel.createFullFamilySetup.mockResolvedValue({ id: 99 });
+
+      await familyController.createSetup(req, res);
+
+      expect(familyModel.createFullFamilySetup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          extra_members: [],
+        }),
+      );
+      expect(consoleSpy).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith("/family?success=family_saved");
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe("listMembers", () => {

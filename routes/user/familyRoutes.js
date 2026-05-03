@@ -17,12 +17,7 @@ router.get("/", familyController.listMembers);
 
 // Setup family
 router.get("/setup", familyController.showSetup);
-router.post(
-  "/setup",
-
-familyUpload.single("self_profile_image"),familyUpload.any(),
-  familyController.createSetup,
-);
+router.post("/setup", familyUpload.setupForm, familyController.createSetup);
 
 // Tree structure
 router.get("/tree/:memberId", familyController.getTreeJson);

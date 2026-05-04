@@ -29,168 +29,6 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  .family-overview-card,
-  .family-section-card,
-  .family-stat-card {
-    background: var(--donation-card);
-    border: 1px solid rgba(191, 161, 95, 0.18);
-    border-radius: 22px;
-    box-shadow: 0 18px 36px rgba(44, 36, 27, 0.12);
-    overflow: hidden;
-  }
-
-  .family-overview-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.45rem 1.5rem;
-    background: linear-gradient(135deg, rgba(191, 161, 95, 0.96), rgba(168, 139, 77, 0.96));
-    color: #fff;
-  }
-
-  .family-overview-kicker,
-  .family-stat-label,
-  .family-detail-label {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  .family-overview-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.26);
-    padding: 0.4rem 0.85rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-  }
-
-  .family-overview-details {
-    padding: 0 1.5rem 1.5rem;
-  }
-
-  .family-stat-card {
-    height: 100%;
-    padding: 1rem 1.1rem;
-    box-shadow: 0 12px 26px rgba(44, 36, 27, 0.09);
-  }
-
-  .family-stat-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--donation-ink);
-    line-height: 1.1;
-    margin: 0.35rem 0;
-  }
-
-  .family-detail-card {
-    border: 1px dashed rgba(191, 161, 95, 0.28);
-    border-radius: 16px;
-    padding: 0.9rem 1rem;
-    background: rgba(191, 161, 95, 0.05);
-    height: 100%;
-  }
-
-  .family-detail-pill {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    padding: 0.35rem 0.8rem;
-    margin: 0.15rem 0.35rem 0.15rem 0;
-    background: rgba(191, 161, 95, 0.12);
-    color: var(--donation-ink);
-    font-size: 0.88rem;
-  }
-
-  .family-table-note {
-    color: var(--donation-muted);
-    font-size: 0.9rem;
-  }
-
-  .branch-tree {
-    position: relative;
-    min-height: 300px;
-    padding: 0.35rem 0.25rem 0.25rem;
-  }
-
-  .branch-tree-row {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    gap: 0.65rem;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0.35rem 0;
-  }
-
-  .branch-tree-row + .branch-tree-row {
-    margin-top: 1.05rem;
-  }
-
-  .branch-tree-node {
-    border: 1px solid rgba(191, 161, 95, 0.42);
-    background: #fff;
-    color: var(--donation-ink);
-    border-radius: 10px;
-    padding: 0.42rem 0.62rem;
-    min-width: 120px;
-    max-width: 168px;
-    text-align: center;
-    line-height: 1.2;
-    font-size: 0.82rem;
-    box-shadow: 0 8px 18px rgba(44, 36, 27, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .branch-tree-node:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 22px rgba(44, 36, 27, 0.18);
-  }
-
-  .branch-tree-node .tree-role {
-    display: block;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 0.68rem;
-    color: var(--donation-muted);
-    margin-bottom: 0.18rem;
-  }
-
-  .branch-tree-placeholder {
-    border: 1px dashed rgba(191, 161, 95, 0.42);
-    background: rgba(191, 161, 95, 0.08);
-    color: var(--donation-muted);
-    border-radius: 10px;
-    padding: 0.42rem 0.62rem;
-    min-width: 120px;
-    text-align: center;
-    font-size: 0.8rem;
-  }
-
-  .tree-connector-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .tree-connector-path {
-    fill: none;
-    stroke: rgba(168, 139, 77, 0.8);
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
   .btn-gold {
     background: var(--donation-gold);
     border-color: var(--donation-gold);
@@ -248,7 +86,7 @@
   }
 
   .setup-empty-header {
-    background: linear-gradient(135deg, var(--donation-gold), var(--donation-gold-dark));
+    background: linear-gradient(135deg,  );
     color: #fff;
     text-align: center;
     padding: 1.4rem 1.2rem;
@@ -398,18 +236,6 @@
           const memberNameById = {};
           members.forEach((m) => { memberNameById[m.id] = m.member_name; });
 
-          const totalMembers = members.length;
-          const headCount = members.filter((m) => m.relationship === "head").length;
-          const spouseCount = members.filter((m) => m.relationship === "spouse").length;
-          const childCount = members.filter((m) => m.relationship === "child").length;
-          const adultCount = members.filter((m) => {
-            const age = parseInt(m.age, 10);
-            return !Number.isNaN(age) && age >= 18;
-          }).length;
-          const selectedMember = selectedMemberId
-            ? members.find((m) => m.id === selectedMemberId)
-            : null;
-
           function relationBadge(relationship) {
             if (relationship === "head") return "primary";
             if (relationship === "spouse") return "success";
@@ -424,74 +250,24 @@
           }
         %>
 
-        <div class="family-overview-card mb-4">
-          <div class="family-overview-header">
-            <div>
-              <div class="family-overview-kicker mb-2">Family Overview</div>
-              <h3 class="mb-1 family-page-title"><%= family.family_name %></h3>
-              <div class="family-overview-badge">
-                <i class="bi bi-person-hearts"></i>
-                <span><%= family.family_uid || "Family ID unavailable" %></span>
-              </div>
-            </div>
-            <div class="text-end">
-              <div class="family-overview-badge mb-2">
-                <i class="bi bi-diagram-3"></i>
-                <span><%= totalMembers %> active members</span>
-              </div>
-              <div class="small text-white-50">
-                <%= selectedMember ? "Tree centered on " + selectedMember.member_name : "Snapshot of the full family structure" %>
-              </div>
-            </div>
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-house-heart"></i> <%= family.family_name %>
+            </h5>
           </div>
-
-          <div class="family-overview-details pt-4">
-            <div class="row g-3 mb-3">
-              <div class="col-sm-6 col-lg-3">
-                <div class="family-stat-card">
-                  <div class="family-stat-label">Total Members</div>
-                  <div class="family-stat-value"><%= totalMembers %></div>
-                  <div class="text-muted small">All active entries in this family</div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div class="family-stat-card">
-                  <div class="family-stat-label">Heads</div>
-                  <div class="family-stat-value"><%= headCount %></div>
-                  <div class="text-muted small">Registered family head records</div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div class="family-stat-card">
-                  <div class="family-stat-label">Adults</div>
-                  <div class="family-stat-value"><%= adultCount %></div>
-                  <div class="text-muted small">Members with age 18 or above</div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div class="family-stat-card">
-                  <div class="family-stat-label">Children</div>
-                  <div class="family-stat-value"><%= childCount %></div>
-                  <div class="text-muted small">Child relationship records</div>
-                </div>
-              </div>
-            </div>
-
+          <div class="card-body">
             <div class="row g-3">
-              <div class="col-lg-8">
-                <div class="family-detail-card h-100">
-                  <div class="family-detail-label text-muted mb-2">Location</div>
-                  <div>
-                    <span class="family-detail-pill"><strong>City:</strong>&nbsp;<%= family.city || "Not provided" %></span>
-                    <span class="family-detail-pill"><strong>State:</strong>&nbsp;<%= family.state || "Not provided" %></span>
-                    <span class="family-detail-pill"><strong>Pincode:</strong>&nbsp;<%= family.pincode || "Not provided" %></span>
-                  </div>
-                  <div class="mt-3 family-table-note">
-                    <strong>Address:</strong> <%= family.address || "Not provided" %>
-                  </div>
-                </div>
+              <div class="col-md-4">
+                <p class="mb-1"><strong>Family ID:</strong> <%= family.family_uid || "-" %></p>
+                <p class="mb-1"><strong>City:</strong> <%= family.city || "Not provided" %></p>
               </div>
-             
+              <div class="col-md-4">
+                <p class="mb-1"><strong>State:</strong> <%= family.state || "Not provided" %></p>
+                <p class="mb-1"><strong>Pincode:</strong> <%= family.pincode || "Not provided" %></p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1"><strong>Address:</strong> <%= family.address || "Not provided" %></p>
               </div>
             </div>
           </div>
@@ -547,102 +323,83 @@
           </div>
         <% } %>
 
-        <div class="row g-4 align-items-start mb-4">
-          <div class="col-lg-5">
-            <div class="card h-100 family-section-card">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-diagram-3"></i> 3-Generation Tree</h5>
-                <% if (selectedMemberId) { %>
-                  <small class="text-muted">Centered on member #<%= selectedMemberId %></small>
-                <% } %>
-              </div>
-              <div class="card-body">
-                <p class="text-muted mb-3">Click any node to rebuild the tree around that person.</p>
-                <div id="treeContainer" data-initial-tree="<%- JSON.stringify(initialTree || null).replace(/\"/g, '&quot;') %>"></div>
-              </div>
-            </div>
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Members (<%= members.length %>)</h5>
           </div>
-          <div class="col-lg-7">
-            <div class="card h-100 family-section-card">
-              <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Members</h5>
-                <span class="badge bg-light text-dark border">Total <%= totalMembers %></span>
-              </div>
-              <div class="card-body p-0">
-                <% if (members.length > 0) { %>
-                  <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle members-table-compact">
-                      <thead class="table-light">
-                        <tr>
-                          <th>Name</th>
-                          <th>Relationship</th>
-                          <th>Gender</th>
-                          <th>Parents</th>
-                          <th>Spouse</th>
-                          <th>Mobile</th>
-                          <th class="text-center">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% members.forEach((member) => { %>
-                          <tr>
-                            <td>
-                              <strong><%= member.member_name %></strong>
-                              <% if (member.relationship === "head") { %>
-                                <span class="badge bg-primary ms-1">Head</span>
+          <div class="card-body p-0">
+            <% if (members.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle members-table-compact">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Name</th>
+                      <th>Relationship</th>
+                      <th>Gender</th>
+                      <th>Parents</th>
+                      <th>Spouse</th>
+                      <th>Mobile</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% members.forEach((member) => { %>
+                      <tr>
+                        <td>
+                          <strong><%= member.member_name %></strong>
+                          <% if (member.relationship === "head") { %>
+                            <span class="badge bg-primary ms-1">Head</span>
+                          <% } %>
+                        </td>
+                        <td>
+                          <span class="badge bg-<%= relationBadge(member.relationship) %>">
+                            <%= member.relationship ? member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) : "-" %>
+                          </span>
+                        </td>
+                        <td><%= member.gender || "-" %></td>
+                        <td>
+                          <div><small>F: <%= nameById(member.father_member_id) %></small></div>
+                          <div><small>M: <%= nameById(member.mother_member_id) %></small></div>
+                        </td>
+                        <td><%= nameById(member.spouse_member_id) %></td>
+                        <td><%= member.mobile || "-" %></td>
+                        <td class="text-center">
+                          <div class="btn-group btn-group-sm">
+                            <a href="/family?memberId=<%= member.id %>" class="btn btn-outline-secondary" title="Center Tree">
+                              <i class="bi bi-bullseye"></i>
+                            </a>
+                            <a href="/family/member/<%= member.id %>" class="btn btn-outline-info" title="View">
+                              <i class="bi bi-eye"></i>
+                            </a>
+                            <% if (isHead) { %>
+                              <a href="/family/member/<%= member.id %>/edit" class="btn btn-outline-primary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                              </a>
+                              <% if (member.relationship !== "head") { %>
+                                <button
+                                  type="button"
+                                  class="btn btn-outline-danger delete-member-btn"
+                                  title="Delete"
+                                  data-id="<%= member.id %>"
+                                  data-name="<%= member.member_name %>"
+                                >
+                                  <i class="bi bi-trash"></i>
+                                </button>
                               <% } %>
-                            </td>
-                            <td>
-                              <span class="badge bg-<%= relationBadge(member.relationship) %>">
-                                <%= member.relationship ? member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) : "-" %>
-                              </span>
-                            </td>
-                            <td><%= member.gender || "-" %></td>
-                            <td>
-                              <div><small>F: <%= nameById(member.father_member_id) %></small></div>
-                              <div><small>M: <%= nameById(member.mother_member_id) %></small></div>
-                            </td>
-                            <td><%= nameById(member.spouse_member_id) %></td>
-                            <td><%= member.mobile || "-" %></td>
-                            <td class="text-center">
-                              <div class="btn-group btn-group-sm">
-                                <a href="/family?memberId=<%= member.id %>" class="btn btn-outline-secondary" title="Center Tree">
-                                  <i class="bi bi-bullseye"></i>
-                                </a>
-                                <a href="/family/member/<%= member.id %>" class="btn btn-outline-info" title="View">
-                                  <i class="bi bi-eye"></i>
-                                </a>
-                                <% if (isHead) { %>
-                                  <a href="/family/member/<%= member.id %>/edit" class="btn btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                  </a>
-                                  <% if (member.relationship !== "head") { %>
-                                    <button
-                                      type="button"
-                                      class="btn btn-outline-danger delete-member-btn"
-                                      title="Delete"
-                                      data-id="<%= member.id %>"
-                                      data-name="<%= member.member_name %>"
-                                    >
-                                      <i class="bi bi-trash"></i>
-                                    </button>
-                                  <% } %>
-                                <% } %>
-                              </div>
-                            </td>
-                          </tr>
-                        <% }) %>
-                      </tbody>
-                    </table>
-                  </div>
-                <% } else { %>
-                  <div class="text-center py-5">
-                    <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
-                    <p class="text-muted mt-3">No family members found.</p>
-                  </div>
-                <% } %>
+                            <% } %>
+                          </div>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
               </div>
-            </div>
+            <% } else { %>
+              <div class="text-center py-5">
+                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3">No family members found.</p>
+              </div>
+            <% } %>
           </div>
         </div>
       <% } else { %>
@@ -690,117 +447,17 @@
     : null;
   let memberIdToDelete = null;
 
-  function createTreeNode(member, role, slot) {
+  function createTreeNode(member, label, tone) {
     if (!member) {
-      return (
-        '<div class="branch-tree-placeholder" data-slot="' + slot + '">' +
-          '<span class="tree-role">' + role + '</span>' +
-          '<span>-</span>' +
-        '</div>'
-      );
+      return '<span class="badge text-bg-light border me-2 mb-2">-</span>';
     }
 
+    const badgeClass = tone || "primary";
     return (
-      '<button type="button" class="branch-tree-node tree-node" data-member-id="' + member.id + '" data-slot="' + slot + '">' +
-        '<span class="tree-role">' + role + '</span>' +
-        '<span>' + member.member_name + '</span>' +
-      '</button>'
+      '<button type="button" class="btn btn-sm btn-outline-' + badgeClass + ' me-2 mb-2 tree-node" data-member-id="' + member.id + '">' +
+      member.member_name + " (" + label + ")" +
+      "</button>"
     );
-  }
-
-  function drawTreeConnectors() {
-    const shell = document.getElementById("branchTreeShell");
-    if (!shell) return;
-
-    const svg = shell.querySelector(".tree-connector-svg");
-    if (!svg) return;
-
-    const shellRect = shell.getBoundingClientRect();
-    const width = shell.clientWidth;
-    const height = shell.clientHeight;
-
-    svg.setAttribute("viewBox", "0 0 " + width + " " + height);
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
-    svg.innerHTML = "";
-
-    function getNodePoint(selector, edge) {
-      const el = shell.querySelector(selector);
-      if (!el || el.classList.contains("branch-tree-placeholder")) return null;
-      const rect = el.getBoundingClientRect();
-      const x = rect.left - shellRect.left + rect.width / 2;
-      const y = edge === "top"
-        ? rect.top - shellRect.top
-        : rect.bottom - shellRect.top;
-      return { x: x, y: y };
-    }
-
-    function addPath(d) {
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", d);
-      path.setAttribute("class", "tree-connector-path");
-      svg.appendChild(path);
-    }
-
-    function connectOrthogonal(start, end) {
-      const midY = Math.round((start.y + end.y) / 2);
-      addPath("M " + start.x + " " + start.y + " L " + start.x + " " + midY + " L " + end.x + " " + midY + " L " + end.x + " " + end.y);
-    }
-
-    const fatherBottom = getNodePoint('[data-slot="father"]', "bottom");
-    const motherBottom = getNodePoint('[data-slot="mother"]', "bottom");
-    const selectedTop = getNodePoint('[data-slot="selected"]', "top");
-    const selectedBottom = getNodePoint('[data-slot="selected"]', "bottom");
-    const spouseTop = getNodePoint('[data-slot="spouse"]', "top");
-    const spouseCenter = getNodePoint('[data-slot="spouse"]', "bottom");
-
-    const childrenTopNodes = Array.from(shell.querySelectorAll('[data-slot^="child-"]'))
-      .filter(function (el) {
-        return !el.classList.contains("branch-tree-placeholder");
-      })
-      .map(function (el) {
-        const rect = el.getBoundingClientRect();
-        return {
-          x: rect.left - shellRect.left + rect.width / 2,
-          y: rect.top - shellRect.top,
-        };
-      });
-
-    if (selectedTop && (fatherBottom || motherBottom)) {
-      if (fatherBottom && motherBottom) {
-        const parentsHub = {
-          x: Math.round((fatherBottom.x + motherBottom.x) / 2),
-          y: Math.round(Math.max(fatherBottom.y, motherBottom.y) + 14),
-        };
-        connectOrthogonal(fatherBottom, parentsHub);
-        connectOrthogonal(motherBottom, parentsHub);
-        connectOrthogonal(parentsHub, selectedTop);
-      } else {
-        connectOrthogonal(fatherBottom || motherBottom, selectedTop);
-      }
-    }
-
-    if (selectedTop && spouseTop) {
-      addPath("M " + selectedTop.x + " " + selectedTop.y + " L " + spouseTop.x + " " + spouseTop.y);
-    }
-
-    if (selectedBottom && childrenTopNodes.length > 0) {
-      const anchorX = spouseCenter
-        ? Math.round((selectedBottom.x + spouseCenter.x) / 2)
-        : selectedBottom.x;
-      const childrenHubY = Math.round(childrenTopNodes[0].y - 16);
-      const minChildX = Math.min.apply(null, childrenTopNodes.map(function (c) { return c.x; }));
-      const maxChildX = Math.max.apply(null, childrenTopNodes.map(function (c) { return c.x; }));
-
-      addPath("M " + anchorX + " " + selectedBottom.y + " L " + anchorX + " " + childrenHubY);
-      if (childrenTopNodes.length > 1) {
-        addPath("M " + minChildX + " " + childrenHubY + " L " + maxChildX + " " + childrenHubY);
-      }
-
-      childrenTopNodes.forEach(function (child) {
-        addPath("M " + child.x + " " + childrenHubY + " L " + child.x + " " + child.y);
-      });
-    }
   }
 
   function renderTree(tree) {
@@ -811,28 +468,29 @@
       return;
     }
 
-    const childrenMarkup = tree.children && tree.children.length
-      ? tree.children.map(function (child, index) {
-          return createTreeNode(child, "Child", "child-" + index);
-        }).join("")
-      : '<div class="branch-tree-placeholder" data-slot="child-empty"><span class="tree-role">Children</span><span>No children</span></div>';
-
     const html =
-      '<div class="branch-tree" id="branchTreeShell">' +
-        '<svg class="tree-connector-svg" aria-hidden="true"></svg>' +
-        '<div class="branch-tree-row">' +
-          createTreeNode(tree.parents ? tree.parents.father : null, "Father", "father") +
-          createTreeNode(tree.parents ? tree.parents.mother : null, "Mother", "mother") +
-        '</div>' +
-        '<div class="branch-tree-row">' +
-          createTreeNode(tree.selected, "Selected", "selected") +
-          createTreeNode(tree.spouse, "Spouse", "spouse") +
-        '</div>' +
-        '<div class="branch-tree-row">' + childrenMarkup + '</div>' +
+      '<div class="mb-3">' +
+        '<div class="fw-semibold mb-2">Level 1: Parents</div>' +
+        createTreeNode(tree.parents ? tree.parents.father : null, "Father", "warning") +
+        createTreeNode(tree.parents ? tree.parents.mother : null, "Mother", "warning") +
+      '</div>' +
+      '<div class="mb-3">' +
+        '<div class="fw-semibold mb-2">Level 2: Selected Person + Spouse</div>' +
+        createTreeNode(tree.selected, "Selected", "primary") +
+        createTreeNode(tree.spouse, "Spouse", "success") +
+      '</div>' +
+      '<div>' +
+        '<div class="fw-semibold mb-2">Level 3: Children</div>' +
+        (
+          tree.children && tree.children.length
+            ? tree.children.map(function (child) {
+                return createTreeNode(child, "Child", "info");
+              }).join("")
+            : '<span class="text-muted">No children</span>'
+        ) +
       '</div>';
 
     container.innerHTML = html;
-    drawTreeConnectors();
 
     document.querySelectorAll(".tree-node").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -888,10 +546,7 @@
   });
 
   renderTree(initialTreeData);
-
-  window.addEventListener("resize", function () {
-    drawTreeConnectors();
-  });
 </script>
 
 <%- include('../partials/footer') %>
+

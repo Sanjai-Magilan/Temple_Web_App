@@ -19,8 +19,11 @@ router.get("/", familyController.listMembers);
 router.get("/setup", familyController.showSetup);
 router.post(
   "/setup",
-
-familyUpload.single("self_profile_image"),familyUpload.any(),
+  familyUpload.fields([
+    { name: "self_profile_image", maxCount: 1 },
+    { name: "father_profile_image", maxCount: 1 },
+    { name: "mother_profile_image", maxCount: 1 },
+  ]),
   familyController.createSetup,
 );
 

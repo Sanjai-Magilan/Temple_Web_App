@@ -202,9 +202,14 @@ exports.createSetup = async (req, res) => {
         ? childrenPosted
         : parseJsonArray(seed.children_json);
 
-    const imagePath = req.file
-      ? "/uploads/family-members/" + req.file.filename
-      : null;
+      const uploadedSelfImage = req.file
+        ? req.file
+        : req.files && Array.isArray(req.files.self_profile_image)
+          ? req.files.self_profile_image[0]
+          : null;
+      const imagePath = uploadedSelfImage
+        ? "/uploads/family-members/" + uploadedSelfImage.filename
+        : null;
 
     await familyModel.createFullFamilySetup({
       user_id: userId,

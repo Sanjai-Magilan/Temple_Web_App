@@ -1,14 +1,152 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
-<div class="container mt-4 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Family Member</h4>
-                </div>
-                <div class="card-body p-4">
+<style>
+    :root {
+        --family-edit-card: #fffaf2;
+        --family-edit-border: rgba(191, 161, 95, 0.22);
+        --family-edit-text: #5d5145;
+        --family-edit-title: #2c241b;
+        --family-edit-accent: #bfa15f;
+        --family-edit-accent-dark: #a88b4d;
+    }
+
+    body {
+        background:
+            linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
+            url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+        background-size: cover;
+        color: var(--family-edit-text);
+        min-height: 100vh;
+    }
+
+    .family-edit-shell {
+        max-width: 820px;
+        margin: 0 auto;
+    }
+
+    .family-edit-card {
+        background: var(--family-edit-card);
+        border: 1px solid var(--family-edit-border);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 24px 52px rgba(0, 0, 0, 0.45);
+    }
+
+    .family-edit-card::before {
+        content: '';
+        display: block;
+        height: 6px;
+        background: linear-gradient(90deg, var(--family-edit-accent), #e6c87d, var(--family-edit-accent));
+    }
+
+    .family-edit-header {
+        padding: 2rem 2rem 1.2rem;
+        text-align: center;
+        color: var(--family-edit-title);
+    }
+
+    .family-edit-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(212, 175, 55, 0.12);
+        border: 1px solid rgba(191, 161, 95, 0.22);
+        color: var(--family-edit-accent-dark);
+    }
+
+    .family-edit-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.7rem, 3vw, 2.15rem);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .family-edit-subtitle {
+        color: #8c7b65;
+        margin: 0.35rem 0 0;
+    }
+
+    .family-edit-body {
+        padding: 0 2rem 2rem;
+    }
+
+    .family-edit-body .form-control,
+    .family-edit-body .form-select {
+        border-radius: 10px;
+        border-color: rgba(191, 161, 95, 0.28);
+        box-shadow: none;
+    }
+
+    .family-edit-body .form-control:focus,
+    .family-edit-body .form-select:focus {
+        border-color: var(--family-edit-accent);
+        box-shadow: 0 0 0 0.2rem rgba(191, 161, 95, 0.18);
+    }
+
+    .btn-gold {
+        background: var(--family-edit-accent);
+        border-color: var(--family-edit-accent);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gold:hover {
+        background: var(--family-edit-accent-dark);
+        border-color: var(--family-edit-accent-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+    }
+
+    .btn-outline-neutral {
+        border-color: rgba(191, 161, 95, 0.4);
+        color: var(--family-edit-title);
+    }
+
+    .btn-outline-neutral:hover {
+        background: rgba(191, 161, 95, 0.12);
+        color: var(--family-edit-title);
+        border-color: rgba(191, 161, 95, 0.6);
+    }
+
+    .text-muted {
+        color: #6b5b4d !important;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 767.98px) {
+        .family-edit-header,
+        .family-edit-body {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+    }
+</style>
+
+<div class="container mt-4 mb-5 family-edit-shell">
+        <div class="row justify-content-center">
+                <div class="col-12">
+                        <div class="family-edit-card">
+                                <div class="family-edit-header">
+                                        <div class="family-edit-icon">
+                                                <i class="bi bi-pencil-square fs-3"></i>
+                                        </div>
+                                        <h4 class="family-edit-title">Edit Family Member</h4>
+                                        <p class="family-edit-subtitle">Update member details without changing the relationship for a family head.</p>
+                                </div>
+                                <div class="family-edit-body">
                     <% if (typeof error !== 'undefined' && error) { %>
                         <div class="alert alert-danger" role="alert">
                             <i class="bi bi-exclamation-triangle"></i> <%= error %>
@@ -103,10 +241,10 @@
                                 </small>
                             </div>
                             <div>
-                                <a href="/family" class="btn btn-outline-secondary me-2">
+                                <a href="/family" class="btn btn-outline-neutral me-2">
                                     <i class="bi bi-x-lg"></i> Cancel
                                 </a>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-gold">
                                     <i class="bi bi-check-lg"></i> Save Changes
                                 </button>
                             </div>
@@ -118,6 +256,5 @@
     </div>
 </div>
 
-<script>
-include('../partials/footer') 
+<%- include('../partials/footer') %>
 

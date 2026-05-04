@@ -1,44 +1,251 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar', { user: typeof user !== 'undefined' ? user : null }) %>
 
-<div class="container mt-4 mb-5">
+<style>
+  :root {
+    --family-view-card: #fffaf2;
+    --family-view-border: rgba(191, 161, 95, 0.22);
+    --family-view-text: #5d5145;
+    --family-view-title: #2c241b;
+    --family-view-accent: #bfa15f;
+    --family-view-accent-dark: #a88b4d;
+  }
+
+  body {
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
+      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--family-view-text);
+    min-height: 100vh;
+  }
+
+  .family-view-shell {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .family-view-card {
+    background: var(--family-view-card);
+    border: 1px solid var(--family-view-border);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 24px 52px rgba(0, 0, 0, 0.45);
+  }
+
+  .family-view-card::before {
+    content: '';
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--family-view-accent), #e6c87d, var(--family-view-accent));
+  }
+
+  .family-view-header {
+    padding: 1.6rem 1.8rem;
+    background: transparent;
+    color: var(--family-view-title);
+  }
+
+  .family-view-headline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .family-view-icon {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(191, 161, 95, 0.22);
+    color: var(--family-view-accent-dark);
+    flex: 0 0 auto;
+  }
+
+  .family-view-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .family-view-subtitle {
+    color: #8c7b65;
+    margin: 0.35rem 0 0;
+  }
+
+  .family-view-body {
+    padding: 0 1.8rem 1.8rem;
+  }
+
+  .family-view-body hr {
+    border-top-color: rgba(191, 161, 95, 0.18);
+    opacity: 1;
+  }
+
+  .family-view-body .text-muted,
+  .family-view-body .form-label.text-muted {
+    color: #7d6d5f !important;
+  }
+
+  .family-view-hero {
+    border: 1px solid rgba(191, 161, 95, 0.18);
+    border-radius: 18px;
+    background: rgba(191, 161, 95, 0.05);
+    padding: 1.2rem;
+  }
+
+  .family-view-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(191, 161, 95, 0.14);
+    border: 1px solid rgba(191, 161, 95, 0.2);
+  }
+
+  .family-view-badge {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+  }
+
+  .family-view-section-title {
+    color: var(--family-view-title);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .family-view-info-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .family-view-info-card {
+    border: 1px solid rgba(191, 161, 95, 0.18);
+    border-radius: 16px;
+    background: #fff;
+    padding: 1rem 1.05rem;
+    height: 100%;
+  }
+
+  .family-view-info-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--family-view-accent-dark);
+    margin-bottom: 0.35rem;
+  }
+
+  .family-view-info-value {
+    margin: 0;
+    color: var(--family-view-title);
+  }
+
+  .btn-gold {
+    background: var(--family-view-accent);
+    border-color: var(--family-view-accent);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gold:hover {
+    background: var(--family-view-accent-dark);
+    border-color: var(--family-view-accent-dark);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+  }
+
+  .btn-outline-neutral {
+    border-color: rgba(191, 161, 95, 0.4);
+    color: var(--family-view-title);
+  }
+
+  .btn-outline-neutral:hover {
+    background: rgba(191, 161, 95, 0.12);
+    color: var(--family-view-title);
+    border-color: rgba(191, 161, 95, 0.6);
+  }
+
+  .alert {
+    border: none;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 767.98px) {
+    .family-view-header,
+    .family-view-body {
+      padding-left: 1.2rem;
+      padding-right: 1.2rem;
+    }
+
+    .family-view-headline {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .family-view-info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="container mt-4 mb-5 family-view-shell">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="bi bi-person"></i> Member Details</h4>
-                    <% if (isHead) { %>
-                        <a href="/family/member/<%= member.id %>/edit" class="btn btn-light btn-sm">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                    <% } %>
-                </div>
-                <div class="card-body p-4">
-                    <!-- Member Name and Relationship -->
-                    <div class="text-center mb-4">
-                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" 
-                             style="width: 80px; height: 80px;">
-                            <i class="bi bi-person-fill text-primary" style="font-size: 2.5rem;"></i>
+        <div class="col-12 col-lg-10">
+            <div class="family-view-card">
+                <div class="family-view-header">
+                    <div class="family-view-headline">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="family-view-icon">
+                                <i class="bi bi-person fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="family-view-title">Member Details</h4>
+                                <p class="family-view-subtitle">Detailed profile information for this family member.</p>
+                            </div>
                         </div>
-                        <h3 class="mt-3 mb-1"><%= member.member_name %></h3>
-                        <span class="badge bg-<%= 
-                            member.relationship === 'head' ? 'primary' : 
-                            member.relationship === 'spouse' ? 'success' : 
-                            member.relationship === 'child' ? 'info' : 
-                            member.relationship === 'parent' ? 'warning' : 'secondary' 
-                        %> fs-6">
+                        <% if (isHead) { %>
+                            <a href="/family/member/<%= member.id %>/edit" class="btn btn-gold btn-sm">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="family-view-body">
+                    <div class="family-view-hero text-center mb-4">
+                        <div class="family-view-avatar mb-3">
+                            <i class="bi bi-person-fill" style="font-size: 2.5rem; color: var(--family-view-accent-dark);"></i>
+                        </div>
+                        <h3 class="mb-2"><%= member.member_name %></h3>
+                        <span class="badge bg-<%=
+                            member.relationship === 'head' ? 'primary' :
+                            member.relationship === 'spouse' ? 'success' :
+                            member.relationship === 'child' ? 'info' :
+                            member.relationship === 'parent' ? 'warning' : 'secondary'
+                        %> family-view-badge">
                             <%= member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) %>
                         </span>
                     </div>
 
-                    <hr>
-
-                    <!-- Contact Information -->
-                    <h5 class="mb-3"><i class="bi bi-telephone"></i> Contact Information</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Email</label>
-                            <p class="mb-0">
+                    <h5 class="family-view-section-title"><i class="bi bi-telephone"></i> Contact Information</h5>
+                    <div class="family-view-info-grid mb-4">
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Email</label>
+                            <p class="family-view-info-value">
                                 <% if (member.email) { %>
                                     <a href="mailto:<%= member.email %>"><%= member.email %></a>
                                 <% } else { %>
@@ -46,9 +253,9 @@
                                 <% } %>
                             </p>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Mobile</label>
-                            <p class="mb-0">
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Mobile</label>
+                            <p class="family-view-info-value">
                                 <% if (member.mobile) { %>
                                     <a href="tel:<%= member.mobile %>"><%= member.mobile %></a>
                                 <% } else { %>
@@ -58,23 +265,22 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-muted small">Address</label>
-                        <p class="mb-0"><%= member.address || 'Not provided' %></p>
+                    <div class="family-view-info-card mb-4">
+                        <label class="family-view-info-label">Address</label>
+                        <p class="family-view-info-value mb-0"><%= member.address || 'Not provided' %></p>
                     </div>
 
                     <hr>
 
-                    <!-- Personal Information -->
-                    <h5 class="mb-3"><i class="bi bi-info-circle"></i> Personal Information</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label text-muted small">Age</label>
-                            <p class="mb-0"><%= member.age ? member.age + ' years' : 'Not provided' %></p>
+                    <h5 class="family-view-section-title"><i class="bi bi-info-circle"></i> Personal Information</h5>
+                    <div class="family-view-info-grid mb-4">
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Age</label>
+                            <p class="family-view-info-value"><%= member.age ? member.age + ' years' : 'Not provided' %></p>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label text-muted small">Date of Birth</label>
-                            <p class="mb-0">
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Date of Birth</label>
+                            <p class="family-view-info-value">
                                 <% if (member.date_of_birth) { %>
                                     <%= new Date(member.date_of_birth).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %>
                                 <% } else { %>
@@ -82,35 +288,34 @@
                                 <% } %>
                             </p>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label text-muted small">Occupation</label>
-                            <p class="mb-0"><%= member.occupation || 'Not provided' %></p>
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Occupation</label>
+                            <p class="family-view-info-value"><%= member.occupation || 'Not provided' %></p>
                         </div>
                     </div>
 
                     <hr>
 
-                    <!-- Family Information -->
-                    <h5 class="mb-3"><i class="bi bi-house-heart"></i> Family Information</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Family Name</label>
-                            <p class="mb-0"><%= family.family_name %></p>
+                    <h5 class="family-view-section-title"><i class="bi bi-house-heart"></i> Family Information</h5>
+                    <div class="family-view-info-grid mb-4">
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Family Name</label>
+                            <p class="family-view-info-value"><%= family.family_name %></p>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted small">Member Since</label>
-                            <p class="mb-0"><%= new Date(member.added_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+                        <div class="family-view-info-card">
+                            <label class="family-view-info-label">Member Since</label>
+                            <p class="family-view-info-value"><%= new Date(member.added_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
                         </div>
                     </div>
 
                     <hr>
 
-                    <div class="d-flex justify-content-between">
-                        <a href="/family" class="btn btn-outline-secondary">
+                    <div class="d-flex flex-wrap justify-content-between gap-2">
+                        <a href="/family" class="btn btn-outline-neutral">
                             <i class="bi bi-arrow-left"></i> Back to Family
                         </a>
                         <% if (isHead) { %>
-                            <a href="/family/member/<%= member.id %>/edit" class="btn btn-primary">
+                            <a href="/family/member/<%= member.id %>/edit" class="btn btn-gold">
                                 <i class="bi bi-pencil"></i> Edit Member
                             </a>
                         <% } %>

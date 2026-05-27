@@ -117,14 +117,14 @@
     background: rgba(255, 250, 245, 0.82);
     border: 1px dashed rgba(191, 161, 95, 0.38);
     border-radius: 18px;
-    padding: 0.95rem 1rem 1rem;
+    padding: 1.15rem 1.1rem 1.2rem;
     min-height: 100%;
   }
 
   .branch-tree {
     position: relative;
-    min-height: 300px;
-    padding: 0.35rem 0.25rem 0.25rem;
+    min-height: 380px;
+    padding: 0.5rem 0.25rem 0.35rem;
   }
 
   .branch-tree-row {
@@ -146,14 +146,15 @@
     border: 1px solid rgba(191, 161, 95, 0.42);
     background: #fff;
     color: var(--donation-ink);
-    border-radius: 10px;
-    padding: 0.42rem 0.62rem;
-    min-width: 120px;
-    max-width: 168px;
+    border-radius: 14px;
+    padding: 0.72rem 0.95rem;
+    min-width: 160px;
+    max-width: 220px;
     text-align: center;
     line-height: 1.2;
-    font-size: 0.82rem;
-    box-shadow: 0 8px 18px rgba(44, 36, 27, 0.1);
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 10px 22px rgba(44, 36, 27, 0.12);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -166,20 +167,22 @@
     display: block;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
+    font-weight: 800;
     color: var(--donation-muted);
-    margin-bottom: 0.18rem;
+    margin-bottom: 0.28rem;
   }
 
   .branch-tree-placeholder {
     border: 1px dashed rgba(191, 161, 95, 0.42);
     background: rgba(191, 161, 95, 0.08);
     color: var(--donation-muted);
-    border-radius: 10px;
-    padding: 0.42rem 0.62rem;
-    min-width: 120px;
+    border-radius: 14px;
+    padding: 0.72rem 0.95rem;
+    min-width: 160px;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.92rem;
+    font-weight: 700;
   }
 
   .tree-connector-svg {
@@ -473,7 +476,6 @@
                 <div class="family-stat-card">
                   <div class="family-stat-label">Adults</div>
                   <div class="family-stat-value"><%= adultCount %></div>
-                  <div class="text-muted small">Members with age 18 or above</div>
                 </div>
               </div>
               <div class="col-sm-6 col-lg-3">
@@ -503,146 +505,17 @@
           </div>
         </div>
 
-        <% if (myFamilyView) { %>
-          <div class="row g-2 mb-4 family-members-compact">
-            <div class="col-md-3">
-              <div class="card h-100">
-                <div class="card-header">Parents</div>
-                <div class="card-body">
-                  <div><strong>Father:</strong> <%= myFamilyView.parents && myFamilyView.parents.father ? myFamilyView.parents.father.member_name : "-" %></div>
-                  <div><strong>Mother:</strong> <%= myFamilyView.parents && myFamilyView.parents.mother ? myFamilyView.parents.mother.member_name : "-" %></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card h-100">
-                <div class="card-header">Siblings</div>
-                <div class="card-body">
-                  <% if (!myFamilyView.siblings || myFamilyView.siblings.length === 0) { %>
-                    <span>-</span>
-                  <% } else { %>
-                    <% myFamilyView.siblings.forEach((s) => { %>
-                      <div><%= s.member_name %></div>
-                    <% }) %>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card h-100">
-                <div class="card-header">Spouse</div>
-                <div class="card-body">
-                  <%= myFamilyView.spouse ? myFamilyView.spouse.member_name : "-" %>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card h-100">
-                <div class="card-header">Children</div>
-                <div class="card-body">
-                  <% if (!myFamilyView.children || myFamilyView.children.length === 0) { %>
-                    <span>-</span>
-                  <% } else { %>
-                    <% myFamilyView.children.forEach((c) => { %>
-                      <div><%= c.member_name %></div>
-                    <% }) %>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-          </div>
-        <% } %>
-
         <div class="row g-4 align-items-stretch">
-          <div class="col-lg-5">
+          <div class="col-12">
             <div class="family-tree-partition h-100">
-              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                <h5 class="mb-0"></i> 3-Generation Tree</h5>
-              
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <h5 class="mb-0"><i class="bi bi-diagram-3"></i> 3-Generation Family Tree</h5>
+                <a href="/family/member/add" class="btn btn-sm btn-gold" title="Add Family Member">
+                  <i class="bi bi-person-plus"></i> Add Member
+                </a>
               </div>
+              <p class="text-muted mb-3"><small>Click on any family member to view their details and edit information</small></p>
                <div id="treeContainer" data-initial-tree="<%- JSON.stringify(initialTree || null).replace(/\"/g, '&quot;') %>"></div>
-            </div>
-          </div>
-          <div class="col-lg-7">
-            <div class="card family-section-card h-100">
-              <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Members</h5>
-                <span class="badge bg-light text-dark border">Total <%= totalMembers %></span>
-              </div>
-              <div class="card-body p-0">
-                <% if (members.length > 0) { %>
-                  <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle members-table-compact">
-                      <thead class="table-light">
-                        <tr>
-                          <th>Name</th>
-                          <th>Relationship</th>
-                          <th>Gender</th>
-                          <th>Parents</th>
-                          <th>Spouse</th>
-                          <th>Mobile</th>
-                          <th class="text-center">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% members.forEach((member) => { %>
-                          <tr>
-                            <td>
-                              <strong><%= member.member_name %></strong>
-                              <% if (member.relationship === "head") { %>
-                                <span class="badge bg-primary ms-1">Head</span>
-                              <% } %>
-                            </td>
-                            <td>
-                              <span class="badge bg-<%= relationBadge(member.relationship) %>">
-                                <%= member.relationship ? member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) : "-" %>
-                              </span>
-                            </td>
-                            <td><%= member.gender || "-" %></td>
-                            <td>
-                              <div><small>F: <%= nameById(member.father_member_id) %></small></div>
-                              <div><small>M: <%= nameById(member.mother_member_id) %></small></div>
-                            </td>
-                            <td><%= nameById(member.spouse_member_id) %></td>
-                            <td><%= member.mobile || "-" %></td>
-                            <td class="text-center">
-                              <div class="btn-group btn-group-sm">
-                                <a href="/family?memberId=<%= member.id %>" class="btn btn-outline-secondary" title="Center Tree">
-                                  <i class="bi bi-bullseye"></i>
-                                </a>
-                                <a href="/family/member/<%= member.id %>" class="btn btn-outline-info" title="View">
-                                  <i class="bi bi-eye"></i>
-                                </a>
-                                <% if (isHead) { %>
-                                  <a href="/family/member/<%= member.id %>/edit" class="btn btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                  </a>
-                                  <% if (member.relationship !== "head") { %>
-                                    <button
-                                      type="button"
-                                      class="btn btn-outline-danger delete-member-btn"
-                                      title="Delete"
-                                      data-id="<%= member.id %>"
-                                      data-name="<%= member.member_name %>"
-                                    >
-                                      <i class="bi bi-trash"></i>
-                                    </button>
-                                  <% } %>
-                                <% } %>
-                              </div>
-                            </td>
-                          </tr>
-                        <% }) %>
-                      </tbody>
-                    </table>
-                  </div>
-                <% } else { %>
-                  <div class="text-center py-5">
-                    <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
-                    <p class="text-muted mt-3">No family members found.</p>
-                  </div>
-                <% } %>
-              </div>
             </div>
           </div>
         </div>
@@ -662,6 +535,77 @@
           </div>
         </div>
       <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(90deg, var(--donation-gold), var(--donation-gold-dark)); color: white; border-bottom: none;">
+        <h5 class="modal-title" id="memberModalTitle">Member Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding: 1.8rem;">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Full Name</label>
+              <div style="font-size: 1.1rem; font-weight: 600; color: var(--donation-ink);"><span id="detailName">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Relationship</label>
+              <div><span id="detailRelationship" class="badge bg-secondary">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Gender</label>
+              <div style="color: var(--donation-ink);"><span id="detailGender">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Age</label>
+              <div style="color: var(--donation-ink);"><span id="detailAge">-</span></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Mobile</label>
+              <div style="color: var(--donation-ink);"><span id="detailMobile">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Father</label>
+              <div style="color: var(--donation-ink);"><span id="detailFather">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Mother</label>
+              <div style="color: var(--donation-ink);"><span id="detailMother">-</span></div>
+            </div>
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Spouse</label>
+              <div style="color: var(--donation-ink);"><span id="detailSpouse">-</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <div class="mb-3">
+              <label class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Children</label>
+              <div style="color: var(--donation-ink);"><span id="detailChildren">-</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid rgba(191, 161, 95, 0.2); padding: 1rem 1.5rem;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="memberCenterTreeBtn" class="btn btn-outline-secondary">
+          <i class="bi bi-bullseye"></i> Center Tree
+        </a>
+        <a href="#" id="memberEditBtn" class="btn btn-gold" style="display: none;">
+          <i class="bi bi-pencil"></i> Edit Member
+        </a>
+        <button type="button" id="memberDeleteBtn" class="btn btn-outline-danger" style="display: none;">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -690,6 +634,64 @@
     ? JSON.parse(treeContainer.dataset.initialTree)
     : null;
   let memberIdToDelete = null;
+  
+  const allMembers = - JSON.stringify(members) ;
+  const isHeadUser = - JSON.stringify(Boolean(isHead)) ;
+  const memberNameMap = {};
+  allMembers.forEach(function(m) { memberNameMap[m.id] = m.member_name; });
+  
+  function getNameById(id) {
+    if (!id) return "-";
+    return memberNameMap[id] || ("#" + id);
+  }
+  
+  function showMemberDetails(memberId) {
+    const normalizedMemberId = Number(memberId);
+    const member = allMembers.find(function(m) { return Number(m.id) === normalizedMemberId; });
+    if (!member) {
+      alert("Member not found.");
+      return;
+    }
+    
+    document.getElementById("memberModalTitle").textContent = member.member_name + " - Details";
+    document.getElementById("detailName").textContent = member.member_name;
+    document.getElementById("detailRelationship").textContent = member.relationship 
+      ? member.relationship.charAt(0).toUpperCase() + member.relationship.slice(1) 
+      : "-";
+    document.getElementById("detailGender").textContent = member.gender || "-";
+    document.getElementById("detailAge").textContent = member.age || "-";
+    document.getElementById("detailMobile").textContent = member.mobile || "-";
+    document.getElementById("detailFather").textContent = getNameById(member.father_member_id);
+    document.getElementById("detailMother").textContent = getNameById(member.mother_member_id);
+    document.getElementById("detailSpouse").textContent = getNameById(member.spouse_member_id);
+    
+    const children = allMembers.filter(function(m) { 
+      return m.father_member_id === memberId || m.mother_member_id === memberId; 
+    });
+    document.getElementById("detailChildren").textContent = children.length > 0 
+      ? children.map(function(c) { return c.member_name; }).join(", ") 
+      : "-";
+    
+    document.getElementById("memberCenterTreeBtn").href = "/family?memberId=" + memberId;
+    document.getElementById("memberEditBtn").href = "/family/member/" + memberId + "/edit";
+    document.getElementById("memberDeleteBtn").setAttribute("data-id", memberId);
+    document.getElementById("memberDeleteBtn").setAttribute("data-name", member.member_name);
+    
+    if (isHeadUser) {
+      document.getElementById("memberEditBtn").style.display = "inline-block";
+      if (member.relationship !== "head") {
+        document.getElementById("memberDeleteBtn").style.display = "inline-block";
+      } else {
+        document.getElementById("memberDeleteBtn").style.display = "none";
+      }
+    } else {
+      document.getElementById("memberEditBtn").style.display = "none";
+      document.getElementById("memberDeleteBtn").style.display = "none";
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById("memberDetailsModal"));
+    modal.show();
+  }
 
   function createTreeNode(member, role, slot) {
     if (!member) {
@@ -833,32 +835,23 @@
 
     document.querySelectorAll(".tree-node").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        const memberId = this.getAttribute("data-member-id");
-        fetch("/family/tree/" + memberId, {
-          headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-          .then(function (res) { return res.json(); })
-          .then(function (data) {
-            if (data && data.success) {
-              renderTree(data.tree);
-            } else {
-              alert(data.message || "Unable to load tree.");
-            }
-          })
-          .catch(function () {
-            alert("Failed to load tree.");
-          });
+        const memberId = Number(this.getAttribute("data-member-id"));
+        showMemberDetails(memberId);
       });
     });
   }
 
-  document.querySelectorAll(".delete-member-btn").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      memberIdToDelete = this.getAttribute("data-id");
-      document.getElementById("deleteMemberName").textContent = this.getAttribute("data-name");
-      const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
-      modal.show();
-    });
+
+
+  document.getElementById("memberDeleteBtn").addEventListener("click", function () {
+    const memberId = this.getAttribute("data-id");
+    const memberName = this.getAttribute("data-name");
+    memberIdToDelete = memberId;
+    document.getElementById("deleteMemberName").textContent = memberName;
+    
+    bootstrap.Modal.getInstance(document.getElementById("memberDetailsModal")).hide();
+    const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+    modal.show();
   });
 
   document.getElementById("confirmDeleteBtn").addEventListener("click", async function () {

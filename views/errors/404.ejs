@@ -3,20 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Path Not Found | <%= process.env.TEMPLE_NAME || 'Temple Portal' %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #fffaf0; color: #5d4037; font-family: 'Georgia', serif; }
+        .error-container { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .om-symbol { font-size: 5rem; color: #ff9800; opacity: 0.3; margin-bottom: 20px; }
+        .error-code { font-size: 8rem; font-weight: bold; color: #bf360c; line-height: 1; }
+        .btn-temple { background-color: #ff9800; color: white; border-radius: 30px; padding: 10px 30px; border: none; transition: 0.3s; }
+        .btn-temple:hover { background-color: #e65100; color: white; transform: translateY(-2px); }
+        .illustration { max-width: 300px; margin-bottom: 30px; border-radius: 50%; border: 5px solid #ffe0b2; }
+        .error-page {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            background:
+                radial-gradient(circle at top, rgba(201, 181, 156, 0.22), transparent 30%),
+                linear-gradient(180deg, #f9f8f6 0%, #f3eee9 100%);
+        }
+
+        .error-card {
+            max-width: 720px;
+            width: 100%;
+            border: 1px solid rgba(201, 181, 156, 0.45);
+            border-radius: 1.5rem;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 24px 60px rgba(75, 70, 63, 0.12);
+            overflow: hidden;
+        }
+
+        .error-badge {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            margin: 0 auto 1.25rem;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #e9dfd1, #d7c4ad);
+            color: #4b463f;
+            font-size: 2rem;
+        }
+
+        .error-code {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(4rem, 12vw, 7rem);
+            line-height: 1;
+            color: #4b463f;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-title {
+            font-family: 'Playfair Display', serif;
+            color: #4b463f;
+        }
+
+        .error-text {
+            color: #5e5a55;
+            max-width: 32rem;
+            margin: 0 auto;
+        }
+
+        .btn-temple {
+            background: #4b463f;
+            color: #fff;
+            border: 1px solid #4b463f;
+            border-radius: 999px;
+            padding: 0.8rem 1.4rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .btn-temple:hover {
+            background: #ffffff;
+            color: #4b463f;
+            transform: translateY(-1px);
+        }
+
+        .btn-soft {
+            background: transparent;
+            color: #4b463f;
+            border: 1px solid rgba(75, 70, 63, 0.18);
+            border-radius: 999px;
+            padding: 0.8rem 1.4rem;
+            font-weight: 600;
+        }
+
+        .btn-soft:hover {
+            background: rgba(75, 70, 63, 0.06);
+            color: #4b463f;
+        }
+
+        @media (max-width: 576px) {
+            .error-card {
+                border-radius: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <h1 class="display-1">404</h1>
-                <h2><%= title %></h2>
-                <p class="text-muted"><%= message %></p>
-                <a href="/" class="btn btn-primary">Go Home</a>
-            </div>
-        </div>
+
+<%- include('../partials/header', { title: '404 - Page Not Found' }) %>
+
+<main class="error-page">
+  <div class="container">
+    <div class="error-card p-4 p-md-5 text-center mx-auto">
+      <div class="error-badge">
+        <i class="bi bi-compass"></i>
+      </div>
+
+      <div class="error-code">404</div>
+      <h1 class="error-title h3 mb-3">Page not found</h1>
+      <p class="error-text lead mb-4">
+        The page you are looking for does not exist, has been moved, or is temporarily unavailable.
+      </p>
+
+      <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+        <a href="/" class="btn btn-temple btn-lg">Go to Home</a>
+        <a href="/dashboard" class="btn btn-soft btn-lg">Go to Dashboard</a>
+      </div>
     </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
+
 </body>
 </html>
-

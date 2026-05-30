@@ -35,7 +35,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
    background:
           linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
-          url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+          url('/views/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
            background-size: cover !important;
            min-height: 100vh;
     overflow-x: hidden;
@@ -71,7 +71,7 @@ body {
     height: 70px;
     width: 100%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-     background-image: url(../../Image/Nav_BG.jpg);
+    background-image: url(/views/Image/Nav_BG.jpg);
     background-size: cover;
 }
 

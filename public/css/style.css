@@ -133,16 +133,14 @@ body {
 
 /* Hover → text & bg only (NO underline) */
 .nav-links a:hover {
-    color: #333;
-    background-color: #f9f7f4;
-    
-   
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.14);
 }
 
 /* Active → text & bg */
 .nav-links a.active {
     color: #ffffff;
-    background-color: #f9f7f4;
+    background-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Underline (hidden by default) */
@@ -154,7 +152,7 @@ body {
     bottom: 10px;
 
     height: 3px;
-    background-color: #333;
+    background-color: #ffffff;
     border-radius: 6px;
 
     transform: scaleX(0);
@@ -218,7 +216,7 @@ body {
 
 .nav-user-dropdown {
     font-size: 12px;
-    color: #666;
+    color: #ffffff;
 }
 
 /* DROPDOWN MENU */
@@ -826,7 +824,7 @@ body {
     display: block;
     height: 3px;
     width: 100%;
-    background-color: #333;
+    background-color: #ffffff;
     border-radius: 3px;
     transition: all 0.3s ease;
 }
@@ -961,8 +959,14 @@ body {
 
     .nav-links a:hover,
     .landing-nav-links a:hover {
-        background-color: var(--surface-primary);
-        color: var(--accent);
+        background-color: rgba(191, 161, 95, 0.12);
+        color: var(--heading-dark);
+    }
+
+    .nav-links a.active,
+    .landing-nav-links a.active {
+        background-color: rgba(191, 161, 95, 0.18);
+        color: var(--heading-dark);
     }
 
     /* Remove underline on mobile */

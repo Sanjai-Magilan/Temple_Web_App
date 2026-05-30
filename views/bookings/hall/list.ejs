@@ -3,30 +3,34 @@
     <style>
         /* Page Background Overrides */
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover !important;
-            /* font-family:  sans-serif !important; */
-            min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+           background-size: cover !important;
+           min-height: 100vh;
         }
 
         /* Page Title styling for visibility */
         .page-title {
-            color: #f8f9fa;
+            color: rgb(120, 53, 15);
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: none;
         }
 
         .btn-gold {
-            background-color: #bfa15f;
-            border-color: #bfa15f;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
             color: white;
+            transition: all 0.2s ease;
         }
 
         .btn-gold:hover {
-            background-color: #a88b4d;
-            border-color: #a88b4d;
-            color: white;
+            background-image: none;
+            background-color: #fff;
+            border-color: 1px solid rgb(120, 53, 15);
+            color: rgb(120, 53, 15);
         }
 
         /* Modal Styling */
@@ -50,7 +54,7 @@
         .booking-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
-            color: #2c241b;
+            color: rgb(120, 53, 15);
             font-weight: 700;
             margin-bottom: 0.2rem;
         }
@@ -146,19 +150,23 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
-            background-color: #bfa15f;
-            border: none;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-top: 1rem;
             font-family: 'Inter', sans-serif;
         }
 
         .btn-submit-custom:hover {
-            background-color: #a88b4d;
+            background-image: none;
+            background-color: #fff;
+            border-color: rgb(229, 231, 235);
+            color: rgb(120, 53, 15);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+            box-shadow: none;
         }
 
         /* Card Hover Effects */

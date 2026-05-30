@@ -75,7 +75,7 @@
         .booking-title {
             font-family: 'Playfair Display', serif;
             font-size: 2.2rem;
-            color: #2c241b;
+            color: rgb(120, 53, 15);
             font-weight: 700;
             margin-bottom: 0.5rem;
             letter-spacing: -0.5px;
@@ -190,19 +190,23 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
-            background-color: #bfa15f;
-            border: none;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-top: 1rem;
             font-family: 'Inter', sans-serif;
         }
 
         .btn-submit-custom:hover {
-            background-color: #a88b4d;
+            background-image: none;
+            background-color: #fff;
+            border-color: rgb(229, 231, 235);
+            color: rgb(120, 53, 15);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+            box-shadow: none;
         }
 
         .btn-submit-custom:disabled {

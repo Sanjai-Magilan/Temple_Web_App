@@ -33,11 +33,23 @@ body {
     display: grid;
     grid-template-rows: auto 1fr auto;
     font-family: 'Segoe UI', sans-serif;
-    background: var(--bg-base);
-    color: var(--text-main);
+   background:
+          linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+           background-size: cover !important;
+           min-height: 100vh;
     overflow-x: hidden;
     /* Prevent horizontal scroll */
     width: 100%;
+}
+
+.page-title,
+.booking-title,
+.family-page-title {
+    font-family: 'Playfair Display', serif;
+    color: rgb(120, 53, 15);
+    text-shadow: none;
+    font-weight: 700;
 }
 
 /* ... existing code ... */

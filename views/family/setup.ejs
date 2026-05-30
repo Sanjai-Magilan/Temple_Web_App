@@ -18,19 +18,18 @@
 
 <style>
   :root {
-    --family-bg: #1e1a14;
-    --family-card: #fffaf2;
-    --family-border: rgba(191, 161, 95, 0.26);
-    --family-accent: #bfa15f;
-    --family-accent-dark: #a88b4d;
+    --family-card: rgba(255, 255, 255, 0.96);
+    --family-border: rgba(255, 255, 255, 0.75);
+    --family-accent: rgb(120, 53, 15);
+    --family-accent-dark: rgb(120, 53, 15);
     --family-text: #5d5145;
-    --family-title: #2c241b;
+    --family-title: rgb(120, 53, 15);
   }
 
   body {
     background:
-      linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58)),
-      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+      linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+      url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
     background-size: cover;
     color: var(--family-text);
     min-height: 100vh;
@@ -56,17 +55,19 @@
     background-color: transparent;
     border: 1px solid transparent;
     color: #fff;
-    font-weight: 600;
-    border-radius: 8px;
+    border-width: 2px;
+    font-weight: 700;
+    border-radius: 14px;
     padding: 0.6rem 1.2rem;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
     transition: all 0.2s ease;
   }
 
   .btn-gold:hover {
+    color: rgb(120, 53, 15);
     background-image: none;
     background-color: #fff;
-    border-color: rgb(229, 231, 235);
-    color: rgb(120, 53, 15);
+    border: 1px solid rgb(123, 53, 15);
     transform: translateY(-2px);
     box-shadow: none;
   }
@@ -109,10 +110,10 @@
     max-width: 820px;
     margin: 0 auto;
     background: var(--family-card);
-    border: 1px solid rgba(212, 175, 55, 0.22);
-    border-radius: 22px;
+    border: 1px solid var(--family-border);
+    border-radius: 28px;
     overflow: hidden;
-    box-shadow: 0 24px 52px rgba(0, 0, 0, 0.48);
+    box-shadow: 0 24px 70px rgba(19, 17, 23, 0.14);
     position: relative;
   }
 
@@ -123,7 +124,7 @@
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(90deg, #bfa15f, #e6c87d, #bfa15f);
+    background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
   }
 
   .family-booking-header {
@@ -183,8 +184,8 @@
 
   .section-block {
     border: 1px solid rgba(191, 161, 95, 0.17);
-    border-radius: 16px;
-    background: #fff;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
     padding: 1.15rem;
     box-shadow: 0 8px 18px rgba(44, 36, 27, 0.08);
   }
@@ -226,7 +227,7 @@
   .field-label {
     font-size: 0.83rem;
     font-weight: 600;
-    color: #5d5145;
+    color: rgb(120, 53, 15);
     margin-bottom: 0.45rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -234,25 +235,25 @@
 
   .form-control,
   .form-select {
-    border-radius: 10px;
-    border-color: #e0d8cc;
+    border-radius: 14px;
+    border-color: rgba(30, 30, 36, 0.12);
     min-height: 46px;
     box-shadow: none;
-    color: #2c241b;
+    color: rgb(120, 53, 15);
     font-size: 0.98rem;
     padding: 0.72rem 0.95rem;
   }
 
   .form-control:focus,
   .form-select:focus {
-    border-color: var(--family-accent);
-    box-shadow: 0 0 0 4px rgba(191, 161, 95, 0.1);
+    border-color: rgba(217, 119, 6, 0.52);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12);
   }
 
   .input-group-text {
-    border-radius: 10px 0 0 10px;
-    border-color: #e0d8cc;
-    background: #fff6e8;
+    border-radius: 14px 0 0 14px;
+    border-color: rgba(30, 30, 36, 0.12);
+    background: #fff;
     color: var(--family-accent-dark);
   }
 
@@ -263,10 +264,10 @@
   }
 
   .member-card {
-    border: 1px solid rgba(191, 161, 95, 0.2);
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0 10px 22px rgba(44, 36, 27, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 22px rgba(19, 17, 23, 0.1);
     overflow: hidden;
     animation: fadeUp 0.28s ease;
   }
@@ -277,12 +278,12 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.9rem 1rem;
-    border-bottom: 1px solid rgba(191, 161, 95, 0.14);
-    background: rgba(191, 161, 95, 0.08);
+    border-bottom: 1px solid rgb(229, 231, 235);
+    background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
   }
 
   .member-card-header strong {
-    color: var(--family-title);
+    color: #fff;
   }
 
   .member-card-body {
@@ -305,7 +306,7 @@
   }
 
   .btn-family {
-    border-radius: 10px;
+    border-radius: 14px;
     min-height: 44px;
     padding-inline: 1rem;
     font-weight: 600;
@@ -313,36 +314,39 @@
   }
 
   .btn-family-primary {
-    background: linear-gradient(135deg, #bfa15f, #a88b4d);
-    border: none;
+    background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+    border: 1px solid transparent;
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 10px 20px rgba(168, 139, 77, 0.22);
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
   }
 
   .btn-family-primary:hover {
-    color: #fff;
+    color: rgb(120, 53, 15);
+    background-image: none;
+    background-color: #fff;
+    border: 1px solid rgb(123, 53, 15);
     transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(168, 139, 77, 0.3);
+    box-shadow: none;
   }
 
   .btn-family-outline {
     border: 1px solid rgba(191, 161, 95, 0.36);
-    color: var(--family-accent-dark);
+    color: rgb(120, 53, 15);
     background: #fff;
   }
 
   .btn-family-outline:hover {
-    color: var(--family-title);
-    border-color: rgba(191, 161, 95, 0.54);
+    color: rgb(120, 53, 15);
+    border-color: rgb(123, 53, 15);
     background: #fff;
   }
 
   .empty-state {
     border: 1px dashed rgba(191, 161, 95, 0.34);
     border-radius: 12px;
-    background: #fdf7ec;
+    background: rgba(255, 255, 255, 0.96);
     padding: 1.1rem;
     color: #7b6a59;
   }
@@ -350,8 +354,8 @@
   .alert {
     border-radius: 12px;
     border: 1px solid rgba(191, 161, 95, 0.22);
-    background: #f9f2e4;
-    color: #2c241b;
+    background: rgba(255, 255, 255, 0.96);
+    color: rgb(120, 53, 15);
   }
 
   @keyframes fadeUp {
@@ -430,7 +434,7 @@
             ✖
           </a>
           <div class="header-icon-wrapper">
-            <i class="bi bi-house-heart" style="font-size: 1.5rem; color: #bfa15f;"></i>
+            <i class="bi bi-house-heart" style="font-size: 1.5rem; color: rgb(120, 53, 15);"></i>
           </div>
           <h2 class="booking-title">Family Registration</h2>
          

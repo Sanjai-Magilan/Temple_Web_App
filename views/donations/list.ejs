@@ -5,39 +5,57 @@
 
         /* Page Background Overrides */
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+           background : linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+     
             background-size: cover !important;
             /* font-family: 'Inter', sans-serif !important; */
             min-height: 100vh;
         }
+        
+               
 
         /* Page Title styling */
         .page-title {
-            color: #f8f9fa;
+            color: rgb(120, 53, 15);
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: none;
         }
 
         .btn-gold {
-            background-color: #bfa15f;
-            border-color: #bfa15f;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
             color: white;
             padding: 0.6rem 1.2rem;
             font-weight: 600;
             border-radius: 8px;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
         }
 
         .btn-gold:hover {
-            background-color: #a88b4d;
-            border-color: #a88b4d;
-            color: white;
+            background-image: none;
+            background-color: #fff;
+            border-color: rgb(229, 231, 235);
+            color: rgb(120, 53, 15);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+            box-shadow: none;
+        }
+
+        .pagination .page-link {
+            color: rgb(120, 53, 15);
+            border-color: rgb(229, 231, 235);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border-color: rgb(229, 231, 235);
+            color: #fff;
         }
 
         /* Card Hover Effects and Styling */
@@ -162,19 +180,23 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
-            background-color: #bfa15f;
-            border: none;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-top: 1rem;
             font-family: 'Inter', sans-serif;
         }
 
         .btn-submit-custom:hover {
-            background-color: #a88b4d;
+            background-image: none;
+            background-color: #fff;
+            border-color: rgb(229, 231, 235);
+            color: rgb(120, 53, 15);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+            box-shadow: none;
         }
     </style>
 
@@ -257,8 +279,7 @@
                         <ul class="pagination justify-content-center">
                             <!-- Previous -->
                             <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="/donations?page=<%= currentPage - 1 %>" aria-label="Previous"
-                                    style="color: #bfa15f;">
+                                <a class="page-link" href="/donations?page=<%= currentPage - 1 %>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -266,8 +287,7 @@
                             <!-- Page Numbers -->
                             <% for(let i=1; i <=totalPages; i++) { %>
                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                    <a class="page-link" href="/donations?page=<%= i %>"
-                                        style="<%= currentPage === i ? 'background-color: #bfa15f; border-color: #bfa15f; color: white;' : 'color: #bfa15f;' %>">
+                                    <a class="page-link" href="/donations?page=<%= i %>">
                                         <%= i %>
                                     </a>
                                 </li>
@@ -276,7 +296,7 @@
                                     <!-- Next -->
                                     <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
                                         <a class="page-link" href="/donations?page=<%= currentPage + 1 %>"
-                                            aria-label="Next" style="color: #bfa15f;">
+                                            aria-label="Next">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>

@@ -2,8 +2,16 @@
     <%- include('../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
         <style>
+            body {
+                background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+                background-size: cover !important;
+                min-height: 100vh;
+            }
+
             .nav-pills .nav-link.active {
-                background-color: #bfa15f;
+                background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+                background-color: transparent;
+                border: 1px solid transparent;
             }
 
             .nav-pills .nav-link {
@@ -31,8 +39,8 @@
 
             /* Pagination Styling to match */
             .page-link {
-                color: #bfa15f;
-                border: none;
+                color: rgb(120, 53, 15);
+                border: 1px solid rgb(229, 231, 235);
                 margin: 0 5px;
                 border-radius: 5px;
                 font-weight: 500;
@@ -40,16 +48,31 @@
 
             .page-link:hover {
                 background-color: #f8f9fa;
-                color: #a88b4d;
+                color: rgb(120, 53, 15);
             }
 
             .page-item.active .page-link {
-                background-color: #bfa15f;
+                background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+                background-color: transparent;
+                border-color: rgb(229, 231, 235);
                 color: white;
             }
 
             .page-item.disabled .page-link {
                 color: #6c757d;
+            }
+
+            .donation-search-btn {
+                transition: all 0.2s ease;
+            }
+
+            .donation-search-btn:hover,
+            .donation-search-btn:focus-visible {
+                background-image: none !important;
+                background-color: #fff !important;
+                border-color: rgb(229, 231, 235) !important;
+                color: rgb(120, 53, 15) !important;
+                box-shadow: none !important;
             }
         </style>
 
@@ -69,7 +92,7 @@
 
                 <!-- Title -->
                 <h2 class="mb-0" 
-                    style="font-family: 'Playfair Display', serif; color: #2c241b;">
+                    style="font-family: 'Playfair Display', serif; color: rgb(120, 53, 15);">
                     View Donations
                 </h2>
 
@@ -140,8 +163,8 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <button type="button" onclick="submitSearch(event)" class="btn btn-primary w-100 btn-lg"
-                                style="background-color: #bfa15f; border-color: #bfa15f; border-radius: 10px;">
+                            <button type="button" onclick="submitSearch(event)" class="btn btn-primary w-100 btn-lg donation-search-btn"
+                                style="background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)); background-color: transparent; border: 1px solid transparent; border-radius: 10px; color: white;">
                                 Search
                             </button>
                         </div>

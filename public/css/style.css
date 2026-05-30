@@ -335,7 +335,7 @@ body {
 .btn {
     border-radius: 24px;
     padding: 10px 22px;
-    border: none;
+
     cursor: pointer;
     transition: all 0.25s ease;
     text-decoration: none;

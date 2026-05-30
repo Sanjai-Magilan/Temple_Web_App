@@ -64,9 +64,21 @@ router.get(
 );
 
 router.get(
+  "/bookings/hall/:id/receipt/view",
+  authMiddleware.verifyToken,
+  receiptController.viewHallReceipt,
+);
+
+router.get(
   "/bookings/pooja/:id/receipt",
   authMiddleware.verifyToken,
   receiptController.downloadPoojaReceipt
+);
+
+router.get(
+  "/bookings/pooja/:id/receipt/view",
+  authMiddleware.verifyToken,
+  receiptController.viewPoojaReceipt,
 );
 
 router.get(

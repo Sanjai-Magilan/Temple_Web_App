@@ -70,16 +70,74 @@ const downloadReceipt = async (req, res, type, model) => {
   res.end(buffer);
 };
 
+const renderReceiptView = async (req, res, type, model) => {
+  const id = Number(req.params.id);
+  if (!id) {
+    return res.status(400).render("errors/400", {
+      title: "Bad Request",
+      message: "Invalid receipt request.",
+    });
+  }
+
+  const record = await model.getReceiptData(id);
+  if (!record) {
+    return res.status(404).render("errors/404", {
+      title: "Not Found",
+      message: "Receipt not found.",
+    });
+  }
+
+  if (!assertAccess(req, record)) {
+    return res.status(403).render("errors/403", {
+      title: "Forbidden",
+      message: "You do not have permission to access this receipt.",
+    });
+  }
+
+  if (record.payment_status !== "completed") {
+    return res.status(400).render("errors/400", {
+      title: "Bad Request",
+      message: "Receipt is available only for completed payments.",
+    });
+  }
+
+  const receipt = await receiptService.ensureReceiptJsonFromRecord(
+    type,
+    record,
+  );
+  const shareUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+  const downloadUrl = shareUrl.replace(/\/view$/, "");
+
+  return res.render("receipts/receipt", {
+    receipt,
+    renderMode: "html",
+    shareUrl,
+    downloadUrl,
+  });
+};
+
 exports.downloadDonationReceipt = async (req, res) => {
   await downloadReceipt(req, res, "donation", donationModel);
+};
+
+exports.viewDonationReceipt = async (req, res) => {
+  await renderReceiptView(req, res, "donation", donationModel);
 };
 
 exports.downloadHallReceipt = async (req, res) => {
   await downloadReceipt(req, res, "hall_booking", hallBookingModel);
 };
 
+exports.viewHallReceipt = async (req, res) => {
+  await renderReceiptView(req, res, "hall_booking", hallBookingModel);
+};
+
 exports.downloadPoojaReceipt = async (req, res) => {
   await downloadReceipt(req, res, "pooja_booking", poojaBookingModel);
+};
+
+exports.viewPoojaReceipt = async (req, res) => {
+  await renderReceiptView(req, res, "pooja_booking", poojaBookingModel);
 };
 
 exports.downloadAdminPaymentReceipt = async (req, res) => {

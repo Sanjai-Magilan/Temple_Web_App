@@ -32,4 +32,10 @@ router.get(
   receiptController.downloadDonationReceipt,
 );
 
+router.get(
+  "/donations/:id/receipt/view",
+  authMiddleware.verifyToken,
+  receiptController.viewDonationReceipt,
+);
+
 module.exports = router;

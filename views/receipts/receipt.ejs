@@ -1,209 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Temple Receipt</title>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Work+Sans:wght@300;400;600&display=swap");
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temple Receipt - <%= receipt.receipt_number || "Receipt" %></title>
+<style>
     :root {
-      --ink: #2d2318;
-      --gold: #b8924b;
-      --sand: #f7f0e4;
-      --clay: #efe3cf;
-      --line: #d8c5a1;
+        --primary-saffron: #FF6F00;
+        --secondary-gold: #FFD700;
+        --text-dark: #1A1A1A;
+        --text-muted: #5C4033;
+        --bg-cream: #FFF8E1;
+        --border-style: 2px solid var(--primary-saffron);
     }
+
     body {
-      margin: 0;
-      font-family: "Work Sans", sans-serif;
-      color: var(--ink);
-      background: var(--sand);
+        font-family: 'Roboto', 'Open Sans', sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
     }
-    .receipt {
-      max-width: 760px;
-      margin: 0 auto;
-      background: #fff;
-      border: 2px solid var(--line);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+
+    .receipt-container {
+        background-color: var(--bg-cream);
+        width: 100%;
+        max-width: 600px;
+        border: 8px double var(--primary-saffron);
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
     }
-    .header {
-      background: linear-gradient(135deg, #f4e8d5, #fdf7ee);
-      border-bottom: 2px solid var(--line);
-      padding: 28px 32px 22px;
-      text-align: center;
+
+    .receipt-container::before, .receipt-container::after {
+        content: '❖';
+        position: absolute;
+        color: var(--primary-saffron);
+        font-size: 24px;
+    }
+    .receipt-container::before { top: 10px; left: 10px; }
+    .receipt-container::after { top: 10px; right: 10px; }
+
+    .header-section {
+        text-align: center;
+        border-bottom: var(--border-style);
+        padding-bottom: 16px;
+        margin-bottom: 16px;
     }
     .temple-name {
-      font-family: "Cormorant Garamond", serif;
-      font-size: 30px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin: 0 0 6px;
+        color: var(--primary-saffron);
+        font-size: 28px;
+        font-family: 'Merriweather', serif;
+        font-weight: bold;
+        margin: 0;
     }
-    .temple-meta {
-      font-size: 12px;
-      letter-spacing: 0.3px;
-      color: #5b4a33;
+    .temple-address, .contact-info {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin: 4px 0;
     }
-    .badge {
-      display: inline-block;
-      margin-top: 14px;
-      background: var(--gold);
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 12px;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: var(--text-dark);
     }
-    .section {
-      padding: 22px 32px;
-      border-bottom: 1px dashed var(--line);
+    .info-group { display: flex; flex-direction: column; }
+    .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
+    .value { font-weight: bold; }
+
+    .donation-details {
+        background-color: rgba(255, 215, 0, 0.1);
+        border: 1px solid var(--secondary-gold);
+        padding: 16px;
+        border-radius: 4px;
+        text-align: center;
+        margin-bottom: 20px;
     }
-    .section:last-child {
-      border-bottom: 0;
+    .amount-highlight {
+        font-size: 32px;
+        color: var(--primary-saffron);
+        font-weight: bold;
+        margin: 8px 0;
     }
-    .title {
-      font-family: "Cormorant Garamond", serif;
-      font-size: 20px;
-      margin: 0 0 12px;
+
+    .compliance-section {
+        font-size: 11px;
+        color: var(--text-muted);
+        border-top: 1px dashed var(--primary-saffron);
+        padding-top: 12px;
+        margin-bottom: 20px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 22px;
-      font-size: 13px;
+
+    .footer-section {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-dark);
+        border-top: var(--border-style);
+        padding-top: 16px;
     }
-    .label {
-      color: #6a5840;
-      font-weight: 600;
+    .bilingual-thanks {
+        font-weight: bold;
+        color: var(--primary-saffron);
+        margin-bottom: 12px;
     }
-    .value {
-      color: #2d2318;
+    .qr-placeholder {
+        width: 64px;
+        height: 64px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
     }
-    .amount {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--gold);
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
     }
-    .footer {
-      padding: 18px 32px 26px;
-      text-align: center;
-      font-size: 11px;
-      color: #6a5840;
+    .btn {
+        background-color: var(--primary-saffron);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
     }
-  </style>
+
+    @media print {
+        body { background-color: white; padding: 0; }
+        .receipt-container { box-shadow: none; border: 2px solid black; }
+        .action-buttons { display: none; }
+    }
+</style>
 </head>
 <body>
-  <div class="receipt">
-    <div class="header">
-      <h1 class="temple-name"><%= receipt.temple.name %></h1>
-      <div class="temple-meta">
-        <%= receipt.temple.address %><br />
-        <%= receipt.temple.phone %> <%= receipt.temple.email ? " | " + receipt.temple.email : "" %>
-      </div>
-      <div class="badge">Official Receipt</div>
+<%
+  const temple = receipt.temple || {};
+  const display = receipt.display || {};
+  const issuedAt = receipt.issued_at
+    ? new Date(receipt.issued_at).toLocaleString("en-IN")
+    : "";
+  const donorContact = display.donor_contact || "NA";
+  const paymentRef = display.payment_reference || "NA";
+  const gotra = display.gotra || "NA";
+  const nakshatra = display.nakshatra || "NA";
+  const amountWords = receipt.payment.amount_words || "";
+  const amountNumeric = receipt.payment.amount || 0;
+  const donationPurpose = display.donation_purpose || "NA";
+  const specificDeity = display.specific_deity || "NA";
+  const dedication = display.dedication || "";
+  const generatedAt = receipt.meta?.generated_at
+    ? new Date(receipt.meta.generated_at).toLocaleString("en-IN")
+    : "";
+  const downloadLink = typeof downloadUrl === "string" ? downloadUrl : "";
+  const shareLink = typeof shareUrl === "string" ? shareUrl : "";
+%>
+
+<div class="receipt-container">
+    <div class="header-section">
+        <div style="font-size: 40px; color: var(--primary-saffron);">🕉️</div>
+        <h1 class="temple-name"><%= temple.name || "Temple Trust" %></h1>
+        <p class="temple-address">
+          <%= temple.address || "" %><%= temple.pin_code ? ", " + temple.pin_code : "" %>
+        </p>
+        <p class="contact-info">
+          Ph: <%= temple.phone || "" %><%= temple.email ? " | " + temple.email : "" %>
+        </p>
+        <p class="contact-info"><strong>OFFICIAL E-RECEIPT</strong></p>
     </div>
 
-    <div class="section">
-      <div class="title">Receipt Details</div>
-      <div class="grid">
-        <div class="label">Receipt Number</div>
-        <div class="value"><%= receipt.receipt_number %></div>
-        <div class="label">Type</div>
-        <div class="value"><%= receipt.receipt_type %></div>
-        <div class="label">Issued At</div>
-        <div class="value"><%= receipt.issued_at %></div>
-      </div>
+    <div class="info-grid">
+        <div class="info-group">
+            <span class="label">Receipt Number</span>
+            <span class="value"><%= receipt.receipt_number || "" %></span>
+        </div>
+        <div class="info-group">
+            <span class="label">Date & Time</span>
+            <span class="value"><%= issuedAt %></span>
+        </div>
+        <div class="info-group">
+            <span class="label">Donor Name</span>
+            <span class="value"><%= receipt.payer.name || "" %></span>
+        </div>
+        <div class="info-group">
+            <span class="label">Payment Method</span>
+            <span class="value"><%= receipt.payment.method || "" %> <%= paymentRef %></span>
+        </div>
+        <div class="info-group">
+            <span class="label">Donor Contact</span>
+            <span class="value"><%= donorContact %></span>
+        </div>
+        <div class="info-group">
+            <span class="label">Gotra / Nakshatra</span>
+            <span class="value"><%= gotra %> / <%= nakshatra %></span>
+        </div>
     </div>
 
-    <div class="section">
-      <div class="title">Devotee</div>
-      <div class="grid">
-        <div class="label">Name</div>
-        <div class="value"><%= receipt.payer.name %></div>
-        <div class="label">Email</div>
-        <div class="value"><%= receipt.payer.email || "NA" %></div>
-        <div class="label">Phone</div>
-        <div class="value"><%= receipt.payer.phone || "NA" %></div>
-      </div>
+    <div class="donation-details">
+        <span class="label">Donation Purpose</span>
+        <h3 style="margin: 4px 0;"><%= donationPurpose %></h3>
+        <p style="font-size: 12px; margin: 0;">Target Deity: <%= specificDeity %></p>
+
+        <div class="amount-highlight">₹ <%= amountNumeric %></div>
+        <p style="font-weight: bold; margin: 0;">Rupees <%= amountWords %> Only</p>
+
+        <% if (dedication) { %>
+        <p style="font-size: 12px; font-style: italic; margin-top: 8px;">"<%= dedication %>"</p>
+        <% } %>
     </div>
 
-    <div class="section">
-      <div class="title">Payment</div>
-      <div class="grid">
-        <div class="label">Payment ID</div>
-        <div class="value"><%= receipt.payment.payment_id %></div>
-        <div class="label">Order ID</div>
-        <div class="value"><%= receipt.payment.order_id %></div>
-        <div class="label">Method</div>
-        <div class="value"><%= receipt.payment.method %></div>
-        <div class="label">Status</div>
-        <div class="value"><%= receipt.payment.status %></div>
-        <div class="label">Amount</div>
-        <div class="value amount">INR <%= receipt.payment.amount %></div>
-      </div>
+    <div class="compliance-section">
+        <p>
+          <strong>Trust Reg No:</strong> <%= temple.trust_reg_no || "NA" %>
+          | <strong>80G Cert:</strong> <%= temple.cert_80g_no || "NA" %>
+          <%= temple.cert_80g_validity ? "(Valid till " + temple.cert_80g_validity + ")" : "" %>
+        </p>
+        <p>
+          <em>
+            Donations are eligible for <%= temple.exemption_percentage || "" %>% tax deduction under section 80G of IT Act.
+          </em>
+        </p>
+        <p>
+          <strong>Bank Details:</strong> <%= temple.bank_name || "NA" %>,
+          A/C: <%= temple.bank_account || "NA" %>, IFSC: <%= temple.bank_ifsc || "NA" %>
+        </p>
     </div>
 
-    <% if (receipt.receipt_type === "donation") { %>
-    <div class="section">
-      <div class="title">Donation Details</div>
-      <div class="grid">
-        <div class="label">Type</div>
-        <div class="value"><%= receipt.details.donation_type %></div>
-        <div class="label">Purpose</div>
-        <div class="value"><%= receipt.details.purpose || "NA" %></div>
-        <div class="label">Anonymous</div>
-        <div class="value"><%= receipt.details.is_anonymous ? "Yes" : "No" %></div>
-      </div>
+    <div class="footer-section">
+        <div class="bilingual-thanks">
+            <p style="margin: 0;">நன்றி! தங்கள் கருணைக்கு மிக்க நன்றி!</p>
+            <p style="margin: 4px 0;">Thank you for your generous donation. May Lord Veeramathi Amman bless you abundantly.</p>
+        </div>
+
+        <div class="qr-placeholder">
+            [QR CODE]
+        </div>
+
+        <p style="margin-top: 12px;">Verify receipt at: <%= temple.website_url || "" %></p>
+        <p style="font-size: 10px; color: var(--text-muted);">This is a digitally signed computer generated receipt. For discrepancies, contact support within 7 days.</p>
+        <p style="font-size: 10px;">Generated At: <%= generatedAt %> | Status: <%= receipt.payment.status || "" %></p>
+    </div>
+
+    <% if (renderMode === "html") { %>
+    <div class="action-buttons">
+        <button class="btn" data-action="share-receipt" data-url="<%= shareLink %>" data-title="Receipt <%= receipt.receipt_number || "" %>">Share Receipt</button>
+        <a class="btn" href="<%= downloadLink %>" style="background-color: var(--text-dark); text-decoration: none;">Download Receipt</a>
     </div>
     <% } %>
 
-    <% if (receipt.receipt_type === "hall_booking") { %>
-    <div class="section">
-      <div class="title">Hall Booking</div>
-      <div class="grid">
-        <div class="label">Hall</div>
-        <div class="value"><%= receipt.details.hall_name %></div>
-        <div class="label">Date</div>
-        <div class="value"><%= receipt.details.booking_date %></div>
-        <div class="label">Time</div>
-        <div class="value"><%= receipt.details.start_time %> - <%= receipt.details.end_time %></div>
-        <div class="label">Event</div>
-        <div class="value"><%= receipt.details.event_type || "NA" %></div>
-        <div class="label">Guests</div>
-        <div class="value"><%= receipt.details.expected_guests || "NA" %></div>
-        <div class="label">Food Required</div>
-        <div class="value"><%= receipt.details.food_required ? "Yes" : "No" %></div>
-        <div class="label">Meals</div>
-        <div class="value"><%= receipt.details.food_meals && receipt.details.food_meals.length ? receipt.details.food_meals.join(", ") : "NA" %></div>
-      </div>
-    </div>
-    <% } %>
+</div>
 
-    <% if (receipt.receipt_type === "pooja_booking") { %>
-    <div class="section">
-      <div class="title">Pooja Booking</div>
-      <div class="grid">
-        <div class="label">Pooja</div>
-        <div class="value"><%= receipt.details.pooja_name %></div>
-        <div class="label">Date</div>
-        <div class="value"><%= receipt.details.booking_date %></div>
-        <div class="label">Time</div>
-        <div class="value"><%= receipt.details.booking_time %></div>
-        <div class="label">Devotee</div>
-        <div class="value"><%= receipt.details.devotee_name %></div>
-        <div class="label">Gotra</div>
-        <div class="value"><%= receipt.details.gotra || "NA" %></div>
-        <div class="label">Nakshatra</div>
-        <div class="value"><%= receipt.details.nakshatra || "NA" %></div>
-        <div class="label">Special Instructions</div>
-        <div class="value"><%= receipt.details.special_instructions || "NA" %></div>
-      </div>
-    </div>
-    <% } %>
+<% if (renderMode === "html") { %>
+<script>
+  (function () {
+    var shareBtn = document.querySelector('[data-action="share-receipt"]');
+    if (!shareBtn) return;
 
-    <div class="footer">
-      This is a computer generated receipt. Please keep it for future reference.
-    </div>
-  </div>
+    shareBtn.addEventListener("click", function () {
+      var url = shareBtn.getAttribute("data-url") || window.location.href;
+      var title = shareBtn.getAttribute("data-title") || "Temple Receipt";
+
+      if (navigator.share) {
+        navigator.share({ title: title, url: url }).catch(function () {});
+        return;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          alert("Receipt link copied.");
+        });
+        return;
+      }
+
+      window.prompt("Copy this link:", url);
+    });
+  })();
+</script>
+<% } %>
+
 </body>
 </html>

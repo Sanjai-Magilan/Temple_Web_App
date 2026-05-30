@@ -274,11 +274,16 @@
                                         Booked on: <%= new Date(booking.created_at).toLocaleDateString() %>
                                     </small>
                                     <% if (booking.payment_status==='completed' ) { %>
-                                        <div class="mt-2">
+                                        <div class="mt-2 d-grid gap-2">
                                             <a href="/bookings/hall/<%= booking.id %>/receipt"
                                                 class="btn btn-sm btn-outline-warning w-100"
                                                 style="color: #bfa15f; border-color: #bfa15f; font-weight: 500;">
                                                 <i class="bi bi-download me-1"></i> Download Receipt
+                                            </a>
+                                            <a href="/bookings/hall/<%= booking.id %>/receipt/view"
+                                                class="btn btn-sm btn-outline-dark w-100"
+                                                style="font-weight: 500;">
+                                                <i class="bi bi-share me-1"></i> Share Receipt
                                             </a>
                                         </div>
                                         <% } %>

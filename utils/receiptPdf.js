@@ -97,7 +97,11 @@ process.once("exit", () => {
 });
 
 exports.renderReceiptPdf = async (receipt) => {
-  const html = await ejs.renderFile(templatePath, { receipt }, { async: true });
+  const html = await ejs.renderFile(
+    templatePath,
+    { receipt, renderMode: "pdf" },
+    { async: true },
+  );
 
   const page = await acquirePage();
   try {

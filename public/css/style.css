@@ -62,7 +62,7 @@ body {
    =========================== */
 
 .nav-bar {
-    background-color: #ffffff;
+    
     padding: 0 40px;
     border-bottom: 1px solid #e0d8c8;
     display: flex;
@@ -71,6 +71,8 @@ body {
     height: 70px;
     width: 100%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+     background-image: url(../../Image/Nav_BG.jpg);
+    background-size: cover;
 }
 
 /* LEFT */
@@ -87,7 +89,7 @@ body {
 .temple-brand-name {
     font-size: 18px;
     font-weight: 700;
-    color: #2c2c2c;
+    color: #ffffff;
 }
 
 .temple-brand-tagline {
@@ -118,7 +120,7 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: #666;
+    color: #ffffff;
     padding: 24px 18px;
     font-size: 15px;
     font-weight: 500;
@@ -133,11 +135,13 @@ body {
 .nav-links a:hover {
     color: #333;
     background-color: #f9f7f4;
+    
+   
 }
 
 /* Active → text & bg */
 .nav-links a.active {
-    color: #333;
+    color: #ffffff;
     background-color: #f9f7f4;
 }
 
@@ -521,7 +525,7 @@ body {
    FOOTER
    =========================== */
 .page-footer {
-    background-color: #f5f1e8;
+   background-color: #f5f1e8;
     padding: 24px 32px;
     border-top: 1px solid #e0d8c8;
 }

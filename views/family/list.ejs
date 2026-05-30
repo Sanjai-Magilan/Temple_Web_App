@@ -10,10 +10,14 @@
     --donation-card: #fffaf5;
   }
 
-  body {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
-    background-size: cover !important;
+  
+   
+      body {
+        background:
+          linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+           background-size: cover !important;
+      
     min-height: 100vh;
   }
 
@@ -25,26 +29,28 @@
   .family-page-title {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    color: #f8f9fa;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: rgb(120, 53, 15);
+    text-shadow: none;
   }
 
   .btn-gold {
-    background: var(--donation-gold);
-    border-color: var(--donation-gold);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+    background-color: transparent;
+    border: 1px solid transparent;
     color: #fff;
     font-weight: 600;
     border-radius: 8px;
     padding: 0.6rem 1.2rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .btn-gold:hover {
-    color: #fff;
-    background: var(--donation-gold-dark);
-    border-color: var(--donation-gold-dark);
+    color: rgb(120, 53, 15);
+    background-image: none;
+    background-color: #fff;
+    border-color: rgb(229, 231, 235);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+    box-shadow: none;
   }
 
   .card {

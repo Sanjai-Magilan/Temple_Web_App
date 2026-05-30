@@ -240,6 +240,197 @@
     }
   </style>
 
+  <style>
+    :root {
+      --card-fill: #FFFFFF;
+      --text-main: #1E1E24;
+      --text-muted: #71717A;
+      --accent: #f72f42;
+      --accent-dark: #d92234;
+      --border-soft: rgba(30, 30, 36, 0.12);
+      --shadow-soft: 0 24px 70px rgba(19, 17, 23, 0.14);
+      --reference-gradient: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+      --reference-title: rgb(120, 53, 15);
+      --reference-divider: rgb(229, 231, 235);
+    }
+
+    .modal-overlay {
+      position: relative;
+      min-height: calc(100vh - 70px);
+      background:
+        linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+        url('/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+      padding: 36px 16px 42px;
+    }
+
+    .booking-modal {
+      max-width: 760px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      padding: 34px 34px 30px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.64);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .close-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-muted);
+      background: rgba(113, 113, 122, 0.08);
+      transition: all .2s ease;
+    }
+
+    .close-btn:hover {
+      color: var(--text-main);
+      background: rgba(247, 47, 66, 0.12);
+    }
+
+    .booking-title {
+      color: var(--reference-title);
+      font-size: 2rem;
+      letter-spacing: .2px;
+    }
+
+    .booking-subtitle {
+      color: var(--text-muted);
+      max-width: 34rem;
+      margin: 8px auto 28px;
+    }
+
+    .form-label {
+      color: var(--text-main);
+      font-size: .84rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .form-input {
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      color: var(--text-main);
+      background: var(--card-fill);
+      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+    .form-input::placeholder {
+      color: #a1a1aa;
+    }
+
+    .form-input:focus {
+      border-color: rgba(217, 119, 6, 0.52);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12);
+    }
+
+    .amount-symbol {
+      color: var(--reference-title);
+      font-weight: 700;
+    }
+
+    .amount-input {
+      color: var(--reference-title);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.05), rgba(245, 158, 11, 0.01));
+    }
+
+    .btn-book {
+      border: 1px solid transparent;
+      background-image: var(--reference-gradient);
+      background-color: transparent;
+      box-shadow: 0 14px 28px rgba(217, 119, 6, 0.24);
+      font-size: .98rem;
+      font-weight: 700;
+      border-radius: 14px;
+      transition: all .2s ease;
+    }
+
+    .btn-book:hover {
+      transform: translateY(-1px);
+      background-image: none;
+      background-color: #fff;
+      color: var(--reference-title);
+      border-color: var(--reference-divider);
+      box-shadow: none;
+    }
+
+    .btn-book:focus-visible,
+    .btn-book:active {
+      outline: none;
+      background-image: none;
+      background-color: #fff;
+      color: var(--reference-title);
+      border-color: var(--reference-divider);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+    }
+
+    .btn-book:disabled {
+      background: #e4e4e7;
+      border-color: #e4e4e7;
+      color: #a1a1aa;
+    }
+
+    .cancel-link {
+      color: var(--text-muted);
+      font-size: .95rem;
+    }
+
+    .cancel-link:hover {
+      color: var(--reference-title);
+    }
+
+    .btn-accent {
+      background-image: var(--reference-gradient);
+      background-color: transparent;
+      border-color: transparent;
+      color: #fff;
+      border-width: 2px;
+    }
+
+    .btn-accent:hover {
+      color: var(--reference-title);
+      background-image: none;
+      background-color: #fff;
+      border-color: var(--reference-divider);
+    }
+
+    .btn-accent:focus-visible,
+    .btn-accent:active {
+      outline: none;
+      color: var(--reference-title);
+      background-image: none;
+      background-color: #fff;
+      border-color: var(--reference-divider);
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+    }
+
+    .row-2 {
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-overlay {
+        padding: 18px 12px 28px;
+      }
+
+      .booking-modal {
+        padding: 26px 18px 22px;
+        border-radius: 22px;
+      }
+
+      .booking-title {
+        font-size: 1.65rem;
+      }
+
+      .row-2 {
+        flex-direction: column;
+      }
+    }
+  </style>
+
   <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
     <!-- ===== POPUP ===== -->
@@ -254,7 +445,7 @@
         <!-- Header -->
         <h2 class="booking-title">Book a Pooja</h2>
         <p class="booking-subtitle">
-          A Guide to Daily Rituals and Divine Connection
+          Choose a sacred service, share the details, and continue to payment.
         </p>
 
         <!-- Form -->

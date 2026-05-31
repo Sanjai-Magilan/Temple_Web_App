@@ -524,7 +524,9 @@ body {
 ========================= */
 
 .landing-updates-panel {
-    background: #fff;
+    position: relative;
+    overflow: hidden;
+    background: url('/views/Image/Auth_BG.jpg') center center / cover no-repeat;
     border-radius: 26px;
     padding: 26px 28px;
     max-height: 520px;
@@ -532,13 +534,27 @@ body {
     height: 480px;
     /* fixed height = more scroll */
     overflow-y: auto;
+    color: #ffffff;
+}
+
+.landing-updates-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.42);
+    pointer-events: none;
+}
+
+.landing-updates-panel > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* Title */
 .landing-updates-panel h3 {
     margin-top: 0;
     margin-bottom: 18px;
-    color: var(--heading-dark);
+    color: #ffffff;
     font-size: 20px;
 }
 
@@ -562,6 +578,7 @@ body {
     margin-bottom: 16px;
     line-height: 1.5;
     position: relative;
+    color: #ffffff;
 }
 
 /* NEW badge */
@@ -577,7 +594,7 @@ body {
 
 /* Links inside updates */
 .landing-updates-list a {
-    color: #6a42c2;
+    color: #ffffff;
     text-decoration: none;
 }
 

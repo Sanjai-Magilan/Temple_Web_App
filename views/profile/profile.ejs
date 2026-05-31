@@ -5,12 +5,39 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
 
+      <style>
+        .profile-action-btn {
+          background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+          color: #fff;
+          border: 1px solid transparent;
+          border-radius: 14px;
+          box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
+          transition: all 0.2s ease-in-out;
+        }
+
+        .profile-action-btn:hover,
+        .profile-action-btn:focus-visible,
+        .profile-action-btn:active {
+          background-image: none;
+          background-color: #fff;
+          border: 1px solid rgb(120, 53, 15) !important;
+          color: rgb(120, 53, 15) !important;
+          box-shadow: none;
+          transform: translateY(-1px);
+          outline: none;
+        }
+
+        .profile-action-btn.btn-sm {
+          padding: 0.35rem 0.8rem;
+        }
+      </style>
+
       <div class="card shadow rounded-3 overflow-hidden">
 
         <!-- Header -->
         <div 
           class="card-header text-white d-flex justify-content-between align-items-center"
-          style="background: linear-gradient(135deg, #d1b570, #b8964f);"
+          style="background:  linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));"
         >
           <h5 class="mb-0">
             <i class="bi bi-person-circle"></i> My Profile
@@ -73,8 +100,7 @@
             <!-- Save Section -->
             <div class="text-end d-none" id="saveSection">
               <button type="submit" 
-                      class="btn text-white px-4"
-                      style="background-color:#d1b570;">
+                      class="btn text-white px-4 profile-action-btn">
                 <i class="bi bi-save"></i> Save Changes
               </button>
             </div>

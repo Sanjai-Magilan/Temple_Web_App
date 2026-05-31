@@ -5,66 +5,86 @@
 
         /* Page Background Overrides */
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+           background : linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/views/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+     
             background-size: cover !important;
             /* font-family: 'Inter', sans-serif !important; */
             min-height: 100vh;
         }
+        
+               
 
         /* Page Title styling */
         .page-title {
-            color: #f8f9fa;
+            color: rgb(120, 53, 15);
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: none;
         }
 
         .btn-gold {
-            background-color: #bfa15f;
-            border-color: #bfa15f;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-width: 2px;
             color: white;
-            padding: 0.6rem 1.2rem;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s;
+            border-radius: 14px;
+            font-weight: 700;
+            box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
         }
 
         .btn-gold:hover {
-            background-color: #a88b4d;
-            border-color: #a88b4d;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+            color: rgb(120, 53, 15);
+            background-image: none;
+            background-color: #fff;
+            border: 1px solid rgb(123, 53, 15);
+            box-shadow: none;
+        }
+
+        .pagination .page-link {
+            color: rgb(120, 53, 15);
+            border-color: rgb(229, 231, 235);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border-color: rgb(229, 231, 235);
+            color: #fff;
         }
 
         /* Card Hover Effects and Styling */
         .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: #FFFBF5;
-            border: none;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
             overflow: hidden;
+            box-shadow: 0 24px 70px rgba(19, 17, 23, 0.14);
         }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+            transform: translateY(-4px);
+            box-shadow: 0 28px 56px rgba(19, 17, 23, 0.16) !important;
             z-index: 10;
         }
 
         /* Modal Specific Styles */
         .modal-content {
-            background: #FFFBF5;
-            border-radius: 20px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 24px 70px rgba(19, 17, 23, 0.14);
         }
 
         .modal-header {
             border-bottom: none;
-            padding: 2rem 2rem 0;
+            padding: 2.25rem 2rem 0;
             text-align: center;
             display: block;
         }
@@ -76,7 +96,7 @@
         .donation-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
-            color: #2c241b;
+            color: rgb(120, 53, 15);
             font-weight: 700;
             margin-bottom: 0.2rem;
         }
@@ -106,18 +126,18 @@
             width: 100%;
             padding: 0.8rem 1rem;
             font-size: 1rem;
-            color: #2c241b;
+            color: rgb(120, 53, 15);
             background-color: #fff;
-            border: 1px solid #e0d8cc;
-            border-radius: 10px;
+            border: 1px solid rgba(30, 30, 36, 0.12);
+            border-radius: 14px;
             transition: all 0.2s ease-in-out;
         }
 
         .form-control-custom:focus,
         .form-select-custom:focus {
-            border-color: #bfa15f;
+            border-color: rgba(217, 119, 6, 0.52);
             outline: 0;
-            box-shadow: 0 0 0 4px rgba(191, 161, 95, 0.1);
+            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12);
         }
 
         .amount-wrapper {
@@ -129,7 +149,7 @@
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #5d5145;
+            color: rgb(120, 53, 15);
             font-weight: 600;
         }
 
@@ -137,7 +157,7 @@
             padding-left: 2rem;
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            color: #bfa15f;
+            color: rgb(120, 53, 15);
             font-size: 1.2rem;
         }
 
@@ -162,19 +182,71 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
-            background-color: #bfa15f;
-            border: none;
-            border-radius: 10px;
+            background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             margin-top: 1rem;
             font-family: 'Inter', sans-serif;
+            box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
         }
 
         .btn-submit-custom:hover {
-            background-color: #a88b4d;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(168, 139, 77, 0.2);
+            color: rgb(120, 53, 15);
+            background-image: none;
+            background-color: #fff;
+            border: 1px solid rgb(123, 53, 15);
+            box-shadow: none;
+        }
+
+        .btn-submit-custom:focus-visible,
+        .btn-submit-custom:active {
+            outline: none;
+            color: rgb(120, 53, 15);
+            background-image: none;
+            background-color: #fff;
+            border-color: rgb(229, 231, 235);
+            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+        }
+
+        .card-header {
+            background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+            color: #fff;
+            border-bottom: 1px solid rgb(229, 231, 235);
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 16px 18px;
+        }
+
+        .card-title {
+            color: rgb(120, 53, 15) !important;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .card-footer {
+            padding: 10px 16px 14px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .empty-donation-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 24px 70px rgba(19, 17, 23, 0.14);
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                border-radius: 22px;
+            }
         }
     </style>
 
@@ -200,7 +272,7 @@
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
                             <div class="card h-100 shadow-sm">
                                 <div class="card-header text-white"
-                                    style="background:linear-gradient(90deg, #bfa15f, #a88b4d);">
+                                    style="background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)); border-bottom: 1px solid rgb(229, 231, 235);">
                                     <h6 class="mb-0 d-flex justify-content-between align-items-center">
                                         <span>₹<%= donation.amount.toLocaleString() %></span>
                                         <span class="badge bg-white text-dark" style="font-size: 0.7em;">
@@ -209,7 +281,7 @@
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title" style="font-family: 'Playfair Display', serif; color: #333;">
+                                    <h5 class="card-title" style="font-family: 'Playfair Display', serif; color: rgb(120, 53, 15);">
                                         <%= donation.donation_type.charAt(0).toUpperCase() +
                                             donation.donation_type.slice(1).replace('_', ' ' ) %>
                                     </h5>
@@ -241,7 +313,7 @@
                                     <div class="card-footer bg-transparent border-top-0 pb-3">
                                         <a href="/donations/<%= donation.id %>/receipt"
                                             class="btn btn-sm btn-outline-warning w-100"
-                                            style="color: #bfa15f; border-color: #bfa15f; font-weight: 500;">
+                                            style="color: rgb(120, 53, 15); border-color: rgb(229, 231, 235); font-weight: 500;">
                                             <i class="bi bi-download me-1"></i> Download Receipt
                                         </a>
                                     </div>
@@ -257,8 +329,7 @@
                         <ul class="pagination justify-content-center">
                             <!-- Previous -->
                             <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="/donations?page=<%= currentPage - 1 %>" aria-label="Previous"
-                                    style="color: #bfa15f;">
+                                <a class="page-link" href="/donations?page=<%= currentPage - 1 %>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -266,8 +337,7 @@
                             <!-- Page Numbers -->
                             <% for(let i=1; i <=totalPages; i++) { %>
                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                    <a class="page-link" href="/donations?page=<%= i %>"
-                                        style="<%= currentPage === i ? 'background-color: #bfa15f; border-color: #bfa15f; color: white;' : 'color: #bfa15f;' %>">
+                                    <a class="page-link" href="/donations?page=<%= i %>">
                                         <%= i %>
                                     </a>
                                 </li>
@@ -276,7 +346,7 @@
                                     <!-- Next -->
                                     <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
                                         <a class="page-link" href="/donations?page=<%= currentPage + 1 %>"
-                                            aria-label="Next" style="color: #bfa15f;">
+                                            aria-label="Next">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
@@ -287,7 +357,7 @@
                             <div class="row">
                                 <div class="col-12 col-md-6 offset-md-3">
                                     <div class="card text-center py-4 shadow-lg border-0"
-                                        style="background: rgba(255, 255, 255, 0.95); border-radius: 20px;">
+                                                style="background: rgba(255, 255, 255, 0.95); border-radius: 24px;">
                                         <div class="card-body">
                                             <i class="bi bi-heart text-muted" style="font-size: 3rem;"></i>
                                             <h4 class="mt-3" style="font-family: 'Playfair Display', serif;">No
@@ -314,7 +384,7 @@
                     <div class="modal-header">
                         <div class="header-icon-wrapper"
                             style="width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                            <i class="bi bi-heart-fill" style="font-size: 1.5rem; color: #bfa15f;"></i>
+                            <i class="bi bi-heart-fill" style="font-size: 1.5rem; color: rgb(120, 53, 15);"></i>
                         </div>
                         <h5 class="donation-title" id="newDonationModalLabel">Make a Donation</h5>
                         <p class="donation-subtitle">Support our spiritual activities and community services</p>

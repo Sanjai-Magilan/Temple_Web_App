@@ -3,18 +3,18 @@
 
 <style>
   :root {
-    --donation-gold: #bfa15f;
-    --donation-gold-dark: #a88b4d;
-    --donation-ink: #2c241b;
-    --donation-muted: #8c7b65;
-    --donation-card: #fffaf5;
+    --family-gold: rgb(191, 161, 95);
+    --family-gold-dark: rgb(168, 139, 77);
+    --family-ink: #3f352b;
+    --family-muted: #6b5b4d;
+    --family-card: #fffaf5;
   }
 
   body {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-      url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
-    background-size: cover !important;
-    min-height: 100vh;
+    background:
+ linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/views/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+           background-size: cover !important;
   }
 
   .family-page-shell {
@@ -25,45 +25,47 @@
   .family-page-title {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    color: #f8f9fa;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: rgb(120, 53, 15);
+    text-shadow: none;
   }
 
   .btn-gold {
-    background: var(--donation-gold);
-    border-color: var(--donation-gold);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+    background-color: transparent;
+    border: 1px solid transparent;
     color: #fff;
     font-weight: 600;
     border-radius: 8px;
     padding: 0.6rem 1.2rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .btn-gold:hover {
-    color: #fff;
-    background: var(--donation-gold-dark);
-    border-color: var(--donation-gold-dark);
+    color: rgb(120, 53, 15);
+    background-image: none;
+    background-color: #fff;
+     border: 1px solid rgb(123, 53, 15);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(168, 139, 77, 0.3);
+    box-shadow: none;
   }
 
   .card {
-    background: var(--donation-card);
-    border: none;
-    border-radius: 15px;
+    background: var(--family-card);
+    border: 1px solid rgba(191, 161, 95, 0.15);
+    border-radius: 18px;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 12px 28px rgba(44, 36, 27, 0.09);
   }
 
   .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-6px);
+    box-shadow: 0 18px 36px rgba(19, 17, 23, 0.18) !important;
     z-index: 10;
   }
 
   .card-header {
-    background: linear-gradient(90deg, #bfa15f, #a88b4d) !important;
+    background: linear-gradient(90deg, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
     color: #fff !important;
     border-bottom: none;
   }
@@ -73,10 +75,10 @@
   }
 
   .setup-empty-card {
-    background: var(--donation-card);
-    border: 1px solid rgba(191, 161, 95, 0.22);
+    background: var(--family-card);
+    border: 1px solid rgba(191, 161, 95, 0.18);
     border-radius: 22px;
-    box-shadow: 0 20px 38px rgba(44, 36, 27, 0.14);
+    box-shadow: 0 20px 38px rgba(44, 36, 27, 0.12);
     width: 100%;
     max-width: 560px;
     min-height: 313px;
@@ -87,7 +89,7 @@
   }
 
   .setup-empty-header {
-    background: linear-gradient(135deg,  );
+    background: linear-gradient(135deg, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
     color: #fff;
     text-align: center;
     padding: 1.4rem 1.2rem;
@@ -97,6 +99,8 @@
     margin: 0;
     font-family: 'Playfair Display', serif;
     font-size: 1.55rem;
+    font-weight: 700;
+    color: rgb(120, 53, 15);
   }
 
   .setup-empty-body {
@@ -105,7 +109,8 @@
   }
 
   .setup-empty-subtitle {
-    color: #6b5b4d;
+    font-family: 'Inter', sans-serif;
+    color: var(--family-muted);
     margin: 0.85rem auto 1.4rem;
     max-width: 420px;
   }
@@ -119,7 +124,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(191, 161, 95, 0.16);
-    color: var(--donation-gold-dark);
+    color: var(--family-gold-dark);
     font-size: 1.5rem;
   }
 
@@ -179,7 +184,7 @@
   }
 
   .modal-content {
-    background: var(--donation-card);
+    background: var(--family-card);
     border-radius: 20px;
     border: 1px solid rgba(212, 175, 55, 0.2);
   }
@@ -411,7 +416,7 @@
           
           <div class="setup-empty-body">
             <div class="setup-empty-icon"><i class="bi bi-house-heart"></i></div>
-            <h5 class="mt-2 mb-1">No Family Found</h5>
+            <h5 class="setup-empty-title mt-2 mb-1">No Family Found</h5>
             <p class="setup-empty-subtitle">Please complete family setup </p>
             <a href="/family/setup" class="btn btn-gold mt-1">
               Setup Family

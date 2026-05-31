@@ -9,7 +9,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f1e8;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1596627706352-78d91c12d4d8?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
     color: #333;
     line-height: 1.6;
 }
@@ -160,7 +161,7 @@ body {
 }
 
 .detail-card {
-    background: #e8e0d0;
+    background: #fffcf5;
     padding: 36px 32px;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -173,8 +174,25 @@ body {
     font-size: 19px;
     font-weight: 600;
     margin-bottom: 32px;
-    color: #2c2c2c;
+    color: rgb(120, 53, 15);
     letter-spacing: -0.3px;
+}
+
+.detail-card .btn-primary {
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    color: #fff !important;
+    transition: all 0.2s ease;
+}
+
+.detail-card .btn-primary:hover,
+.detail-card .btn-primary:focus-visible {
+    background-image: none !important;
+    background-color: #fff !important;
+    border-color: rgb(229, 231, 235) !important;
+    color: rgb(120, 53, 15) !important;
+    box-shadow: none !important;
 }
 
 .detail-content {
@@ -254,7 +272,8 @@ body {
 .section-title {
     font-size: 20px;
     font-weight: 600;
-    color: #2c2c2c;
+    font-family: 'Playfair Display', serif;
+    color: rgb(120, 53, 15);
     margin-bottom: 24px;
     padding-left: 4px;
 }

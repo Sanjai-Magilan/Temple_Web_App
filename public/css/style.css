@@ -453,14 +453,22 @@ body {
 }
 
 .landing-hero-primary:hover,
+.landing-hero-primary:focus-visible,
+.landing-hero-primary:active {
+    background-image: none !important;
+    background-color: #fff !important;
+    color: rgb(120, 53, 15) !important;
+    border-color: ipx solid rgb(120, 53, 15) !important;
+    box-shadow: none !important;
+    transform: translateY(-1px);
+}
+
 .landing-hero-secondary:hover,
 .landing-nav-primary:hover,
 .landing-nav-secondary:hover,
-.landing-hero-primary:focus-visible,
 .landing-hero-secondary:focus-visible,
 .landing-nav-primary:focus-visible,
 .landing-nav-secondary:focus-visible,
-.landing-hero-primary:active,
 .landing-hero-secondary:active,
 .landing-nav-primary:active,
 .landing-nav-secondary:active {

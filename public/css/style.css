@@ -267,7 +267,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--surface-primary);
+    background: url('/views/Image/Nav_BG.jpg') center center / cover no-repeat;
     position: relative;
     z-index: 10;
 }
@@ -276,7 +276,7 @@ body {
 .landing-logo {
     font-weight: 600;
     font-size: 18px;
-    color: var(--heading-dark);
+    color: #ffffff;
 }
 
 /* =========================
@@ -287,7 +287,7 @@ body {
     padding: 6px 12px;
     cursor: pointer;
     position: relative;
-    color: var(--text-main);
+    color: #ffffff;
     font-size: 14.5px;
     transition: color 0.2s ease;
     text-decoration: none;
@@ -295,7 +295,7 @@ body {
 
 /* Hover state */
 .landing-nav-links a:hover {
-    color: var(--heading-dark);
+    color: #ffffff;
 }
 
 /* Underline indicator */
@@ -306,7 +306,7 @@ body {
     bottom: -6px;
     width: 0;
     height: 2px;
-    background: var(--accent);
+    background: #ffffff;
     border-radius: 2px;
     transform: translateX(-50%);
     transition: width 0.25s ease;
@@ -319,7 +319,7 @@ body {
 
 /* Active (Home) */
 .landing-nav-links a.active {
-    color: var(--heading-dark);
+    color: #ffffff;
     font-weight: 600;
 }
 
@@ -359,25 +359,33 @@ body {
 
 /* Register */
 .landing-nav-secondary {
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--heading-dark);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    color: #ffffff !important;
 }
 
 .landing-nav-secondary:hover {
-    background: rgba(201, 181, 156, 0.15);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
 }
 
 /* Login */
 .landing-nav-primary {
-    background: var(--accent);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18) !important;
 }
 
 .landing-nav-primary:hover {
-    background: #bfa889;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border-color: rgb(123, 53, 15) !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.22) !important;
 }
 
 /* =========================
@@ -410,7 +418,7 @@ body {
 .landing-hero-content h1 {
     font-size: 56px;
     margin-bottom: 10px;
-    color: var(--heading-dark);
+    color: rgb(120, 53, 15);
 }
 
 .landing-hero-tagline {
@@ -430,14 +438,64 @@ body {
 
 /* Hero buttons */
 .landing-hero-primary {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18) !important;
 }
 
 .landing-hero-secondary {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid var(--accent);
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    color: #fff !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.14) !important;
+}
+
+.landing-hero-primary:hover,
+.landing-hero-secondary:hover,
+.landing-nav-primary:hover,
+.landing-nav-secondary:hover,
+.landing-hero-primary:focus-visible,
+.landing-hero-secondary:focus-visible,
+.landing-nav-primary:focus-visible,
+.landing-nav-secondary:focus-visible,
+.landing-hero-primary:active,
+.landing-hero-secondary:active,
+.landing-nav-primary:active,
+.landing-nav-secondary:active {
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    border-color: rgb(123, 53, 15) !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.22) !important;
+    transform: translateY(-1px);
+}
+
+.landing-nav-primary,
+.landing-nav-secondary {
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    border: 1px solid transparent !important;
+}
+
+.btn-auth {
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    border: 1px solid transparent !important;
+}
+
+.btn-auth:hover,
+.btn-auth:focus-visible,
+.btn-auth:active {
+    background-image: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)) !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    border-color: rgb(123, 53, 15) !important;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.22) !important;
+    transform: translateY(-1px);
 }
 
 /* =========================

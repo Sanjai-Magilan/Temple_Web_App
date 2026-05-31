@@ -69,7 +69,7 @@
         padding: 10px 16px;
         font-size: 13px;
         font-weight: 600;
-        color: #2c241b;
+        color: rgb(120, 53, 15);
       }
 
       /* ===== CARD BODY ===== */
@@ -294,6 +294,190 @@
       }
     </style>
 
+    <style>
+      :root {
+        --card-fill: #FFFFFF;
+        --text-main: #1E1E24;
+        --text-muted: #71717A;
+        --accent: #f72f42;
+        --accent-dark: #d92234;
+        --border-soft: rgba(30, 30, 36, 0.12);
+        --shadow-soft: 0 24px 70px rgba(19, 17, 23, 0.14);
+        --reference-gradient: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6));
+        --reference-title: rgb(120, 53, 15);
+        --reference-divider: rgb(229, 231, 235);
+      }
+
+      body {
+        background:
+          linear-gradient(180deg, rgba(255, 250, 243, 0.30), rgba(255, 247, 238, 0.38)),
+          url('/views/Image/Background_Theme_1.jpg') center center / cover no-repeat fixed;
+           background-size: cover !important;
+      }
+
+      .page-title {
+        color: var(--reference-title);
+        text-shadow: none;
+      }
+
+      .btn-gold,
+      .btn-submit-custom {
+        background-image: var(--reference-gradient);
+        background-color: transparent;
+        border-color: transparent;
+        border-width: 2px;
+        color: #fff;
+        border-radius: 14px;
+        font-weight: 700;
+        box-shadow: 0 14px 28px rgba(217, 119, 6, 0.18);
+      }
+
+      .btn-gold:hover,
+.btn-submit-custom:hover {
+    color: var(--reference-title);
+    background-image: none;
+    background-color: #fff;
+    border: 1px solid rgb(123, 53, 15);
+    box-shadow: none;
+}
+
+      .btn-gold:focus-visible,
+      .btn-submit-custom:focus-visible,
+      .btn-gold:active,
+      .btn-submit-custom:active {
+        outline: none;
+        color: var(--reference-title);
+        background-image: none;
+        background-color: #fff;
+        border-color: var(--reference-divider);
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+      }
+
+      .pooja-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .pooja-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 28px 56px rgba(19, 17, 23, 0.16);
+      }
+
+      .pooja-header {
+        background: var(--reference-gradient);
+        color: #fff;
+        border-bottom: 1px solid var(--reference-divider);
+      }
+
+      .card-title,
+      .booking-title,
+      .modal-content .booking-title {
+        color: var(--reference-title);
+      }
+
+      .info-line,
+      .card-footer {
+        color: var(--text-muted);
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.75);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .modal-header {
+        padding-top: 2.25rem;
+      }
+
+      .form-label-custom {
+        color: var(--text-main);
+      }
+
+      .form-control-custom,
+      .form-select-custom {
+        border-radius: 14px;
+        border: 1px solid var(--border-soft);
+        color: var(--text-main);
+      }
+
+      .form-control-custom:focus,
+      .form-select-custom:focus {
+        border-color: rgba(217, 119, 6, 0.52);
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12);
+      }
+
+      .amount-symbol {
+        color: var(--reference-title);
+      }
+
+      .amount-input {
+        color: var(--reference-title);
+      }
+
+      .badge-pending {
+        background: rgba(247, 47, 66, 0.12);
+        color: var(--reference-title);
+      }
+
+      .badge-confirmed {
+        background: rgba(22, 163, 74, 0.12);
+        color: #15803d;
+      }
+
+      .badge-cancelled {
+        background: rgba(220, 53, 69, 0.12);
+        color: #b91c1c;
+      }
+
+      .amount-badge {
+        background: rgba(30, 30, 36, 0.04);
+        border-color: var(--reference-divider);
+        color: var(--reference-title);
+      }
+
+      .empty-state-card {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 28px;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .btn-accent {
+        background-image: var(--reference-gradient);
+        background-color: transparent;
+        border-color: transparent;
+        border-width: 2px;
+        color: #fff;
+      }
+
+      .btn-accent:hover {
+        color: var(--reference-title);
+        background-image: none;
+        background-color: #fff;
+        border-color: var(--reference-divider);
+      }
+
+      .btn-accent:focus-visible,
+      .btn-accent:active {
+        outline: none;
+        color: var(--reference-title);
+        background-image: none;
+        background-color: #fff;
+        border-color: var(--reference-divider);
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.14);
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          border-radius: 22px;
+        }
+      }
+    </style>
+
     <%- include('../../partials/navbar', { user: typeof user !=='undefined' ? user : null }) %>
 
       <div class="container mt-4 mb-5">
@@ -328,8 +512,10 @@
 
                   <!-- HEADER -->
 
-                  <div class="pooja-header">
-                    <%= booking.booking_number %>
+                  <div class="pooja-header" style="background: linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22), rgb(217, 119, 6)); border-bottom: 1px solid rgb(229, 231, 235);">
+                    <h6 class="mb-0">
+                      <%= booking.booking_number %>
+                    </h6>
                   </div>
 
                   <!-- BODY -->

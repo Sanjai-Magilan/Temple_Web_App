@@ -190,6 +190,68 @@ exports.createSetup = async (req, res) => {
     const context = await buildSetupContext(req.user);
     const seed = context.formData || {};
 
+    // ==================== File Handling ====================
+    // Build a map of file field names to their uploaded filenames
+    const fileMap = {};
+    if (req.files && typeof req.files === "object") {
+      // req.files is an object with fieldName as key and array of files as value
+      Object.keys(req.files).forEach((fieldName) => {
+        if (
+          Array.isArray(req.files[fieldName]) &&
+          req.files[fieldName].length > 0
+        ) {
+          fileMap[fieldName] = req.files[fieldName][0].filename;
+        }
+      });
+    }
+
+    // Get image paths for standard fields
+    const selfImagePath = fileMap["self_profile_image"]
+      ? "/uploads/family-members/" + fileMap["self_profile_image"]
+      : null;
+    const fatherImagePath = fileMap["father_profile_image"]
+      ? "/uploads/family-members/" + fileMap["father_profile_image"]
+      : null;
+    const motherImagePath = fileMap["mother_profile_image"]
+      ? "/uploads/family-members/" + fileMap["mother_profile_image"]
+      : null;
+
+    // ==================== Parse Extra Members JSON ====================
+    let extraMembers = [];
+    if (req.body.extra_members_json) {
+      try {
+        const parsed = JSON.parse(req.body.extra_members_json);
+        if (Array.isArray(parsed)) {
+          extraMembers = parsed.map((member) => {
+            // Get the uploaded image filename if one exists for this member
+            const imageFieldName =
+              member.imageField || `extra_member_image_${member.index || 0}`;
+            const uploadedFilename = fileMap[imageFieldName];
+            const imagePath = uploadedFilename
+              ? "/uploads/family-members/" + uploadedFilename
+              : null;
+
+            return {
+              name: String(member.name || "").trim(),
+              relationship: String(member.relationship || "").trim(),
+              mobile: String(member.mobile || "").trim(),
+              occupation: String(member.occupation || "").trim(),
+              dob: String(member.dob || "").trim(),
+              age: member.age ? parseInt(member.age, 10) : null,
+              imagePath: imagePath,
+            };
+          });
+        }
+      } catch (parseError) {
+        console.warn(
+          "Could not parse extra_members_json, using empty array:",
+          parseError.message,
+        );
+        extraMembers = [];
+      }
+    }
+
+    // ==================== Parse Siblings JSON ====================
     const siblingsPosted = parseJsonArray(req.body.siblings_json);
     const childrenPosted = parseJsonArray(req.body.children_json);
 
@@ -202,10 +264,7 @@ exports.createSetup = async (req, res) => {
         ? childrenPosted
         : parseJsonArray(seed.children_json);
 
-    const imagePath = req.file
-      ? "/uploads/family-members/" + req.file.filename
-      : null;
-
+    // ==================== Create Family Setup ====================
     await familyModel.createFullFamilySetup({
       user_id: userId,
 
@@ -224,6 +283,7 @@ exports.createSetup = async (req, res) => {
         seed.father_occupation,
       ),
       father_gender: "male",
+      father_image_path: fatherImagePath,
 
       mother_name: pickValue(req.body.mother_name, seed.mother_name),
       mother_mobile: pickValue(req.body.mother_mobile, seed.mother_mobile),
@@ -233,6 +293,7 @@ exports.createSetup = async (req, res) => {
         req.body.mother_occupation,
         seed.mother_occupation,
       ),
+      mother_image_path: motherImagePath,
 
       self_name: pickValue(req.body.self_name, seed.self_name),
       self_mobile: pickValue(req.body.self_mobile, seed.self_mobile),
@@ -243,7 +304,7 @@ exports.createSetup = async (req, res) => {
         req.body.self_occupation,
         seed.self_occupation,
       ),
-      self_image_path: imagePath,
+      self_image_path: selfImagePath,
 
       spouse_name: pickValue(req.body.spouse_name, seed.spouse_name),
       spouse_mobile: pickValue(req.body.spouse_mobile, seed.spouse_mobile),
@@ -257,6 +318,7 @@ exports.createSetup = async (req, res) => {
 
       siblings: siblings,
       children: children,
+      extra_members: extraMembers,
     });
 
     res.redirect("/family?success=family_saved");
@@ -291,7 +353,7 @@ exports.listMembers = async (req, res) => {
         family: null,
         members: [],
         isHead: false,
-      
+
         myFamilyView: null,
         selectedMemberId: null,
         initialTree: null,

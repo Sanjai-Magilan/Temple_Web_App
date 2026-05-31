@@ -361,6 +361,60 @@ CREATE TABLE `users` (
   KEY `idx_email_otp` (`email_otp`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `persons`
+--
+
+DROP TABLE IF EXISTS `persons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `persons` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `gender` varchar(20) DEFAULT NULL,
+  `dob` date DEFAULT NULL,
+  `mobile` varchar(20) DEFAULT NULL,
+  `occupation` varchar(255) DEFAULT NULL,
+  `door_no` varchar(50) DEFAULT NULL,
+  `street` varchar(255) DEFAULT NULL,
+  `district` varchar(255) DEFAULT NULL,
+  `state` varchar(255) DEFAULT NULL,
+  `pincode` varchar(20) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_persons_user_id` (`user_id`),
+  CONSTRAINT `fk_persons_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `relationships`
+--
+
+DROP TABLE IF EXISTS `relationships`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `relationships` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `person_id` int(10) unsigned NOT NULL,
+  `related_person_id` int(10) unsigned NOT NULL,
+  `relation` varchar(50) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_relationships_user_id` (`user_id`),
+  KEY `idx_relationships_person_id` (`person_id`),
+  KEY `idx_relationships_related_person_id` (`related_person_id`),
+  KEY `idx_relationships_lookup` (`user_id`,`person_id`,`related_person_id`,`relation`),
+  CONSTRAINT `fk_relationships_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `fk_relationships_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `fk_relationships_related_person` FOREIGN KEY (`related_person_id`) REFERENCES `persons` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

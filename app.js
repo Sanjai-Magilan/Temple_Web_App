@@ -61,6 +61,7 @@ app.use((req, res, next) => {
 });
  
 // Static files
+app.use("/views/Image", express.static(path.join(__dirname, "views", "Image")));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Authentication middleware (optional - makes user available if logged in) 

@@ -184,7 +184,7 @@ body {
 }
 
 .nav-user:hover {
-    background-color: #f5f1e8;
+    background-color: #6c6a6897;
 }
 
 .nav-user-avatar {
@@ -207,11 +207,12 @@ body {
 .nav-user-name {
     font-size: 14px;
     font-weight: 600;
+    color: #ffffff;
 }
 
 .nav-user-role {
     font-size: 12px;
-    color: #999;
+    color: #c7c6c6;
 }
 
 .nav-user-dropdown {
